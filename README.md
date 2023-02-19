@@ -1,6 +1,6 @@
 # web_dev
 This repository contains the code related to web development comprising:
-JavaScript or ECMAScript,
+Vanilla JavaScript or ECMAScript,
 Hyper-Text Markup Language,
 Cascade Style Sheet,
 Structured Query Language,
