@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>ES5</title>
+		<meta charset = "utf-8">	
+	</head>
+	<body>
+		<h1>JavaScript Concepts</h1>	
+		<div>
+			<h3>Low-level Debugging</h3>
+		<p>Please open console from developer tools<br> and then
+		<a href = "vanilla.html" onclick = "console.log('console.log - A way of low level debugging');
+		alert('alert - A way of low level debugging')
+		return false;"> click me	</a>
+		<!-- alert() provides lower level of debugging -->
+		</p>
+		</div>
+		<div>
+			<h3>Ways of including JavaScript</h3>
+				<p>>>><strong>First Paragraph</strong></p>
+				<script type = "text/javascript">
+					document.write('<p>Hello World !</p>');	
+					document.write('<p>From inline < script >< /script > within HTML document</p>');
+				</script>
+				<noscript>Your browser has disabled javascript or doesn't support it.</noscript>
+		<!-- noscript tag to insert html when script is disabled or unsupported in browser -->
+				<p>>>><strong>Second Paragraph</strong></p>
+				<script src = "vanilla.js"></script>
+				<p>>>><strong>Third Paragraph</strong> </p>
+				<p><a href = "vanilla.html" onclick = "alert('JavaScript as part of an event as HTML tags attribute.');
+				return false;"> click me </a>
+		<!-- alert() provides lower level of debugging -->
+				</p>
+				<p> From < a href=''>< /a > as attribute, an event. </p>
+		</div>
+		<div>
+			<h3>JavaScript Syntax Error</h3>
+			<p>If the JavaScript Engine finds a syntax error at some stage,<br> the rest of the code in the script will be skipped and the<br> Engine will jump to execute the code in next script available.</p>
+		</div>
+		<div>
+		<h3>The Language</h3>
+		<p>Please open the web developer tool console to see javascript runs.</p><!--
+		<script src = 'vanilla.js'></script>
+		</div>		-->
+	</body>
+</html>
