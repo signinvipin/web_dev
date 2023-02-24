@@ -1,4 +1,4 @@
-'use strict';
+
 
 // JavaScript file as source to include code to HTML 
 document.write('<p>This is HTML5</p>');
@@ -19,7 +19,7 @@ console.log('Character Escaping \' with \\ -> one \'2\' three');
 console.log("x =  4\n+3.565; whitespace and newline doesn't matter");
 var x =  4 
 +3.565;
-console.log('x = '+x);
+console.log('var x = '+x);
 
 // Numeric Constants
 console.log('One type - Numeric Constant i.e,');
@@ -43,7 +43,7 @@ console.log('carName = '+carName);
 console.log('CARNAME = '+CARNAME);
 
 // Variable Conversion / type
-console.log(' y = 23; ');
+console.log('var y = 23; ');
 var y = 23;
 console.log(' y = isFinite '+isFinite(y));
 console.log('y/0 = '+y/0);
