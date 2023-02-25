@@ -60,6 +60,22 @@ const continent = 'Asia';
 let description = 'India is in Asia, and its 1371 million people speak Hindi';
 console.log(description);
 
+// Equality Operators: == vs. ===
+
+const numNeighbours = prompt('How many neighbour countries does your country have?');
+//console.log(typeof(numNeighbours));
+const numNbrs = Number(numNeighbours); // prompt user-input value is a string type
+//console.log(typeof(numNbrs));
+
+
+if (numNbrs === 1){
+	console.log('Only 1 border');
+} else if (numNbrs > 1) {
+	console.log('More than one border');
+} else {
+	console.log('No borders');
+}
+
 // Strings and Template Literals
 
 console.log(`${country} is in ${continent}, and its ${population} million people speak ${language}`);
@@ -70,4 +86,20 @@ if (language == 'English' && population < 50 && !(isIsland)) {
 	console.log('You should live in India:)');
 } else {
 	console.log("India doesn't meet your criteria:(");
+}
+
+// The switch Statement
+
+switch (language){
+	case 'Chinese':	case 'Mandarin': console.log('MOST number of native speakers!');
+	break;
+	case 'Spanish': console.log('2nd place in number of native speakers');
+	break;
+	case 'English': console.log('3rd place for English');
+	break;
+	case 'Hindi': console.log('4th place for Hindi');
+	break;
+	case 'Arabic': console.log('5th most spoken language is Arabic');
+	break;
+	default: console.log('Great language too :D');
 }
