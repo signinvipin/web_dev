@@ -32,7 +32,7 @@ const continent = 'Asia';
 const isIsland = false;
 //isIsland = true; // invalid assignment
 */
-
+/*
 // Basic Operators
 
 let population = 1370;
@@ -43,7 +43,7 @@ console.log(population);
 //Taking Decisions: if / else Statements
 let populationFinland = 6;
 if (population > populationFinland){
-   console.log("Our country's population is more.");	
+   console.log("Our country's population is more.");6[<65;59;46M]	
 } else {
 	console.log("Finlands' population is more.");
 }
@@ -103,3 +103,85 @@ switch (language){
 	break;
 	default: console.log('Great language too :D');
 }
+*/
+// Coding Challenge #1
+
+/*
+//data-1
+let markWeight = 78;
+let markHeight = 1.69;
+let johnWeight = 92;
+let johnHeight = 1.95;
+*/
+/*
+//data-2
+let markWeight = 95;
+let markHeight = 1.88;
+let johnWeight = 85;
+let johnHeight = 1.76;
+*/
+/*
+const markBMI = markWeight/(markHeight**2);
+const johnBMI = johnWeight/(johnHeight**2);
+console.log(markBMI, johnBMI);
+
+const markHigherBMI = markBMI > johnBMI;
+console.log('markHigherBMI - '+markHigherBMI);
+*/
+
+//Coding Challenge #2
+/*
+const markBMI =  markWeight/(markHeight**2);
+const johnBMI = johnWeight/(johnHeight**2);
+console.log(markBMI, johnBMI);
+
+if (markBMI > johnBMI){
+	console.log("Mark's BMI is higher than John's!");
+	console.log(`Mark's BMI(${markBMI}) is higher than John's (${johnBMI})!`);
+} else {
+	console.log("John's BMI is higher than Mark's!");
+	console.log(`John's BMI(${johnBMI}) is higher than Mark's (${markBMI})!`);
+}
+//console.log('markHigherBMI - '+markHigherBMI);
+*/
+
+// Coding Challenge #3
+
+/* data-1
+const avgScoreDolphins = (96+108+89)/3;
+const avgScoreKoalas = (88+91+110)/3;
+*/
+/* data-2
+const avgScoreDolphins = (97+112+101)/3;
+const avgScoreKoalas = (109+95+123)/3;
+*/
+/*
+// data-3
+const avgScoreDolphins = (97+112+101)/3;
+const avgScoreKoalas = (109+95+106)/3;
+
+console.log(avgScoreDolphins);
+console.log(avgScoreKoalas);
+
+if (avgScoreDolphins > avgScoreKoalas && avgScoreDolphins >= 100){
+	console.log('Dolphins Won!');
+} else if (avgScoreKoalas > avgScoreDolphins && avgScoreKoalas >= 100) {
+	console.log('Koalas Won!');
+} else if (avgScoreKoalas === avgScoreDolphins && avgScoreDolphins >= 100 && avgScoreKoalas >= 100) {
+	console.log('It is a draw !');
+} else {
+	console.log('No team Wins!');
+}
+*/
+
+// Coding Challenge #4
+
+//const bill = 275;
+//const bill = 40;
+const bill = 430;
+
+const tip = (bill >= 50 && bill <= 300) ? (0.15*bill) : (0.2*bill);
+console.log('tip is '+tip);
+console.log(`The bill was ${bill}, the tip was ${tip}, and the total value
+${bill+tip}`);
+
