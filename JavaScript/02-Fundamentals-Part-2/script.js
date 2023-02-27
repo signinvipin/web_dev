@@ -191,7 +191,7 @@ for(let cnt = 0; cnt < listOfNeighbours.length; cnt++){
 }*/
 
 // Loop Backards
-
+/*
 const listOfNeighbours = [
 	['Canada', 'Mexico'],
 	['Spain'],
@@ -202,4 +202,22 @@ for (let i = (listOfNeighbours.length-1); i >= 0; i--)
    // console.log(listOfNeighbours[i]);
    for (let y = (listOfNeighbours[i].length-1); y >=0; y--)
       console.log(`Neighbour: ${listOfNeighbours[i][y]}`);
+*/
+// while Loop
+/*
+const populations = [1441, 1370, 9, 22];
 
+const percentageOfWorld3 = (population) => {
+   const popPercentage = (population/7900) * 100;
+   return popPercentage;
+}
+
+let percentages3 = [];
+let countr = 0; 
+while (countr < populations.length){
+   const percVal = percentageOfWorld3(populations[countr]);
+   percentages3.push(percVal);
+   countr++;
+}
+console.log(percentages3);
+*/
