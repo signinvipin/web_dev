@@ -56,7 +56,7 @@ console.log(indiaPop);
 console.log(finlandPop);
 */
 // Function Calling other Functions
-
+/*
 const percentageOfWorld3 = (population) => {
    const popPercentage = (population/7900) * 100;
    return popPercentage;
@@ -70,4 +70,22 @@ function describePopulation (country, population){
 describePopulation('China', 1441);
 describePopulation('India', 1370);
 describePopulation('Finland', 9);
+*/
 
+// Intro to Arrays
+
+const populations = [1441, 1370, 9, 22];
+console.log(populations.length === 4);
+
+const percentageOfWorld3 = (population) => {
+   const popPercentage = (population/7900) * 100;
+   return popPercentage;
+}
+
+let percentages = [];
+percentages.push(percentageOfWorld3(populations[0]));
+percentages.push(percentageOfWorld3(populations[1]));
+percentages.push(percentageOfWorld3(populations[2]));
+percentages.push(percentageOfWorld3(populations[3]));
+
+console.log(percentages);
