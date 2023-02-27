@@ -129,3 +129,18 @@ console.log(myCountry);
 myCountry['population'] = myCountry['population'] - 2;
 console.log(myCountry);
 
+// Object Methods
+
+myCountry.describe = function (){
+   console.log(`${this.country} has ${this.population} million ${this.language}-speaking people, ${this.neighbours.length} neighbouring countries and a capital called ${this.capital}.`);
+}
+myCountry.describe();
+myCountry.checkIsland = function () {
+   (this.neighbours.length === 0) ? this.isIsland = true : this.isIsland = false ;
+}
+
+myCountry.checkIsland();
+console.log(myCountry);
+
+// 
+		   	   	   	   		   	   	   	   	   	   	   	   	   	  
