@@ -179,7 +179,7 @@ for(let popNo = 0; popNo < populations.length; popNo++){
 }
 */
 // Loops in Loops
-
+/*
 const listOfNeighbours = [['Canada', 'Mexico'], ['Spain'], ['Norway', 'Sweden', 'Russia']];
 // console.log(listOfNeighbours);
 
@@ -188,6 +188,18 @@ for(let cnt = 0; cnt < listOfNeighbours.length; cnt++){
    for(let incnt = 0; incnt < listOfNeighbours[cnt].length; incnt++){
       console.log(`Neighbour: ${listOfNeighbours[cnt][incnt]}`);
       }
-}
+}*/
 
+// Loop Backards
+
+const listOfNeighbours = [
+	['Canada', 'Mexico'],
+	['Spain'],
+	['Norway', 'Sweden', 'Russia'],
+	];
+console.log(listOfNeighbours);
+for (let i = (listOfNeighbours.length-1); i >= 0; i--)
+   // console.log(listOfNeighbours[i]);
+   for (let y = (listOfNeighbours[i].length-1); y >=0; y--)
+      console.log(`Neighbour: ${listOfNeighbours[i][y]}`);
 
