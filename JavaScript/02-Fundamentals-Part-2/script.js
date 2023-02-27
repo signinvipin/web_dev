@@ -73,7 +73,7 @@ describePopulation('Finland', 9);
 */
 
 // Intro to Arrays
-
+/*
 const populations = [1441, 1370, 9, 22];
 console.log(populations.length === 4);
 
@@ -89,3 +89,20 @@ percentages.push(percentageOfWorld3(populations[2]));
 percentages.push(percentageOfWorld3(populations[3]));
 
 console.log(percentages);
+*/
+// Basic Array Operations/Methods
+
+const neighbours = ['Nepal', 'Bangladesh', 'Bhutan', 'Sri Lanka', 'Pakistan', 'Tibet'];
+neighbours.push('Utopia');
+console.log(neighbours);
+neighbours.pop();
+console.log(neighbours);
+
+if (!neighbours.includes('Germany')){
+   console.log('Probably not a central European country :D');
+}
+
+const pakInd = neighbours.indexOf('Pakistan');
+neighbours[pakInd] = 'Islamic Republic of Pakistan';
+console.log(neighbours);
+
