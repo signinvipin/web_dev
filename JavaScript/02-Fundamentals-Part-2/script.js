@@ -108,7 +108,7 @@ console.log(neighbours);
 */
 
 // Intro to Objects
-
+/*
 const myCountry = {
 	country : 'India',
 	capital : 'New Delhi',
@@ -141,6 +141,41 @@ myCountry.checkIsland = function () {
 
 myCountry.checkIsland();
 console.log(myCountry);
+*/
+// Iteration - 'for' loop
+/*
+for(let person = 1; person <= 50; person++){
+   console.log(`Voter number ${person} is currently voting..`);
+}
+*/
+// Looping Arrays
 
-// 
-		   	   	   	   		   	   	   	   	   	   	   	   	   	  
+const populations = [1441, 1370, 9, 22];
+
+const percentageOfWorld3 = (population) => {
+   const popPercentage = (population/7900) * 100;
+   return popPercentage;
+}
+
+let percentages2 = [];
+for(let popNo = 0; popNo < populations.length; popNo++){
+	const percVal = percentageOfWorld3(populations[popNo]);
+	percentages2.push(percVal);
+}
+console.log(percentages2);
+
+// Loop Breaking 
+
+for(let popNo = 0; popNo < populations.length; popNo++){
+   if(populations[popNo]===9) break;
+   console.log(populations[popNo]);
+}
+
+// Loop Continuing
+
+for(let popNo = 0; popNo < populations.length; popNo++){
+   if(populations[popNo]===9) continue;
+   console.log(populations[popNo]);
+}
+
+
