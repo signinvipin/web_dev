@@ -149,7 +149,7 @@ for(let person = 1; person <= 50; person++){
 }
 */
 // Looping Arrays
-
+/*
 const populations = [1441, 1370, 9, 22];
 
 const percentageOfWorld3 = (population) => {
@@ -176,6 +176,18 @@ for(let popNo = 0; popNo < populations.length; popNo++){
 for(let popNo = 0; popNo < populations.length; popNo++){
    if(populations[popNo]===9) continue;
    console.log(populations[popNo]);
+}
+*/
+// Loops in Loops
+
+const listOfNeighbours = [['Canada', 'Mexico'], ['Spain'], ['Norway', 'Sweden', 'Russia']];
+// console.log(listOfNeighbours);
+
+for(let cnt = 0; cnt < listOfNeighbours.length; cnt++){
+   console.log(listOfNeighbours[cnt]);
+   for(let incnt = 0; incnt < listOfNeighbours[cnt].length; incnt++){
+      console.log(`Neighbour: ${listOfNeighbours[cnt][incnt]}`);
+      }
 }
 
 
