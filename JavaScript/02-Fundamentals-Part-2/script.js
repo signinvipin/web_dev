@@ -91,7 +91,7 @@ percentages.push(percentageOfWorld3(populations[3]));
 console.log(percentages);
 */
 // Basic Array Operations/Methods
-
+/*
 const neighbours = ['Nepal', 'Bangladesh', 'Bhutan', 'Sri Lanka', 'Pakistan', 'Tibet'];
 neighbours.push('Utopia');
 console.log(neighbours);
@@ -105,4 +105,16 @@ if (!neighbours.includes('Germany')){
 const pakInd = neighbours.indexOf('Pakistan');
 neighbours[pakInd] = 'Islamic Republic of Pakistan';
 console.log(neighbours);
+*/
+
+// Intro to Objects
+
+const myCountry = {
+	country : 'India',
+	capital : 'New Delhi',
+	language : 'Hindi',
+	population : 1370,
+	neighbours : ['Nepal', 'Bangladesh', 'Bhutan', 'Sri Lanka', 'Pakistan', 'Tibet']
+}
+
 
