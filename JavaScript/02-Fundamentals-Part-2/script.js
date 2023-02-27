@@ -27,7 +27,7 @@ console.log(indiaPop);
 console.log(finlandPop);
 */
 // Function Expression
-
+/*
 const percentageOfWorld2 = function (population){
    const popPercentage = (population/7900) * 100;
    return popPercentage;
@@ -39,5 +39,21 @@ const finlandPop = percentageOfWorld2(9);
 console.log(chinaPop);
 console.log(indiaPop);
 console.log(finlandPop);
+*/
 
-	      
+// Arrow Function 
+
+const percentageOfWorld3 = (population) => {
+   const popPercentage = (population/7900) * 100;
+   return popPercentage;
+}
+	      	      		      	   	      	      	      	      	      const chinaPop = percentageOfWorld3(1441);
+const indiaPop = percentageOfWorld3(1370);
+const finlandPop = percentageOfWorld3(9);
+console.log(chinaPop);
+console.log(indiaPop);
+console.log(finlandPop);
+
+// Function
+
+
