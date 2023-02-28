@@ -225,7 +225,7 @@ console.log(percentages3);
 // Coding Challenges
 
 // Challenge #1
-
+/*
 // Data-1
 const scoresDolphins = [44, 23, 71];
 const scoresKoalas = [65, 54, 49];
@@ -252,3 +252,25 @@ const checkWinner = function (Dolphins, Koalas){
 }
 checkWinner(avgDolphins, avgKoalas);
 checkWinner(avgDolphins2, avgKoalas2);
+*/
+
+// Challenge #2
+
+const calcTip = function (bill){
+  const tipVal = (bill>= 50 && bill <= 300) ? bill * 0.15 : bill * 0.2 ;
+  return tipVal;
+}
+console.log(calcTip(100));
+
+const bills = [125, 555, 44];
+const tips = [];
+const totalBills = [];
+for(let a = 0; a < bills.length; a++){
+   const tip = calcTip(bills[a]);
+   tips.push(tip);
+   const totalBill = bills[a] + tip ;
+   totalBills.push(totalBill);
+}
+console.log(tips);
+console.log(totalBills);
+
