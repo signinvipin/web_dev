@@ -221,3 +221,34 @@ while (countr < populations.length){
 }
 console.log(percentages3);
 */
+
+// Coding Challenges
+
+// Challenge #1
+
+// Data-1
+const scoresDolphins = [44, 23, 71];
+const scoresKoalas = [65, 54, 49];
+// Data-2
+const scoresDolphins2 = [85, 54, 41];
+const scoresKoalas2 = [23, 34, 27];
+
+const calcAverage = (scores) => (scores[0]+scores[1]+scores[2])/3 ;
+
+const avgDolphins = calcAverage(scoresDolphins);
+const avgKoalas = calcAverage(scoresKoalas);
+const avgDolphins2 = calcAverage(scoresDolphins2);
+const avgKoalas2 = calcAverage(scoresKoalas2);
+console.log('Averages : Dolphins - '+avgDolphins+', Koalas - '+avgKoalas+  ', Dolphins2 - '+avgDolphins2+', Koalas2 - '+avgKoalas);
+
+const checkWinner = function (Dolphins, Koalas){
+  if(Dolphins >= 2 * Koalas){
+     console.log(`Dolphins win(${Dolphins} vs. ${Koalas})`);
+  } else if (Koalas >= 2 * Dolphins){
+     console.log(`Koalas win(${Koalas} vs. ${Dolphins})`);
+  } else {
+   console.log('No Team Wins');
+  }
+}
+checkWinner(avgDolphins, avgKoalas);
+checkWinner(avgDolphins2, avgKoalas2);
