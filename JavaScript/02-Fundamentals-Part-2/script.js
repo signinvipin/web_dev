@@ -254,7 +254,7 @@ checkWinner(avgDolphins, avgKoalas);
 checkWinner(avgDolphins2, avgKoalas2);
 */
 
-// Challenge #2
+// Challenge #2 & #4
 /*
 const calcTip = function (bill){
   const tipVal = (bill>= 50 && bill <= 300) ? bill * 0.15 : bill * 0.2 ;
@@ -276,7 +276,7 @@ console.log(totalBills);
 */
 
 // Challenge #3
-
+/*
 const objectMark = {
     name : 'Mark Miller',
     mass : 78,
@@ -305,5 +305,6 @@ console.log(objectMark);
 console.log(objectJohn);
 
 objectJohn.bmi > objectMark.bmi ? console.log(`John's BMI (${objectJohn.bmi}) is higher than Mark's (${objectMark.bmi})!`) : console.log(`Mark's BMI (${objectMark.bmi}) is higher than John's (${objectJohn.bmi})!`;
-
+*/
+// ends fundamentals JS -2
 
