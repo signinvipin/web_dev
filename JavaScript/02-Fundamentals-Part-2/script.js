@@ -255,7 +255,7 @@ checkWinner(avgDolphins2, avgKoalas2);
 */
 
 // Challenge #2
-
+/*
 const calcTip = function (bill){
   const tipVal = (bill>= 50 && bill <= 300) ? bill * 0.15 : bill * 0.2 ;
   return tipVal;
@@ -273,4 +273,37 @@ for(let a = 0; a < bills.length; a++){
 }
 console.log(tips);
 console.log(totalBills);
+*/
+
+// Challenge #3
+
+const objectMark = {
+    name : 'Mark Miller',
+    mass : 78,
+    height : 1.69,
+    calcBMI : function (){
+       const bmiVal = this.mass/this.height**2 ;
+       this.bmi = bmiVal;
+       return bmiVal;
+    },
+}
+
+const objectJohn = {
+   name : 'John Smith',
+   mass : 92,
+   height : 1.95,
+   calcBMI : function (){
+   	  const bmiVal = this.mass/this.height**2 ;
+   	  this.bmi = bmiVal;
+   	  return bmiVal;
+   },
+}
+
+console.log(objectMark.calcBMI());
+console.log(objectJohn.calcBMI());
+console.log(objectMark);
+console.log(objectJohn);
+
+objectJohn.bmi > objectMark.bmi ? console.log(`John's BMI (${objectJohn.bmi}) is higher than Mark's (${objectMark.bmi})!`) : console.log(`Mark's BMI (${objectMark.bmi}) is higher than John's (${objectJohn.bmi})!`;
+
 
