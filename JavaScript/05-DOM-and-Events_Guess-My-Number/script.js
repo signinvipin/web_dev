@@ -26,6 +26,13 @@ function generateRandom () {
 }
 let randNumber = generateRandom();
 
+let guess = false;
+
+// Record Score
+let setScore = Number(initScore);
+// console.log(setScore);
+
+
 // Initialize all elements 
 function initializePlayAgain () {
 	msgOutputText.textContent = initMessage;
@@ -35,6 +42,9 @@ function initializePlayAgain () {
 	body.style.backgroundColor = '';
 	numberInput.value = '';
 	randNumber = generateRandom();
+	setScore = Number(initScore);
+	guess = false;
+	// console.log('setScore - '+setScore);
 	// return randomNumberAgain;
 }
 
@@ -43,13 +53,16 @@ function initializePlayAgain () {
 btnPlayAgain.addEventListener('click', initializePlayAgain);
 
 
-// Set Score and Record Score
-let setScore = Number(initScore);
-// console.log(setScore);
+// Game Lost features
+function gameLost () {
+	body.style.backgroundColor = '#DA012D';
+}
 
+
+// update setScore
 function updateScore () {
-    setScore-=1;
-    scoreOutputText.textContent = setScore;
+  setScore-=1;
+  scoreOutputText.textContent = setScore;
 }
 
 
@@ -65,37 +78,45 @@ function updateHighScore () {
 }
 
 
-// Comparing user input to random number
-function checkInput (userInput, randNumber) {
-	if (userInput === randNumber) {
-		msgOutputText.textContent = '* * * Correct * * *';
-		showCorrectNumber.textContent = userInput;
-		showCorrectNumber.style.width = '25rem';
-		body.style.backgroundColor = '#D2691E';
-		updateHighScore();
-		setScore = Number(initScore);
-	} else if (userInput > randNumber) {
-		msgOutputText.textContent = "It's HIGH";
-	} else {
-		msgOutputText.textContent = "It's LOW";
-	}
+// when Correct Guess
+function correctGuess (userInput) {
+	showCorrectNumber.textContent = userInput;
+	showCorrectNumber.style.width = '25rem';
+	body.style.backgroundColor = '#D2691E';
 }
+
+
+// event-handler with message output
+function checkInput () {
+    const userInput = Number(numberInput.value);
+    if (setScore !== 0 && guess === false)
+       updateScore();
+       // console.log('click - ');
+       if (setScore >= 1) {
+	      if (userInput <=20 && userInput >=1) {
+	         if (userInput === randNumber) {
+	            msgOutputText.textContent = '* * * Correct * * *';
+	            correctGuess(userInput);
+	            updateHighScore();
+	            guess = true;
+	         } else if (userInput > randNumber) {
+	            msgOutputText.textContent = "It's HIGH";
+	         } else {
+	            msgOutputText.textContent = "It's LOW";
+	         } 
+	      } else { 
+	         msgOutputText.textContent = 'Enter between 1 - 20!';
+	      } 
+       } else {
+	      msgOutputText.textContent = 'U lost the Game !';
+	      gameLost();
+	   }
+}
+
 
 // check button click event listener
-function get (){
-    const userInput = Number(numberInput.value);
-    // numberInput.value = '';
-        
-    if (userInput > 0 && userInput <= 20) {
-       // console.log(userInput);
-       updateScore();
-       checkInput(userInput, randNumber);
-    } else {
-       msgOutputText.textContent = 'Enter between 1 - 20!';
-       // console.log(userInput);
-    }
-}
+btnCheckNumber.addEventListener('click', checkInput);
+		   
 
-btnCheckNumber.addEventListener('click', get );
 
 
