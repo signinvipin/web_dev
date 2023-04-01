@@ -77,7 +77,7 @@ console.log('lastPersonName = '+lastPersonName+', outside block scope');
 */
 
 // Variable Environment - Hoisting & TDZ
-
+/*
 // Hoisting makes it possible to use a variable or function declaration even before it is declaration at the later stage
 
 // only function declaration can be hoisted, not function expression, not arrow function
@@ -89,7 +89,7 @@ function addEvent(){
 }
 
 // this doesn't work with let const and var declarations
-/*
+
 console.log(substractEventVar); // undefined
 console.log(substractEventLet); // uninitialized
 console.log(substractEventConst); // uninitialized
@@ -97,19 +97,52 @@ console.log(substractEventConst); // uninitialized
 var substractEventVar = 'a-b is substraction';
 let substractEventLet = 'a-b is substraction';
 const substractEventConst = 'a-b is substraction';
-*/
+
 // When variables are used before their declaration in a scope it creates a temporal dead zone (TDZ) upto the declaration step of variables
-/*
+
 const detailCar = `This is a ${brandCar} car.`;
 console.log(detailCar);
 const mileageCar = '97Kmph';
 const categoryCar = 'Hatchback';
 // TDZ up until this point for brandCar variable
 const brandCar = 'Tata';
-*/
 
 // var declared > undefined and function scoped
 // let, const declared > uninitialized
+*/
 
+// The 'this' keyword/variable
+
+// Used in method in object > points to parent object
+const firstObject = {
+	year : 1999,
+	weightObject: function(){
+		console.log(`Made in year ${this.year}.`);
+		console.log(this);
+	}
+}
+
+firstObject.weightObject();
+
+// Used in simple function call > undefined
+function simFunction(){
+	console.log(`Made in year ${this.year}.`);
+	console.log(this);
+}
+// simFunction();
+
+// Used in Arrow function > no 'this', points to undefined/window object
+const arrFunction = () => {
+	console.log(`Made in year ${this.year}.`);
+	console.log(this);
+}
+
+arrFunction();
+
+// Used in eventListener callback > points to windows object event element
+document.addEventListener('click', function(){
+	console.log(`Made in year ${this.year}.`);
+	console.log(this); // HTMLDocument on click on page
+})
 
 
