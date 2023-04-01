@@ -52,8 +52,26 @@ console.log('carBrand '+carBrand+' , in Global Scope');
 
 // variable or function created inside a block can not be accessed outside the block scope
 
+function newFunction(){
+	const uName = 'Jonas';
+	console.log('uName = '+uName+', inside function block');
 
+	function add(a, b){
+		console.log('add = '+a+' and '+b+', inside function block');
+	}
+	add(2,3);
+}
+newFunction();
+console.log('uName = uName is not defined, outside function block');
+// says uName not defined
 
 // variable created with var inside block scope can be accessed outside the block
 
+if (true){
+	var lastPersonName = 'Dorsey';
+	console.log('lastPersonName = '+lastPersonName+', inside block scope');
+}
 
+console.log('lastPersonName = '+lastPersonName+', outside block scope');
+
+// 
