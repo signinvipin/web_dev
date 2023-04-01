@@ -1,5 +1,5 @@
 'use strict';
-
+/*
 // We can use a variable, which is created after declaring a function, in that function and the function can be called after this created variable used in function.
 
 // function using variable created later in execution sequence
@@ -74,4 +74,42 @@ if (true){
 
 console.log('lastPersonName = '+lastPersonName+', outside block scope');
 
-// 
+*/
+
+// Variable Environment - Hoisting & TDZ
+
+// Hoisting makes it possible to use a variable or function declaration even before it is declaration at the later stage
+
+// only function declaration can be hoisted, not function expression, not arrow function
+
+addEvent();
+
+function addEvent(){
+	console.log('a+b is an addition');
+}
+
+// this doesn't work with let const and var declarations
+/*
+console.log(substractEventVar); // undefined
+console.log(substractEventLet); // uninitialized
+console.log(substractEventConst); // uninitialized
+
+var substractEventVar = 'a-b is substraction';
+let substractEventLet = 'a-b is substraction';
+const substractEventConst = 'a-b is substraction';
+*/
+// When variables are used before their declaration in a scope it creates a temporal dead zone (TDZ) upto the declaration step of variables
+/*
+const detailCar = `This is a ${brandCar} car.`;
+console.log(detailCar);
+const mileageCar = '97Kmph';
+const categoryCar = 'Hatchback';
+// TDZ up until this point for brandCar variable
+const brandCar = 'Tata';
+*/
+
+// var declared > undefined and function scoped
+// let, const declared > uninitialized
+
+
+
