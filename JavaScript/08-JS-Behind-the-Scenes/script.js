@@ -192,7 +192,7 @@ thirdArrObject.weightObject();
 */
 
 // 'arguments' keyword 
-/*
+
 // for no. of parameters passed in Regular function
 // parameters passed can be any in number and produces an iterable object
 // Not for Arrow Functions
@@ -204,7 +204,7 @@ addExp(1,2,4);
 
 // Primitive and Object reassigning and referencing
 
-// with primitives, values are copied and assigned, to create new property - New reference points created
+// with primitives types, values are copied and assigned, to create new property - New reference points created
 let carName = 'Tata';
 let carNewName = carName;
 carName = 'Maruti';
@@ -212,6 +212,7 @@ console.log(carName);
 console.log(carNewName);
 
 // with objects, reassigning to variable doesn't replace, it creates reference to original object - Points to old reference
+// Reference Types
 const fourthArrObject = {
 	year : 1999,
 	weightObjectArr: function() {
@@ -224,6 +225,14 @@ const fifthArrObject = fourthArrObject;
 console.log(fifthArrObject);
 
 // changes made in new object but change reflected in original object - new object name is referenced to old object instead of creating a original object copy to make new object 
+
 fifthArrObject.year = 2001;
 console.log(fourthArrObject);
-*/
+
+// To Copy Object
+
+const sixthArrObject = Object.assign({},fourthArrObject);
+console.log(sixthArrObject);
+sixthArrObject.year = 2023;
+console.log(sixthArrObject); // did not changed the original
+console.log(fourthArrObject);
