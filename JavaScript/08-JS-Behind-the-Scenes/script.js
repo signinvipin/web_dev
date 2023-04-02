@@ -112,7 +112,7 @@ const brandCar = 'Tata';
 */
 
 // The 'this' keyword/variable
-
+/*
 // Used in method in object > points to parent object
 const firstObject = {
 	year : 1999,
@@ -145,4 +145,60 @@ document.addEventListener('click', function(){
 	console.log(this); // HTMLDocument on click on page
 })
 
+// 'this' keyword with Regular and Arrow Function
+
+// Arrow function resulting 'this' to undefined.
+const firstArrObject = {
+	year : 1999,
+	weightObjectArr: () => {
+	    console.log(`Made in year ${this.year}.`);
+	    console.log(this);
+	},
+}
+firstArrObject.weightObjectArr();
+
+// Arrow function inside a regular function block points to the parent object as arrow function borrows this from parent scope.
+const secondArrObject = {
+	year : 1999,
+	weightObject: function(){
+		// console.log(`Made in year ${this.year}.`);
+		// console.log(this);
+		const weightObjectArr = () => {
+		    console.log(`Made in year ${this.year}.`);
+		    console.log(this);
+		}
+		weightObjectArr();
+	},
+}
+secondArrObject.weightObject();
+
+// 'this' keyword in regular function inside a regular function in a parent object points to undefined. So, 'self' is used.
+
+const thirdArrObject = {
+	year : 1999,
+	weightObject: function(){
+	// console.log(`Made in year ${this.year}.`);
+	// console.log(this);
+	    const self = this;
+		const weightObjectArr = function(){
+		    console.log(`Made in year ${self.year}.`);
+		    console.log(self);
+		}
+		weightObjectArr();
+	},
+}
+
+thirdArrObject.weightObject();
+*/
+
+// 'arguments' keyword 
+
+// for no. of parameters passed in Regular function
+// parameters passed can be any in number and produces an iterable object
+// Not for Arrow Functions
+function addExp(a,b){
+	console.log(arguments);
+	return a+b;
+}
+addExp(1,2,4);
 
