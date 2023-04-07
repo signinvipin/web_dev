@@ -28,8 +28,9 @@ const restaurant = {
   },
 };
 
-
+/*
 // Destructuring Arrays
+// use of square brackets []
 
 // taking out values in seperate variables and logging them 
 const [x, y, z] = [1, 4, 7];
@@ -70,7 +71,49 @@ console.log('From object = '+l+', '+m+', '+n);
 // Selecting and taking values by skipping from array inside object
 let [o,,q] = restaurant.starterMenu;
 console.log('From object (skipped) o = '+o+', q = '+q);
-
 // Switching values from array inside objects
 [o, q] = [q, o];
 console.log('Switched Variables o = '+o+', q = '+q);
+*/
+
+// Destructuring Objects
+// use of curly braces
+/*
+console.log(location); // 'location' is a reserved keyword for url 
+
+const { name, categories, mainMenu } = restaurant;
+const { name: Name, categories: Categories } = restaurant;
+console.log('name = '+name);
+console.log('categories = '+categories);
+// +', Location = '+location);
+console.log('Name = '+Name);
+console.log('Categories = '+Categories);
+
+
+// Swaping variables
+let a = 11;
+let b = 12;
+console.log('a = '+a+',b = '+b);
+const swapObject = {a:12, b:15, c:16};
+({a, b} = swapObject); // must put in bracket
+console.log('swap-a = '+a+',swap-b = '+b);
+
+// Retrieve values from nested object
+const {openingHours:{thu:{open, close}}} = restaurant;
+console.log('thu-open = '+open+', thu-close = '+close);
+
+// assign different variable names to values retrieved
+const {openingHours:{fri:{open:O, close:C}}} = restaurant;
+console.log('fri-open = '+O+', fri-close = '+C);
+
+// Using object to keep multiple arguments and use it in function
+// function objectAsArgument(object){            Or,
+function objectAsArgument({name, categories, mainMenu}){
+	console.log(name);
+	// console.log(location);
+	console.log(categories);
+	console.log(mainMenu);
+}
+// objectAsArgument(restaurant);
+objectAsArgument({categories, name, mainMenu});
+*/
