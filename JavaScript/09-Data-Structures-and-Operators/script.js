@@ -117,3 +117,60 @@ function objectAsArgument({name, categories, mainMenu}){
 // objectAsArgument(restaurant);
 objectAsArgument({categories, name, mainMenu});
 */
+
+// The Spread Operator
+
+// spread array in array and extend it
+const arrOne = [4, 5, 6];
+const arrTwo = [1,2,3,...arrOne]; // always on rightside
+console.log(arrTwo);
+
+// take array from object and expand an array
+const objectOne = {
+	arrOne:[4, 5, 6],
+	arrTwo:[1,2,3],
+}
+const arrThree = [...objectOne.arrTwo,...objectOne.arrOne];
+console.log(arrThree);
+
+// with strings
+const str = 'jonas';
+console.log(...str);
+
+// use as arguments to function
+function addNum (a,b,c){
+	console.log(a,b,c);
+}
+addNum(...arrOne);
+
+// The Rest Operator
+
+// with arrays
+const [a, b, ...rest] = [1, 2, 3, 4, 5, 6];
+console.log(rest); // always on leftside
+
+// with functions
+function multiplyOne (...restItems){
+	console.log(restItems+', Run loop to perform multiplication');
+}
+multiplyOne(1,2,3,4,5,6,7,8,9);
+
+// skipping values
+const [c,,e,...restOnes] = [1, 2, 3, 4, 5, 6];
+console.log('c = '+c+', e = '+e+', restOnes = '+restOnes);
+
+// The SHORT-CIRCUITING
+
+// AND Operator
+
+// OR Operator 
+
+// AND Assignment Operator
+
+// OR Assignment Operator
+
+// Nullish Coalescing Operator
+
+// Nullish Assigment Operator
+
+
