@@ -162,15 +162,59 @@ console.log('c = '+c+', e = '+e+', restOnes = '+restOnes);
 // The SHORT-CIRCUITING
 
 // AND Operator
+// short-circuits with first false or last true value
+console.log(0 && 48); // 0 is considered as false in JS.
+console.log(43 && 'last true '+7);
 
 // OR Operator 
+// short-circuits with first true or last false value
+const firstTrue = 'firstTrue';
+const lastTrue = 'secondTrue';
+console.log(firstTrue || lastTrue);
+
+const firstFalse = '';
+const lastFalse = 0;
+console.log(firstFalse || lastFalse);
 
 // AND Assignment Operator
+let headCount = 4;
+// headCount = headCount && 'last true - Four';
+headCount &&= 'last true - Four';
+console.log(headCount);
+
+let hatCount = 0;
+// hatCount = hatCount && 4;
+hatCount &&= 4;
+console.log('first false - '+hatCount);
 
 // OR Assignment Operator
+let numbPerson = 0;
+// numbPerson = numbPerson || 10;
+numbPerson ||= 10;
+console.log('first true '+numbPerson);
+
+let numbPerson2 = '';
+// numbPerson2 = numbPerson2 || 0;
+numbPerson2 ||= 0;
+console.log('last false '+numbPerson2);
 
 // Nullish Coalescing Operator
 
-// Nullish Assigment Operator
+// assumes 0 and '' as true
+let shipCount = 0;
+// let shipCount = '';
+console.log('shipCount is '+shipCount ?? '4 ships');
 
+shipCount = undefined;
+console.log(shipCount ?? 'No ships');
+
+
+// Nullish Assigment Operator
+// let boatCount = null;
+let boatCount = undefined;
+// console.log(typeof(boatCount));
+// let boatCount = '';
+// boatCount = boatCount ?? '4 Boats';
+boatCount ??= '4 Boats';
+console.log('boatCount is '+boatCount);
 
