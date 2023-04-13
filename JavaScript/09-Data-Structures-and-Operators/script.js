@@ -222,7 +222,7 @@ let boatCount = undefined;
 boatCount ??= '4 Boats';
 console.log('boatCount is '+boatCount);
 */
-
+/*
 // for - of Loop
 
 const starterFood = restaurant.starterMenu;
@@ -237,7 +237,8 @@ for (const starter of starterFood){
 for (const starter of starterFood.entries()){
 	console.log(starter);
 }
-
+*/
+/*
 // Enhanced Template Literals
 
 // Prevously
@@ -250,7 +251,8 @@ const userId = {
 }
 userId.introLog();
 
-// After
+// After - enables us to compute property name manually or literally
+
 const detailId = {
 	name:'Jonas',
 	age: 32,
@@ -259,8 +261,52 @@ const detailId = {
 const userIdEnhanced = {
 	detailId,
 	introLog () {
-		console.log(`My name is ${detailId.name} and age is ${detailId.age}.`);
+		console.log(`My name is ${detailId.name} and age is`+' '+(detailId.age)+'.');
 	},
 }
 
 userIdEnhanced.introLog();
+
+// example
+const catMenu = restaurant.categories;
+const weekDay = ['mon','tue','wed','thu','fri','sat','sun'];
+
+const newCatMenu = {
+	[weekDay[0]]: (catMenu[0]),
+}
+
+console.log(newCatMenu);
+*/
+/*
+// Optional Chaining '?.'
+
+// normally
+
+// const mondayOpen = restaurant.openingHours.mon.open;
+// console.log(mondayOpen);
+
+// const mondayOpen1 = restaurant.openingHours.mon;
+// console.log(mondayOpen1);
+
+const mondayOpen2 = restaurant.openingHours;
+console.log(mondayOpen2);
+
+// after Optional Chaining ?.
+
+// Syntax
+// obj.val?.prop
+// obj.val?.[expr]
+// obj.func?.(args)
+
+// when value is null or undefined or not present, it returns 'undefined' instead of throwing an error
+
+const mondayOpen3 = restaurant.openingHours?.mon?.open;
+console.log(mondayOpen3);
+
+// example
+
+const ageDetails = [{name:'Jonas', age:32}, {name:'Matilda', age:10},];
+console.log(ageDetails[0]?.name??'no entries available');
+console.log(ageDetails[2]?.name??'no entries available');
+*/
+
