@@ -200,6 +200,10 @@ console.log('last false '+numbPerson2);
 
 // Nullish Coalescing Operator
 
+// Recognizes four values/responses only
+// for true - 0 , '' 
+// for false - null, undefined 
+
 // assumes 0 and '' as true
 let shipCount = 0;
 // let shipCount = '';
