@@ -119,7 +119,7 @@ objectAsArgument({categories, name, mainMenu});
 */
 
 // The Spread Operator
-
+/*
 // spread array in array and extend it
 const arrOne = [4, 5, 6];
 const arrTwo = [1,2,3,...arrOne]; // always on rightside
@@ -221,4 +221,21 @@ let boatCount = undefined;
 // boatCount = boatCount ?? '4 Boats';
 boatCount ??= '4 Boats';
 console.log('boatCount is '+boatCount);
+*/
+
+// for - of Loop
+
+const starterFood = restaurant.starterMenu;
+console.log(starterFood);
+
+// for item only
+for (const starter of starterFood){
+	console.log(starter);
+}
+
+// for arrays having index no and item
+for (const starter of starterFood.entries()){
+	console.log(starter);
+}
+
 
