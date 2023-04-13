@@ -310,3 +310,26 @@ console.log(ageDetails[0]?.name??'no entries available');
 console.log(ageDetails[2]?.name??'no entries available');
 */
 
+// Destructuring Objects for Looping
+
+// using Object.keys(obj or prop)
+const keyLoop = Object.keys(restaurant);
+console.log(keyLoop);
+
+const keyLoop1 = Object.keys(restaurant.openingHours);
+console.log(keyLoop1);
+
+// using Object.values(prop)
+const valLoop = Object.values(restaurant);
+console.log(valLoop);
+
+const valLoop1 = Object.values(restaurant.mainMenu);
+console.log('Main Menu - '+valLoop1);
+
+// using Object.entries(obj or prop)
+// It outputs item with index number in array
+const entryLoop = Object.entries(restaurant);
+console.log(entryLoop);
+
+const entryLoop1 = Object.entries(restaurant.mainMenu);
+console.log(entryLoop1);
