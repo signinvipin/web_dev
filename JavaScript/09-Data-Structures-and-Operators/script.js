@@ -238,4 +238,29 @@ for (const starter of starterFood.entries()){
 	console.log(starter);
 }
 
+// Enhanced Template Literals
 
+// Prevously
+const userId = {
+	firstName:'Jonas',
+	lastName:'Schmedtman',
+	introLog: function () {
+		console.log(`My name is ${this.firstName} ${this.lastName}.`);
+	}
+}
+userId.introLog();
+
+// After
+const detailId = {
+	name:'Jonas',
+	age: 32,
+}
+
+const userIdEnhanced = {
+	detailId,
+	introLog () {
+		console.log(`My name is ${detailId.name} and age is ${detailId.age}.`);
+	},
+}
+
+userIdEnhanced.introLog();
