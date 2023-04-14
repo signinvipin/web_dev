@@ -309,7 +309,7 @@ const ageDetails = [{name:'Jonas', age:32}, {name:'Matilda', age:10},];
 console.log(ageDetails[0]?.name??'no entries available');
 console.log(ageDetails[2]?.name??'no entries available');
 */
-
+/*
 // Destructuring Objects for Looping
 
 // using Object.keys(obj or prop)
@@ -333,3 +333,86 @@ console.log(entryLoop);
 
 const entryLoop1 = Object.entries(restaurant.mainMenu);
 console.log(entryLoop1);
+*/
+/*
+// Set  
+// keep and count only unique copy of item in array
+const foodItems = new Set(['biscuit', 'cookies', 'cake', 'pizza', 'pasta','pizza','biscuit', 'cake',]);
+console.log(foodItems);
+
+// create new set
+const foodOne = new Set();
+console.log(foodOne);
+
+// add items to the set
+foodOne.add('biscuit');
+foodOne.add('cake');
+foodOne.add('pizza');
+console.log(foodOne);
+
+// read or check presence of an item in a set
+const pastaThere = foodOne.has('pasta');
+console.log('pastaInFoodOne = '+pastaThere);
+
+const cakeThere = foodOne.has('cake');
+console.log('cakeInFoodOne = '+cakeThere);
+
+// delete an item in a set
+foodItems.delete('biscuit');
+
+const biscuitIsThere = foodItems.has('biscuit');
+console.log('biscuitInFoodItems = '+biscuitIsThere);
+
+// check the size of the set
+console.log(foodOne.size);
+
+// clear all elements in set
+console.log('foodOne has - '+[...foodOne]);
+foodOne.clear();
+console.log('foodOne has - '+[...foodOne]);
+*/
+/*
+// Maps
+// have key-value pair, key can be string or number or any other type
+
+// create the map
+const mapOne = new Map();
+
+// creating map 'array of arrays' way
+const mapTwo = new Map([[1, 'Dog'], ['two', 'Cat'], [true, 'God'], [false, 'Deamon'], ['car', 8972]]);
+console.log(mapOne);
+console.log(mapTwo);
+
+// add/set key-value pair to map
+mapOne.set('car', 'Tata');
+mapOne.set(2, 'Jonas');
+mapOne.set(true, 'GOD');
+mapOne.set('', 'Empty');
+
+console.log(mapOne);
+
+// check size 
+console.log('mapOne size - '+mapOne.size);
+
+// check presence
+console.log('mapOne has 2 - '+mapOne.has(2));
+console.log('mapTwo has false - '+mapTwo.has(false));
+
+// read or get value of key from map
+console.log('valueOfKey false - '+mapTwo.get(false));
+console.log('valueOfKey true - '+mapTwo.get(true));
+console.log('valueOfKey 1 - '+mapTwo.get(1));
+
+// delete pair from map
+mapOne.delete(2);
+mapOne.delete('');
+console.log(mapOne);
+
+// clear all pairs in map
+mapOne.clear();
+console.log(mapOne);
+*/
+
+// Working with Strings & Operations
+
+
