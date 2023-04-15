@@ -1,8 +1,7 @@
 'use strict';
 
 // Data needed for a later exercise
-const flights =
-  '_Delayed_Departure;fao93766109;txl2133758440;11:25+_Arrival;bru0943384722;fao93766109;11:45+_Delayed_Arrival;hel7439299980;fao93766109;12:05+_Departure;fao93766109;lis2323639855;12:30';
+const flights =  '_Delayed_Departure;fao93766109;txl2133758440;11:25+_Arrival;bru0943384722;fao93766109;11:45+_Delayed_Arrival;hel7439299980;fao93766109;12:05+_Departure;fao93766109;lis2323639855;12:30';
 
 // Data needed for first part of the section
 const restaurant = {
@@ -413,6 +412,113 @@ mapOne.clear();
 console.log(mapOne);
 */
 
-// Working with Strings & Operations
+// *** Working with Strings & Operations***
+
+// **how JavaScript works in background with Strings**
+
+// converts string(primitive) to object
+const stringJs = new String('jonas');
+console.log(stringJs);
+console.log(typeof stringJs);
+
+// then converts it back to string and returns(primitive)
+const asIs = 'yes';
+console.log(asIs);
+console.log(typeof asIs);
+
+// **Operations with Strings**
+
+const airLine = 'TATA Air India';
+const airPlane = 'Boeing 737 Max';
+
+// using indexOf('arg') to find the location of element
+console.log(airPlane.indexOf('a'));
+console.log(airPlane.indexOf('3'));
+
+// using lastIndexOf('arg') to find last occurance of element
+console.log(airPlane.indexOf('7')); //first occurance
+console.log(airPlane.lastIndexOf('7')); //last occurance
+
+// retrieve element with position of element in string
+console.log('at position 12 - '+airPlane[12]);
+console.log('at position 0 in Bus - '+'Bus'[0]);
+
+// find length of string
+console.log('length of airLine - '+airLine.length);
+console.log('length of airPlane - '+airPlane.length);
+
+// slice and take out part of string
+console.log('airLine - '+airLine+', airPlane - '+airPlane);
+// from beginning
+console.log('Sliced 4 '+airLine.slice(4)); 
+// from end
+console.log('Sliced -2 '+airLine.slice(-2));
+//from pos-2-pos R-L, starts from 7 to 9 but not 9th element
+console.log('airPlane Index 7-9, but not 9th element = '+airPlane.slice(7,9));
+console.log('Pos count-slice R-L = '+airPlane.slice(7,10));
+// slice begin from R-count and end at count from L
+console.log('Pos-cnt R&L slice = '+airPlane.slice(7, -4));
+// slice count start and end from L-R
+console.log('Pos-cnt L-R, Index -4 to -7 but not -7th element = '+airPlane.slice(-7, -4));
+
+// trim, trimStart, trimEnd
+const strLine = '  the flight was late \n ';
+console.log(strLine);
+// trim and remove whitespaces and newlines from start
+console.log(strLine.trimStart());
+// trim and clears whitespaces and newlines from end
+console.log(strLine.trimStart());
+//removed whitespaces and newline character at the either ends
+console.log(strLine.trim());
+
+// split - 
+const splitLine = 'We are learning data structure and methods.';
+console.log(splitLine);
+// split from where provided element is present in 
+console.log(splitLine.split(' '));
+
+// replace 
+const senTence = splitLine;
+// replace only the first occurrence R-L
+console.log(senTence.replace(' ', '_'));
+console.log(senTence.replace('and', '&'));
+
+// replace all occurrences 
+console.log(senTence.replaceAll(' ', '_'));
 
 
+// check if string includes an element
+console.log('senTence includes-data = '+senTence.includes('data'));
+
+// check if string startwith element
+console.log('startswith- W = '+senTence.startsWith('W'));
+console.log('startswith- a = '+senTence.startsWith('a'));
+
+// check if string endsWith
+console.log('endsWith- h = '+senTence.endsWith('h'));
+console.log('endsWith- . = '+senTence.endsWith('.'));
+
+// string to upper case
+console.log('UpperCase - '+senTence.toUpperCase());
+// string to lower case
+console.log('LowerCase - '+senTence.toLowerCase());
+
+// Padding
+
+// .padStart(totalFinalLength, 'padwithelement')
+// .padEnd(totalFinalLength, 'padwithelement')
+
+// pad string at start with element
+console.log(airLine.padStart(20, '->'));
+// pad string at end with element
+console.log(airLine.padEnd(20, '->'));
+
+// Join strings with element/s in-between
+
+// join strings in array with joining element
+// arrayOfStrings.join('elementToJoinStrings')
+const joinString = [airLine,airPlane];
+console.log(joinString);
+console.log(joinString.join(' - '));
+
+// can visit mdn for more methods on strings
