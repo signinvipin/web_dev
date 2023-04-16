@@ -413,7 +413,7 @@ console.log(mapOne);
 */
 
 // *** Working with Strings & Operations***
-
+/*
 // **how JavaScript works in background with Strings**
 
 // converts string(primitive) to object
@@ -520,5 +520,115 @@ console.log(airLine.padEnd(20, '->'));
 const joinString = [airLine,airPlane];
 console.log(joinString);
 console.log(joinString.join(' - '));
-
+*/
 // can visit mdn for more methods on strings
+
+
+// ***Coding Challenge***
+
+// Coding Challenege #1
+
+// Data
+const game = {
+  team1: 'Bayern Munich',
+  team2: 'Borrussia Dortmund',
+  players: [
+    [
+      'Neuer',
+	  'Pavard',
+	  'Martinez',
+	  'Alaba',
+	  'Davies',
+	  'Kimmich',
+	  'Goretzka',
+	  'Coman',
+	  'Muller',
+	  'Gnarby',
+	  'Lewandowski',
+	],
+	[
+	  'Burki',
+	  'Schulz',
+	  'Hummels',
+	  'Akanji',
+	  'Hakimi',
+	  'Weigl',
+	  'Witsel',
+	  'Hazard',
+	  'Brandt',
+	  'Sancho',
+	  'Gotze',
+	],
+  ],
+  score: '4:0',
+  scored: ['Lewandowski', 'Gnarby', 'Lewandowski', 'Hummels'],
+  date: 'Nov 9th, 2037',
+  odds: {
+	team1: 1.33,
+	x: 3.25,
+	team2: 6.5,
+  },
+};
+
+// Solution
+/*
+// task 1
+const [players1,players2] = game.players;
+console.log(players1, players2);
+// task 2
+const [gk, ...fieldPlayers] = players1;
+console.log(gk);
+console.log(fieldPlayers);
+// task 3
+const allPlayers = [...players1, ...players2];
+console.log(allPlayers);
+// task 4
+const players1Final = [...players1, 'Thiago', 'Coutinho', 'Perisic'];
+console.log(players1Final);
+// task 5
+const {odds:{team1, x: draw, team2},} = game;
+
+console.log(team1, draw, team2);
+// task 6
+function printGoals(...names){
+	console.log('Scored - '+names);
+	console.log('GameScore - '+game.score);
+}
+printGoals('Lewandowski', 'Gnarby', 'Lewandowski', 'Hummels');
+// task 7
+team1 < team2 && console.log('WinnerTeam team1 = '+team1);
+*/
+
+// Coding Challenge #2
+
+// task 1
+const gameScored = game.scored;
+for (const nam of gameScored.entries()){
+	console.log(`Goal ${nam[0]+1}: ${nam[1]}`);
+}
+// task 2
+const gameOdds = game.odds;
+const itrOdds = Object.values(gameOdds);
+
+let a = 0;
+let b = 0;
+						
+for (const odds of itrOdds){
+	a = a + odds;
+	b = b + 1;
+	b === itrOdds.length && console.log('average - '+(a/b));
+}
+// task 3
+for (let [team,odd] of Object.entries(game.odds)){
+ team === 'x' ? team = 'draw' : team = `victory ${game[team]}`;
+	console.log(`Odd of ${team}: ${odd}`);
+}
+// Bonus
+const scorers = {};
+for(let name of game.scored){
+	scorers[name] ? scorers[name] = scorers[name] + 1 : scorers[name] = 1;
+}
+console.log(scorers);
+
+// Coding Challenge #3
+
