@@ -527,7 +527,7 @@ console.log(joinString.join(' - '));
 // ***Coding Challenge***
 
 // Coding Challenege #1
-
+/*
 // Data
 const game = {
   team1: 'Bayern Munich',
@@ -571,7 +571,7 @@ const game = {
 };
 
 // Solution
-/*
+
 // task 1
 const [players1,players2] = game.players;
 console.log(players1, players2);
@@ -597,7 +597,7 @@ function printGoals(...names){
 printGoals('Lewandowski', 'Gnarby', 'Lewandowski', 'Hummels');
 // task 7
 team1 < team2 && console.log('WinnerTeam team1 = '+team1);
-*/
+
 
 // Coding Challenge #2
 
@@ -629,6 +629,77 @@ for(let name of game.scored){
 	scorers[name] ? scorers[name] = scorers[name] + 1 : scorers[name] = 1;
 }
 console.log(scorers);
+*/
 
 // Coding Challenge #3
+/*
+// Data
+const gameEvents = new Map([
+  [17, '⚽ GOAL'],
+  [36, '�� Substitution'],
+  [47, '⚽ GOAL'],
+  [61, '�� Substitution'],
+  [64, '�� Yellow card'],
+  [69, '�� Red card'],
+  [70, '�� Substitution'],
+  [72, '�� Substitution'],
+  [76, '⚽ GOAL'],
+  [80, '⚽ GOAL'],
+  [92, '�� Yellow card'],
+]);
+
+// Solution
+
+// syntax 
+// new Map ([[],[],[]])
+// new Set([])
+
+// task 1
+const eventValues = gameEvents.values();
+const gameEventSet = new Set([...eventValues]);
+console.log(gameEventSet);
+// task 2
+gameEvents.delete(64);
+console.log(gameEvents);
+// task 3
+const newGameEventSize = gameEvents.size;
+const totalTime = 90;
+console.log(`An event happened, on average, every ${totalTime/newGameEventSize} minutes.`);
+// task 4
+for(const [time, event] of gameEvents){
+	const half = time <= 45 ? 'FIRST HALF' : 'SECOND HALF';
+	console.log(`[${half}] ${time}: ${event}`);
+}
+*/
+
+// Coding Challenge #4
+/*
+document.body.append(document.createElement('textarea'));
+document.body.append(document.createElement('button'));
+
+const btnTextArea = document.querySelector('button');
+
+btnTextArea.addEventListener('click', function(){
+	let cnt = 0;
+	const textArea = document.querySelector('textarea').value;
+	const removeText = textArea;
+	const joinTextArea = removeText.split('\n');
+	for (const text of joinTextArea){
+		const splitText = text.split('_');
+		const splitText2 = splitText[1].split('');
+		// console.log(splitText2);
+		const [cptl,...lwr] = splitText2;
+		const cptlCase = cptl.toUpperCase();
+		const lwrCase = lwr.join('').toLowerCase();
+		const joinCase = cptlCase+lwrCase;
+		const camelCase = splitText[0]+joinCase;
+		cnt+=1;
+		const camelPad= camelCase.padEnd(20,' ');
+		const camelPad2 = camelPad.padEnd(20+cnt,'*');
+		console.log(camelPad2,cnt);
+	}	
+})
+*/
+
+// ****** End of Module *******
 
