@@ -115,7 +115,6 @@ fruits.forEach(buyOne); // fruit as argument to buyOne
 
 
 // Function can be assigned to a variable as a value
-
 // Function can be returned from a function as a value
 
 function introDuce(name){
@@ -170,6 +169,46 @@ function introPersonOne(){
 }
 // introPersonOne();
 const introBindThree = introPersonOne.bind(introObjectThree);
-introBindThree();
+introBindThree(); // returned function
 const introBindFour = introPersonOne.bind(introObjectFour);
 introBindFour();
+
+
+// Partial Application with bind method
+
+// apply or set the arguments to pre-define it for all use cases- set the this keyword to null and provide only arguments
+
+function suspect (name,age) {
+	return console.log(`The vehicle is driven by ${name}, a ${age} yr old male.`);
+}
+
+
+const partAppBind = suspect.bind(null,'jane');
+partAppBind(16);
+partAppBind(46);
+
+// IIFE - Immediately Invoked Function Expression
+// these are one time use only function
+// syntax - (function(){};)();
+
+(function () {
+	console.log('It is an IIFE response.');
+})();
+
+
+// Closures
+
+// a closure variable environment in execution context helps in variable links between when they were first created and used when modified at later stage.
+
+function stepper(){ 
+	let step = 0;       // in execution context var. env.
+	return function (){
+		step++;
+		console.log(`This is step ${step}.`);
+	}
+}
+const stepperTwo = stepper(); // stepper exited the E.C
+stepperTwo();
+stepperTwo(); // accessing variable 'step'
+stepperTwo();
+
