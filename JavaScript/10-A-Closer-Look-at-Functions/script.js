@@ -1,7 +1,7 @@
 'use strict';
 
 // A Closer Look At Function
-
+/*
 // Passing Default parameters to function
 function groupDetail (groupName = 'Nogroup', numbPer=4) {
   console.log(`The ${groupName} group has ${numbPer} number of persons.`);
@@ -176,7 +176,7 @@ introBindFour();
 
 // Partial Application with bind method
 
-// apply or set the arguments to pre-define it for all use cases- set the this keyword to null and provide only arguments
+// apply or set the arguments to pre-define it for all use cases- set the 'this' to null and provide only arguments
 
 function suspect (name,age) {
 	return console.log(`The vehicle is driven by ${name}, a ${age} yr old male.`);
@@ -210,5 +210,80 @@ function stepper(){
 const stepperTwo = stepper(); // stepper exited the E.C
 stepperTwo();
 stepperTwo(); // accessing variable 'step'
-stepperTwo();
+*/
 
+// **Coding Challenge**
+
+// Challenge #1
+
+const poll = {
+   question: "What is your favourite programming language?",
+   options: ["0: JavaScript", "1: Python", "2: Rust", "3: C++"],
+   answers: new Array(4).fill(0),// This generates [0, 0, 0, 0].
+};
+
+
+// task #3
+function displayResults (pollAnswer) {
+   console.log(`Poll results are - `+pollAnswer+'.');
+   console.log(pollAnswer);
+}
+// displayResults();
+
+// task #1
+function registerNewAnswer () {
+   let pollAnswer = this.answers;
+   function callPrompt() {
+      const inputPrompt = prompt(`${poll.question}\n${poll.options[0]}\n${poll.options[1]}\n${poll.options[2]}\n${poll.options[3]}\n(Write option number)`);
+      // console.log(inputPrompt);
+      return inputPrompt;
+   }
+
+   let inputValue = callPrompt();
+   // console.log('input value - \"'+inputValue+'\" ,typeof - '+typeof inputValue);
+
+   function inputValueCheck () {
+   	  inputValue === '' ? inputValue = NaN : inputValue = Math.trunc(Number(inputValue));
+   	  // console.log('inputValueF',inputValue);
+   	  return inputValue;
+   }
+   inputValue = inputValueCheck();
+   
+   // while loop - prompt to enter correct value
+   while (isNaN(inputValue) || inputValue > 3 || inputValue < 0) {
+      inputValue = callPrompt();
+      // console.log('inputBeforeCheck - '+inputValue);
+      inputValue = inputValueCheck();
+      // console.log('inputAfterCheck - '+inputValue);
+   }      
+   // console.log('finalInputValue- '+inputValue);
+   function updateAnswers () {
+      pollAnswer[inputValue] = pollAnswer[inputValue] + 1;
+   }
+   updateAnswers();
+
+   displayResults(pollAnswer);   
+}
+
+// task #2
+const btnPoll =  document.querySelector('.poll');
+btnPoll.addEventListener('click',registerNewAnswer.bind(poll));
+
+
+// Challenge #2
+/*
+// Closure and IIFE usecase
+// IIFE executes once and creates eventlistener to be used later when clicked
+// Closure helps retrieve 'header' variable 
+
+(function () {
+	const header = document.querySelector('h1');
+	// created 'header' variable from 'h1' selection
+	header.style.color = 'red';
+
+	document.querySelector('body').addEventListener('click', function () {
+	// used closure link to access variable to change color when body is clicked
+   header.style.color = 'blue';
+	})
+})();
+*/
