@@ -1,76 +1,84 @@
 'use strict';
 
-/////////////////////////////////////////////////
-/////////////////////////////////////////////////
-// BANKIST APP
+//** Working with Arrays**
 
-// Data
-const account1 = {
-  owner: 'Jonas Schmedtmann',
-  movements: [200, 450, -400, 3000, -650, -130, 70, 1300],
-  interestRate: 1.2, // %
-  pin: 1111,
-};
+// Slice
+const arr = [ 'a', 'b', 'c', 'd', 'e'];
+console.log(arr);
+console.log(arr.slice(2));
+console.log(arr.slice(2, -2));
+console.log(arr.slice(-4, -1));
+console.log(arr.slice(0, 3));
+console.log(arr);
 
-const account2 = {
-  owner: 'Jessica Davis',
-  movements: [5000, 3400, -150, -790, -3210, -1000, 8500, -30],
-  interestRate: 1.5,
-  pin: 2222,
-};
+// Splice
+const arr2 = [ 'A', 'B', 'C', 'D', 'E'];
+console.log(arr2); // alters original array
+// console.log(arr2.splice(2));
+// console.log(arr2.splice(-2));
+// console.log(arr2.splice(-4));
+// console.log(arr2.splice(0, 3));
+// console.log(arr2);
 
-const account3 = {
-  owner: 'Steven Thomas Williams',
-  movements: [200, -200, 340, -300, -20, 50, 400, -460],
-  interestRate: 0.7,
-  pin: 3333,
-};
 
-const account4 = {
-  owner: 'Sarah Smith',
-  movements: [430, 1000, 700, 50, 90],
-  interestRate: 1,
-  pin: 4444,
-};
+// Reverse
+console.log(arr.reverse()); // alters array
+console.log(arr2.reverse());
 
-const accounts = [account1, account2, account3, account4];
+// At
+console.log(arr.at(0)); // what is at(position)
+console.log(arr.at(1));
+console.log(arr.at(2));
+console.log(arr.at(3));
 
-// Elements
-const labelWelcome = document.querySelector('.welcome');
-const labelDate = document.querySelector('.date');
-const labelBalance = document.querySelector('.balance__value');
-const labelSumIn = document.querySelector('.summary__value--in');
-const labelSumOut = document.querySelector('.summary__value--out');
-const labelSumInterest = document.querySelector('.summary__value--interest');
-const labelTimer = document.querySelector('.timer');
+// Concat
+console.log(arr.concat(arr2));
+console.log(arr2.concat(arr));
 
-const containerApp = document.querySelector('.app');
-const containerMovements = document.querySelector('.movements');
+// Join
+console.log(arr.join(' '));
+console.log(arr2.join('-'));
 
-const btnLogin = document.querySelector('.login__btn');
-const btnTransfer = document.querySelector('.form__btn--transfer');
-const btnLoan = document.querySelector('.form__btn--loan');
-const btnClose = document.querySelector('.form__btn--close');
-const btnSort = document.querySelector('.btn--sort');
+// ForEach-Looping
+function logEach(a) {
+   console.log(a);
+}
 
-const inputLoginUsername = document.querySelector('.login__input--user');
-const inputLoginPin = document.querySelector('.login__input--pin');
-const inputTransferTo = document.querySelector('.form__input--to');
-const inputTransferAmount = document.querySelector('.form__input--amount');
-const inputLoanAmount = document.querySelector('.form__input--loan-amount');
-const inputCloseUsername = document.querySelector('.form__input--user');
-const inputClosePin = document.querySelector('.form__input--pin');
+arr.forEach(logEach);
+arr2.forEach(logEach);
 
-/////////////////////////////////////////////////
-/////////////////////////////////////////////////
-// LECTURES
+// Throw-away Variable '_'
+function throwAway (x, _, z) {
+	console.log(x,z);
+}
 
-const currencies = new Map([
-  ['USD', 'United States dollar'],
-  ['EUR', 'Euro'],
-  ['GBP', 'Pound sterling'],
-]);
+throwAway('d',3,6);
 
-const movements = [200, 450, -400, 3000, -650, -130, 70, 1300];
+// **Data Transformation**
 
-/////////////////////////////////////////////////
+// Map
+function mapArray (arrayItem, index, array){
+	return arrayItem.toUpperCase();
+}
+const mapAlpbt = arr.map(mapArray);
+console.log(mapAlpbt);
+
+// Filter
+const arr3 = [1, 2, 3, 4, 5, 6];
+
+function filterArray (arrayItem, index, array) {
+   if (arrayItem > 2) return arrayItem;
+}
+
+const filterNumbers = arr3.filter(filterArray);
+console.log(filterNumbers);
+
+// Reduce
+function reduceArray (acc, arrayItem, index, array){
+	return acc + arrayItem;
+}
+
+const reduceValue = arr3.reduce(reduceArray,0);
+console.log(reduceValue);
+
+
