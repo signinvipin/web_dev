@@ -1,7 +1,12 @@
 'use strict';
-
+/*
+// auto-page reload
+setTimeout(() => {
+	window.location.reload();
+}, 5000);
+*/
 //** Working with Arrays**
-
+/*
 // Slice
 const arr = [ 'a', 'b', 'c', 'd', 'e'];
 console.log(arr);
@@ -40,8 +45,10 @@ console.log(arr.join(' '));
 console.log(arr2.join('-'));
 
 // ForEach-Looping
+let strA = '';
 function logEach(a) {
-   console.log(a);
+   strA = strA+a
+   console.log(strA);
 }
 
 arr.forEach(logEach);
@@ -80,5 +87,103 @@ function reduceArray (acc, arrayItem, index, array){
 
 const reduceValue = arr3.reduce(reduceArray,0);
 console.log(reduceValue);
+
+// Sort 
+
+	// Ascending
+const arr4 = arr3;
+arr4.sort((a,b)=>{
+	if (a > b) return 1;
+	if (b > a) return -1;
+});
+console.log(arr4);
+
+	// Descending
+arr4.sort((a,b)=>{
+	if (a > b) return -1;
+	if (b > a) return 1;
+});
+console.log(arr4);
+
+  // Simplified
+	// Ascending
+arr4.sort((a,b)=> a-b);
+console.log(arr4);
+	// Descending
+arr4.sort((a,b)=> b-a);
+console.log(arr4);
+
+
+// From
+// syntax - Array.from(iterable,function)
+	// create new array with length and condn
+const arrayFrom = Array.from({length:7}, ()=>1);
+console.log(arrayFrom);
+
+const arrayFromOne = Array.from(arrayFrom, (_, i) => i + 1);
+console.log(arrayFromOne);
+
+	// takes iterable and create array with data and condn
+/*
+const arrayFromIterable = Array.from(document.querySelector('.class'), ()=>{
+	el=> el.replace('$','');
+});
+console.log(arrayFromIterable);
+*/
+
+/*
+// Fill
+// takes value to be filled as argument or
+// takes value ,from pos ,to pos as argument
+const fillArray = new Array (7); //create empty array
+const fillOne = fillArray.fill('1');
+const fillSelect = fillArray.fill(23,2,5); 
+console.log(fillArray);
+
+// Flat
+// flat() takes no. of level of nest upto which unnesting is required as argument - Default is 1
+// flattens one level down by default
+const nestArray = [ 1, 2, [ 3, [ 4], 5], 6, 7, [ 9, 0]];
+// const nestArr = nestArray.flat();
+const nestArr = nestArray.flat(3);
+console.log(nestArr);
+
+// Flatmap
+// flattens and maps one level deep only ; use flat() for more depth
+function flatMapFn (a) {
+	return a;
+}
+const flatmapResponse = nestArray.flatMap(flatMapFn);
+console.log(flatmapResponse);
+
+// Some(fn)
+// checks if one item qualifies or not
+// takes function for condn ; searches values' presence
+function someFunction (a) {
+	console.log(a, a > 4);
+	return a;
+}
+
+const someValue = nestArray.some(someFunction);
+console.log(someValue);
+
+// Every
+// checks if every item qualifies or not
+function everyFunction (x){
+	return x < 1;
+}
+const fillOneValue = fillOne.every(everyFunction);
+console.log(fillOneValue);
+*/
+
+// PreventDefault
+// when href='#', makes certain actions to prevent we do it
+/*
+const preventAction = function (event){
+	event.preventDefault();
+}
+*/
+
+// **Coding Challenges**
 
 
