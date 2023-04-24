@@ -87,102 +87,140 @@ function reduceArray (acc, arrayItem, index, array){
 
 const reduceValue = arr3.reduce(reduceArray,0);
 console.log(reduceValue);
+*/
 
-// Sort 
+// find(condn fn)
+// returns item in array which qualifies the condn fn.
+const arr4 = [1, 2, 3, 4, 5, 6];
+console.log(arr4.find((a) => a > 4)); // 5
 
-	// Ascending
-const arr4 = arr3;
-arr4.sort((a,b)=>{
-	if (a > b) return 1;
-	if (b > a) return -1;
+// findIndex(cdn. fn)
+// finds the index of qualifying item
+console.log(arr4.findIndex((a) => a > 4)); // 4
+
+// [].map(fn)
+// map takes condn fn as arg and applies to every item
+// and place them at previous respective positions in
+// array
+const arrMap = arr4.map((e,i,arr)=>e * 2);
+console.log(arrMap);
+
+// [].filter(fn)
+const arrFilter = arr4.filter((e,i,arr)=>e>3);
+console.log('a > 3 = '+arrFilter);
+
+// [].flat(depth no.)
+const arrayNest3 = [1, 2, [3, [4, 5], 6], 7, 8];
+console.log(arrayNest3);
+
+const arrayFlat = arrayNest3.flat(); // default 1 level
+console.log(arrayFlat);
+
+const arrayFlatTwo = arrayNest3.flat(2);
+console.log(arrayFlatTwo);
+
+// [].flatMap(fn)
+// un-nesting and apply map fn on un-nested array items
+console.log(arrayNest3.flatMap((a)=>a)); // level 1 deep
+
+// [].reduce(fn,accval)
+// accVal - accumulate values on it using as base
+// a - accumulator, e -element, i- index, arr - array
+const arrReduce = arr4.reduce((a,e,i,arr)=> a = a+e , 0);
+console.log(arrReduce);
+
+// [].sort()
+// sorts items in array 
+const arraySort = [6, 2, 5, 7, 8, 4, 1, 3, 0];
+console.log(arraySort.sort());
+
+const arraySortOne = ['f', 'c', 'd', 'b', 'e', 'a', 'g', 'i', 'h'];
+console.log(arraySortOne);
+console.log(arraySortOne.sort());
+
+// [].sort(fn)
+const arraySortTwo = [-250, 433, -503, 956, 323, -198];
+const arrSorted = arraySortTwo.sort();
+console.log(arrSorted);
+
+	// ascending
+const srtaArr = arraySort.sort((a,b) => {
+	if (a>b) return 1;
+	if (b>a) return -1;
 });
-console.log(arr4);
+console.log(srtaArr);
 
-	// Descending
-arr4.sort((a,b)=>{
-	if (a > b) return -1;
-	if (b > a) return 1;
+	// descending
+const sortdArr = arraySort.sort((a,b) => {
+	if (a>b) return -1;
+	if (b>a) return 1;
 });
-console.log(arr4);
+console.log(sortdArr);
 
-  // Simplified
-	// Ascending
-arr4.sort((a,b)=> a-b);
-console.log(arr4);
-	// Descending
-arr4.sort((a,b)=> b-a);
-console.log(arr4);
+// Simple Way
+	// ascending
+const srtSimpleA = arraySort.sort((a,b) => a-b);
+console.log(srtSimpleA);
 
+	// descending
+const srtSimpleD = arraySort.sort((a,b) => b-a);
+console.log(srtSimpleD);
 
-// From
-// syntax - Array.from(iterable,function)
-	// create new array with length and condn
-const arrayFrom = Array.from({length:7}, ()=>1);
+// Creating and Filling Arrays*****
+
+// Array.from([],fn)
+const arrayFrom = Array.from({length:6}, (e,i) => 1);
 console.log(arrayFrom);
 
-const arrayFromOne = Array.from(arrayFrom, (_, i) => i + 1);
-console.log(arrayFromOne);
+const arrayFrom1 = Array.from(new Array(7), (e,i) => 1);
+console.log(arrayFrom1);
 
-	// takes iterable and create array with data and condn
-/*
-const arrayFromIterable = Array.from(document.querySelector('.class'), ()=>{
-	el=> el.replace('$','');
-});
-console.log(arrayFromIterable);
+const arrayFrom2 = Array.from({length:6}, (e,i) => i+1);
+console.log(arrayFrom2);
+
+/* *** const arrayFromDOM = Array.from((selectedDOMElement-iterable), fn. ops.);
 */
 
-/*
-// Fill
-// takes value to be filled as argument or
-// takes value ,from pos ,to pos as argument
-const fillArray = new Array (7); //create empty array
-const fillOne = fillArray.fill('1');
-const fillSelect = fillArray.fill(23,2,5); 
-console.log(fillArray);
+// some(fn)
+// returns boolean if any item matches the condn
+const arraySome = arraySort.some((a)=>a===5);
+console.log('a === 5 = '+arraySome);
 
-// Flat
-// flat() takes no. of level of nest upto which unnesting is required as argument - Default is 1
-// flattens one level down by default
-const nestArray = [ 1, 2, [ 3, [ 4], 5], 6, 7, [ 9, 0]];
-// const nestArr = nestArray.flat();
-const nestArr = nestArray.flat(3);
-console.log(nestArr);
-
-// Flatmap
-// flattens and maps one level deep only ; use flat() for more depth
-function flatMapFn (a) {
-	return a;
-}
-const flatmapResponse = nestArray.flatMap(flatMapFn);
-console.log(flatmapResponse);
-
-// Some(fn)
-// checks if one item qualifies or not
-// takes function for condn ; searches values' presence
-function someFunction (a) {
-	console.log(a, a > 4);
-	return a;
-}
-
-const someValue = nestArray.some(someFunction);
-console.log(someValue);
-
-// Every
-// checks if every item qualifies or not
-function everyFunction (x){
-	return x < 1;
-}
-const fillOneValue = fillOne.every(everyFunction);
-console.log(fillOneValue);
-*/
+// every(fn)
+// returns boolean if all item pass the condn
+const arrayEvery = arraySort.every((a)=>a<9);
+console.log('a < 9 = '+arrayEvery);
 
 // PreventDefault
-// when href='#', makes certain actions to prevent we do it
+// when href='#', page auto-acts by default 
 /*
-const preventAction = function (event){
+const precentAction = function (event){
 	event.preventDefault();
 }
+// use fn with event handler
 */
+
+// fill(item)
+// takes item to be filled to  empty array as arg 
+const arrayFill = new Array(6);
+arrayFill.map((a)=>5); // can't fill
+console.log(arrayFill);
+
+const arrayFilled = arrayFill.fill(5);
+console.log(arrayFilled);
+
+// 1 - item to be filled, 2 - start Pos, 4 - end Pos.
+const arrayFilled1 = arrayFill.fill(1,2,4);
+console.log(arrayFilled1);
+
+// doesn't take function conditions
+function arrFill (a,i){
+	a = 0;
+	return a+i;
+}
+// no fn input
+// console.log(arrayFill.fill(arrFill));
+
 
 // **Coding Challenges**
 
