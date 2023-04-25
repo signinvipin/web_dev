@@ -87,7 +87,7 @@ function reduceArray (acc, arrayItem, index, array){
 
 const reduceValue = arr3.reduce(reduceArray,0);
 console.log(reduceValue);
-*/
+
 
 // find(condn fn)
 // returns item in array which qualifies the condn fn.
@@ -102,7 +102,7 @@ console.log(arr4.findIndex((a) => a > 4)); // 4
 // map takes condn fn as arg and applies to every item
 // and place them at previous respective positions in
 // array
-const arrMap = arr4.map((e,i,arr)=>e * 2);
+const arrMap = arr4.map((e,i,arr)=>e*2);
 console.log(arrMap);
 
 // [].filter(fn)
@@ -179,7 +179,7 @@ const arrayFrom2 = Array.from({length:6}, (e,i) => i+1);
 console.log(arrayFrom2);
 
 /* *** const arrayFromDOM = Array.from((selectedDOMElement-iterable), fn. ops.);
-*/
+
 
 // some(fn)
 // returns boolean if any item matches the condn
@@ -198,7 +198,7 @@ const precentAction = function (event){
 	event.preventDefault();
 }
 // use fn with event handler
-*/
+
 
 // fill(item)
 // takes item to be filled to  empty array as arg 
@@ -220,8 +220,147 @@ function arrFill (a,i){
 }
 // no fn input
 // console.log(arrayFill.fill(arrFill));
+*/
+
+// **Working with Numbers**
+/*
+// all numbers in JS are internally recognized as floats 
+// as is the case in 64base2 - binary number system
+console.log(23 === 23.0); // true
+
+// with base2 it is improper when stating fraction values
+// base2 0 to 1
+// base10 0 to 9, is more good to work with
+console.log(0.1+0.2); // 0.30000000000000004
+console.log(0.1+0.2 === 0.3); // false
+
+// Conversion to Number type
+console.log(typeof(Number('36')));
+console.log(+'78');
+
+// ___Number___
+
+// parseInt
+// parse and return only integer from beginning
+console.log(Number.parseInt('20rem')); //20
+console.log(Number.parseInt('69px')); // 69
+// can also take secondary argument - numbersystem
+// binary-2, octal-8, decimal-10, hexadecimal-16
+console.log(Number.parseInt('76px',16)); // 118
+console.log(Number.parseInt('76px',10)); // 76
+console.log(Number.parseInt('76px',8)); // 62
 
 
-// **Coding Challenges**
 
+// parseFloat
+// parse and return only float from beginning
+console.log(Number.parseFloat('23.4px')); // 23.4
+console.log(Number.parseFloat('46.8rem')); // 46.8
 
+// isNaN check??
+console.log(Number.isNaN(+'20px')); // false
+console.log(Number.isNaN('28')); // false
+console.log(Number.isNaN(34)); // false
+
+// isFinite
+console.log(24/0); // Infinity
+console.log(Number.isFinite(24/0)); // false
+
+// isInteger
+console.log(Number.isInteger(24)); // true
+console.log(Number.isInteger(2.3)); // false
+
+// ___Math___
+
+// Square Root
+console.log(Math.sqrt(25)); // 5
+console.log(Math.sqrt(64)); // 8
+// otherway
+console.log(25**(1/2)); // 5
+
+// Max Value
+console.log(Math.max(1,5,2,6,8,3,9)); // 9
+
+// Min Value
+console.log(Math.min(1,5,3,7,4,5,2)); // 1
+
+// Generate Random Value between 0-1
+const rand = Math.random();
+console.log(rand);
+
+// Truncate Value
+console.log(Math.trunc(rand));
+
+// Round
+// round-off value to next/previous stable non-decimal
+// if above '.50' then next value
+console.log(Math.round(23.56)); // 24
+// if below '.50' then previous value
+console.log(Math.round(23.17)); // 23
+
+// Ceil
+// round-off the Value to next upper stable non-decimal
+// even if its 0.01 more
+console.log(Math.ceil(29.01)); // 30
+
+// Floor
+// round-off the value to previous non-decimal stable
+// even if it is 0.99 closer to next
+console.log(Math.floor(43.99)); // 43
+
+// Fixing Decimal Places to Float
+console.log((12.345464778).toFixed(2)); // 12.35
+console.log((12.345464778).toFixed()); // 12
+console.log((12.345464778).toFixed(4)); // 12.3455
+
+// Number Seperator
+// console.log(1,00,000); // Not allowed
+// for representation use '_' underscore
+console.log(1_00_000); // 100000
+
+// Remainder Operator (Modulus Operator)
+// checks the remainder of division with condition,
+// checks and returns true if remainder qualifies
+console.log(24%2 === 0); // true
+
+// BigInt
+// primitive types
+// 64-bit to store any number
+// 0..<store number>...53...<store sign and decimal>...63
+
+// BigInt JS can handle 
+// 2 - base2, -1: starts from 0, 53 - space for number
+console.log(2**53-1); // 9007199254740991
+
+// Max BigInt
+// console.log(MAX_BIGINT);
+
+// Safe BigInt limit
+console.log('Safe: +(2**53-1) to -(2**53-1)')
+
+// Usage of BigInt
+
+// Way One - use suffix 'n'
+const intOne = 1536666512616717884844999181899n;
+console.log(typeof intOne, intOne);
+
+// Way Two - use bigInt()
+const intTwo = BigInt(17263748502857398922881187465467352);
+console.log(typeof intTwo, intTwo);
+
+// Logical & Math Operations
+// -, +, /, "*" possible on loose equality with auto type-coercion
+// happens b/w same type only
+
+console.log(10n + 20n); // 30n
+console.log(30n - 10n); // 20n
+console.log(20n*2n); // 40n
+console.log(10n / 2n); // 5n
+// console.log(10n - 10); // TypeError
+console.log(20n == 20); // true - loose equality
+console.log(20n === 20); // false - strict equality
+
+console.log(10n+'10n'); // string 1010n
+console.log(10n/3n); // 3n --no decimal roundoff
+
+*/
