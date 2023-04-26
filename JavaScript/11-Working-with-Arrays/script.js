@@ -308,6 +308,10 @@ console.log(Math.ceil(29.01)); // 30
 // even if it is 0.99 closer to next
 console.log(Math.floor(43.99)); // 43
 
+// Absolute value
+console.log(Math.abs(-23)); // 23
+console.log(Math.abs(23.0));  // 23
+
 // Fixing Decimal Places to Float
 console.log((12.345464778).toFixed(2)); // 12.35
 console.log((12.345464778).toFixed()); // 12
@@ -362,5 +366,97 @@ console.log(20n === 20); // false - strict equality
 
 console.log(10n+'10n'); // string 1010n
 console.log(10n/3n); // 3n --no decimal roundoff
-
 */
+
+// **Working with Date and Time**
+
+// Generate new date for creation moment
+const dateNow = new Date();
+console.log(dateNow);
+
+// Parse Time from string
+const dateParse = new Date('Wednesday, 26 April, 2023');
+console.log(dateParse);
+
+const dateParseOne = new Date('12/10/2023');
+console.log(dateParseOne);
+
+console.log(Date(dateNow)); // Wed Apr 26 2023 12:51:34 GMT+0530 (India Standard Time)
+
+
+// TimeStamp
+// TimeStamp starts from unix creation Jan 01, 1970.
+// Create TimeStamp
+// Way #1
+const dateTimeStamp = dateNow.getTime(); 
+console.log(dateTimeStamp);  // 1682496447172
+// Way #2
+const dateTimeStampOne = Number(dateNow);
+console.log(dateTimeStampOne); // 1682496447172
+// Way #3
+console.log(Date.now()); // 1682496447188
+
+// Retrieve Elements 
+// Date
+console.log(dateNow.getDate()); // 26 or at time of run
+// Minutes
+console.log(dateNow.getMinutes()); // 42
+// Hour
+console.log(dateNow.getHours()); // 12
+// Seconds
+console.log(dateNow.getSeconds()); // 51
+// Day
+console.log(dateNow.getDay()); // 3
+// Month
+console.log(dateNow.getMonth()); // 3, starts from 0
+// Year
+console.log(dateNow.getYear()); // 123
+// Full Year
+console.log(dateNow.getFullYear()); // 2023
+// Convert to ISO Format
+console.log(dateNow.toISOString()); // 2023-04-26T07:18:21.081Z
+
+// Internationalization of dates 
+// Internationalization API - DateTimeFormat
+
+// new Intl.DateTimeFormat().format()
+
+const optionsObj = {
+	hour:'numeric',
+	minute:'numeric',
+	month:'long',
+	year:'numeric',
+	weekday:'long',
+}
+
+const intlDate = new Intl.DateTimeFormat('en-US', optionsObj).format(dateNow);
+console.log(intlDate); // April 2023 Wednesday at 12:57 PM
+
+// Internationalization of Number
+// Internationalization API - NumberFormat
+
+// new Intl.NumberFormat().format()
+
+const optionsObjCur = {
+	style:'currency',
+	currency:'USD',
+} 
+
+const optionsObjSp = {
+	style:'unit',
+	unit: 'kilometer-per-hour',
+}
+
+// Access local language
+const localLang = navigator.language;
+console.log(localLang); // en-US
+
+const intlNum = new Intl.NumberFormat('en-US',optionsObjCur).format(2535.78);
+console.log(intlNum); // $2,535.78
+
+const intlNumSpd = new Intl.NumberFormat(localLang, optionsObjSp).format(25.7);
+console.log(intlNumSpd); // 25.7 km/h
+
+// ***Intl - style - ?
+
+
