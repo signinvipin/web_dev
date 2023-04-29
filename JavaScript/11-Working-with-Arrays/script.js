@@ -369,7 +369,7 @@ console.log(10n/3n); // 3n --no decimal roundoff
 */
 
 // **Working with Date and Time**
-
+/*
 // Generate new date for creation moment
 const dateNow = new Date();
 console.log(dateNow);
@@ -457,6 +457,157 @@ console.log(intlNum); // $2,535.78
 const intlNumSpd = new Intl.NumberFormat(localLang, optionsObjSp).format(25.7);
 console.log(intlNumSpd); // 25.7 km/h
 
-// ***Intl - style - ?
+// ***Intl - style - Find more?
+*/
+
+// ****Coding Challenges****
+
+// Challenge #1
+/*
+const dogsJuliaD1 = [3, 5, 2, 12, 7];
+const dogsKateD1 = [4, 1, 15, 8, 3];
+
+const dogsJuliaD2 = [9, 16, 6, 8, 3];
+const dogsKateD2 = [10, 5, 6, 1, 4];
+
+const checkDogs = function (arrayOne, arrayTwo) {
+ // task #1
+	const juliaArrayCopy = arrayOne;
+	const newJuliaArray = juliaArrayCopy.slice(1,-2);
+ // task #2
+	const arrayDogAge = newJuliaArray.concat(arrayTwo);
+ // task #3
+	let a = 0;
+	for (let dog of arrayDogAge){
+		a++;
+		let dogAdultPuppy = dog >= 3 ? `Dog number ${a} is an adult, and is ${dog} years old.` : `Dog number ${a} is still a puppy.`;
+		console.log(dogAdultPuppy);
+		}
+}
+ // task #4
+checkDogs(dogsJuliaD1, dogsKateD1);
+checkDogs(dogsJuliaD2, dogsKateD2);
+*/
+
+// Challenge #2
+/*
+const ageD1 = [5, 2, 4, 1, 15, 8, 3];
+const ageD2 = [16, 6, 10, 5, 6, 1, 4];
+
+const calcAverageHumanAge = function (arr) {
+	// task #1
+	const humanAge = arr.map((dogAge,i,arr) => dogAge <= 2 ? 2*dogAge : 16 + dogAge*4);	
+	console.log(humanAge);
+	
+	//  task #2
+	const adultAge = humanAge.filter((e,i,arr) => {
+		if (e >= 18) return e; });
+	console.log(adultAge);
+	
+	// task #3
+	// way#1
+	const addAge = adultAge.reduce((acc,e) =>	acc + e, 0);
+	const avgAge = addAge/adultAge.length;
+
+	// way#2
+	// if [2,3],so divide each one by array length individually
+	// then add like - (2/2 + 3/2)
+		
+	console.log(avgAge.toFixed(2));
+
+	return avgAge.toFixed(2);
+	
+}
+    // task #4
+calcAverageHumanAge(ageD1);
+calcAverageHumanAge(ageD2);
+*/
+
+// Challenge #3
+/*
+const ageDat1 = [5, 2, 4, 1, 15, 8, 3];
+const ageDat2 = [16, 6, 10, 5, 6, 1, 4];
+
+const calcAverageHumanAge = (arr) => 
+arr.map((dogAge) => dogAge <= 2 ? 2*dogAge : 16 + dogAge*4)
+.filter((e) => e >= 18)
+.reduce((acc,e,i,arr) => acc + (e/arr.length),0);
+
+console.log(calcAverageHumanAge(ageDat1).toFixed(2));
+console.log(calcAverageHumanAge(ageDat2).toFixed(2));
+*/
+
+// Challenge #4
+/*
+const dogs = [
+	{ weight: 22, curFood: 250, owners: ['Alice', 'Bob'] },
+	{ weight: 8, curFood: 200, owners: ['Matilda'] },
+	{ weight: 13, curFood: 275, owners: ['Sarah', 'John'] },
+	{ weight: 32, curFood: 340, owners: ['Michael'] },
+];
+
+// task 1
+dogs.forEach((obj,i)=>obj.recFood =
+Math.trunc(obj.weight**0.75*28));
+
+console.log(dogs);
+
+// task 2
+const arraySarah = dogs.filter((e,i,arr)=>(e.owners).includes('Sarah'));
+const [{weight,curFood,recFood}] = arraySarah;
+// console.log(weight,curFood,recFood);
+
+function foodEating (recFood,curFood) {
+	let okFood = recFood;
+	const recFoodAbvLmt = okFood += okFood*0.10;
+	const recFoodLwLmt = okFood -= okFood*0.10;
+	// console.log(recFoodAbvLmt, recFoodLwLmt);
+
+	if (curFood < recFoodLwLmt) {
+		console.log('Eating is too little.');
+	} else if (curFood > recFoodAbvLmt) {
+		console.log('Eating is too much.');
+	} else {
+		console.log('Eating is Okay.');
+	}
+};
+foodEating(recFood, curFood);
 
 
+// task 3
+const ownersEatTooMuch = dogs.filter((e) =>	e.curFood > e.recFood)
+.map((e)=>e.owners).flat();
+console.log(ownersEatTooMuch);
+
+const ownersEatTooLittle = dogs.filter((e)=> e.curFood < e.recFood)
+.map((e)=>e.owners).flat();
+console.log(ownersEatTooLittle);
+
+// task 4
+console.log(`${ownersEatTooMuch.join(' and ')}'s dogs eat too much.`);
+console.log(`${ownersEatTooLittle.join(' and ')}'s dogs eat too little!`);
+
+// task 5
+const recFoodDog = dogs.some((e)=> e.curFood === e.recFood);
+console.log(recFoodDog);
+
+// task 6
+const curFoodCheck = dogs.some((e)=> (e.curFood < (e.recFood + e.recFood*0.10)) && (e.curFood > (e.recFood - e.recFood*0.10)));
+console.log(curFoodCheck);
+
+// task 7
+const okayFoodDogs = dogs.filter((e)=>
+(e.curFood < (e.recFood + e.recFood*0.10)) && 
+(e.curFood > (e.recFood - e.recFood*0.10)));
+
+console.log(okayFoodDogs);
+
+// task 8
+
+const dogsCopy = Array.from(dogs, (e)=>e); // create copy
+// console.log(dogsCopy);
+
+const sortDogsAs = dogsCopy.sort((a,b)=>a.recFood - b.recFood);
+console.log(sortDogsAs); // sort mutates original 'dogsCopy'
+
+*/
