@@ -35,42 +35,119 @@ const account4 = {
 
 const accounts = [account1, account2, account3, account4];
 
-// Elements
-const labelWelcome = document.querySelector('.welcome');
-const labelDate = document.querySelector('.date');
-const labelBalance = document.querySelector('.balance__value');
-const labelSumIn = document.querySelector('.summary__value--in');
-const labelSumOut = document.querySelector('.summary__value--out');
-const labelSumInterest = document.querySelector('.summary__value--interest');
-const labelTimer = document.querySelector('.timer');
+// DOM Element Selection
 
-const containerApp = document.querySelector('.app');
-const containerMovements = document.querySelector('.movements');
+const userName = document.querySelector('.login__input--user');
+const passWord = document.querySelector('.login__input--pin');
+const btnUserPass = document.querySelector('.login__btn');
+const appMain = document.querySelector('.app');
+const welcomeAtLogin = document.querySelector('.welcome');
+const logTimer = document.querySelector('.timer');
 
-const btnLogin = document.querySelector('.login__btn');
-const btnTransfer = document.querySelector('.form__btn--transfer');
-const btnLoan = document.querySelector('.form__btn--loan');
-const btnClose = document.querySelector('.form__btn--close');
-const btnSort = document.querySelector('.btn--sort');
 
-const inputLoginUsername = document.querySelector('.login__input--user');
-const inputLoginPin = document.querySelector('.login__input--pin');
-const inputTransferTo = document.querySelector('.form__input--to');
-const inputTransferAmount = document.querySelector('.form__input--amount');
-const inputLoanAmount = document.querySelector('.form__input--loan-amount');
-const inputCloseUsername = document.querySelector('.form__input--user');
-const inputClosePin = document.querySelector('.form__input--pin');
+// Message before login
+const loggedOutMessage = welcomeAtLogin.textContent;
 
-/////////////////////////////////////////////////
-/////////////////////////////////////////////////
-// LECTURES
+// Timer Variables
+let timerMinutes; 
+let timerSeconds;
+let timerVar;
 
-const currencies = new Map([
-  ['USD', 'United States dollar'],
-  ['EUR', 'Euro'],
-  ['GBP', 'Pound sterling'],
-]);
 
-const movements = [200, 450, -400, 3000, -650, -130, 70, 1300];
+const logOutTimer = function () {
+	clearInterval(timerVar);
+	timerMinutes = 9; // 3 minute timer
+	timerSeconds = 59;
+	timerVar = setInterval(() => {
+		if (timerSeconds < 0) {
+			timerSeconds = 59;
+			timerMinutes -= 1;
+		}
+		if (timerMinutes === 0 && timerSeconds === 0){
+			clearInterval(timerVar);
+			appMain.style.opacity = 0;
+			// console.log(loggedOutMessage);
+			welcomeAtLogin.textContent = loggedOutMessage;
+		}
+		// console.log(timerMinutes, timerSeconds);
+		const seconds = String(timerSeconds).padStart(2, '0');
+		const minutes = String(timerMinutes).padStart(2, '0');
+		// console.log(`${minutes}:${seconds}`);
+		logTimer.textContent = `${minutes}:${seconds}`;
+		timerSeconds -= 1;
+	}, 1000);
+	return timerVar;
+}
+// console.log(timerVar);
 
-/////////////////////////////////////////////////
+
+const checkCredentials = function () {
+	const usName = userName.value;
+	const psWord = passWord.value;
+	// console.log(typeof usName, typeof psWord);
+
+	const [nmOwner] = accounts.filter(function (item) {
+		// console.log(item);
+		const itmOwner = item.owner;
+		const itmPin = String(item.pin);
+		// console.log(itmOwner, itmPin, usName, psWord);
+
+		const nameOwnr = itmOwner.split(' ')
+		.map((name)=>name.slice(0,1).toLowerCase()).join('');				// console.log(typeof nameOwnr, typeof itmPin);
+
+		// return false;
+		return usName === nameOwnr && psWord === itmPin;
+	});
+	// console.log(typeof nmOwner); // object
+	return nmOwner ;
+	
+}
+
+const changeWelcome = function (userAccount) {
+
+	// Message after login
+	welcomeAtLogin.textContent = `Welcome, ${(userAccount.owner.split(' '))[0]}!`;
+}
+
+
+const balanceMoves = function () {
+	
+}
+
+
+const displayWelcome = function (userAccount) {
+	userName.value = '';
+	passWord.value = '';
+	// console.log(userAccount);
+	
+	if (typeof userAccount === 'object'){
+		// console.log(event);
+		appMain.style.opacity = 1;
+		
+	}
+}
+
+
+btnUserPass.addEventListener('click', (event)=>{
+    event.preventDefault(); 
+
+	// console.log(userName.value, passWord.value);
+
+	const userAccount = checkCredentials();
+	// console.log(userAccount);
+
+	displayWelcome(userAccount);
+	changeWelcome(userAccount);
+
+	// console.log(timerVar);
+	
+	
+	logOutTimer();
+
+	
+	
+});
+
+
+
+

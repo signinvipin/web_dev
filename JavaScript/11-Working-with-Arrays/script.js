@@ -458,6 +458,18 @@ const intlNumSpd = new Intl.NumberFormat(localLang, optionsObjSp).format(25.7);
 console.log(intlNumSpd); // 25.7 km/h
 
 // ***Intl - style - Find more?
+
+
+// setTimeOut and setInterval
+// Method setTimeout - happens one time only
+const countDown = setTimeout(()=> console.log('yes'),4000);
+// clear TimeOut timer
+clearTimeout(countDown);
+
+// Method setInterval - happens after each provided time gap
+const interval = setInterval(()=>console.log('No'),1000);
+// clear Interval timer
+setTimeout(()=>clearInterval(interval),4000);
 */
 
 // ****Coding Challenges****
