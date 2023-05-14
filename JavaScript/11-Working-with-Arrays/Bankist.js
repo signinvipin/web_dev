@@ -52,7 +52,14 @@ const appMain = document.querySelector('.app');
 const welcomeAtLogin = document.querySelector('.welcome');
 const logTimer = document.querySelector('.timer');
 const transactionMoves = document.querySelector('.movements');
+const btnSortMoves = document.querySelector('.btn--sort');
+const balanceValue = document.querySelector('.balance__value');
+const sumIn = document.querySelector('.summary__value--in');
+const sumOut = document.querySelector('.summary__value--out');
 
+
+// User Account Details
+let userAccount;
 
 // Message before login
 const loggedOutMessage = welcomeAtLogin.textContent;
@@ -88,6 +95,49 @@ const logOutTimer = function () {
 	return timerVar;
 }
 // console.log(timerVar);
+
+// Internationalize Number
+const intNumber = function (n) {
+	const optionsObj = {
+		style:'currency',
+		currency: userAccount.currency,
+	}
+	const intlNumber = Intl.NumberFormat(userAccount.locale, optionsObj).format(n);
+	// console.log(intlNumber);
+	return intlNumber ;
+}
+
+
+// displayBalance
+const displayBalance = function () {
+	const moves = userAccount.movements;
+	const intrst = userAccount.interestRate;
+	
+	const endBalance = moves
+	.reduce((acml, e)=>{ return acml + e; },0);
+	const endIntlBalance = intNumber(endBalance);			
+	// console.log(endIntlBalance);
+	balanceValue.textContent = endIntlBalance;
+	
+
+	// Net Amount Out '-'
+	const netOut = moves.filter((e)=>String(e).startsWith('-'))
+	.reduce((ac,e)=>{return ac + e},0);
+	// console.log(netOut);
+	sumOut.textContent = Math.abs(netOut);
+	
+
+	// Net Amount In '+'
+	const netIn = moves
+	.filter((e)=>!String(e).startsWith('-'))
+	.reduce((ac,e)=>{return ac + e},0);
+	// console.log(netIn);
+	sumIn.textContent = netIn;
+
+	// Calc Interest and Display
+	const 
+	
+}
 
 
 // Check USER and PIN
@@ -146,48 +196,47 @@ oldEntriesTimeStamp(accounts);
 
 // for new entries - generate timestamp - display it
 
-
-// Retrieve Timestamp object for Date
+// Create an array of Moves with TimeStamp
 let moveWithTimeStamp = [];
 // console.log(moveWithTimeStamp);
-/*
-const retrieveTimeStamp = function (userAccount) {
-	const {movements,timeStamp} = userAccount;
-	for(let i = 0; i < movements.length; i++) {
-		let move = movements[i];
-		let tStamp = timeStamp[i];
-		console.log(move, tStamp);
-		moveWithTimeStamp.unshift([move,tStamp]); 
-		
-	}
-	console.log(moveWithTimeStamp);
-}
-retrieveTimeStamp(accounts[0]);
-*/
 
-// Show all Balance Moves
-const balanceMoves = function (userAccount) {
+
+// Retrieve Timestamp object for Date
+const retrieveMoveNTimeStamp = function (userAccount) {
 	const {movements,timeStamp} = userAccount;
-	
 	for(let i = 0; i < movements.length; i++) {
 		let move = movements[i];
 		let tStamp = timeStamp[i];
 		// console.log(move, tStamp);
-		moveWithTimeStamp.unshift([move,tStamp]);
-			
+		moveWithTimeStamp.push([move,tStamp]); 
+		
+	}
+	// console.log(moveWithTimeStamp);
+}
+// retrieveTimeStamp(accounts[0]);
+
+
+// Show all Balance Moves
+const balanceMoves = function (userAccount, array) {
+	// First, clear any previous html from UI.
+	transactionMoves.innerHTML = '';
+	// Loop and provide move and time stamp
+	for (let [move, tStamp] of array) {
+		// console.log(move, tStamp);
+		
 		let moveType =  String(move).startsWith('-') ? 'withdrawal' : 'deposit';
-		console.log(moveType);
+		// console.log(moveType);
 
 		const objOptions = {
 			style: 'currency',
 			currency: userAccount.currency,
 		}
 		let moveValue = new Intl.NumberFormat(userAccount.locale, objOptions).format(move);
-		console.log(moveValue);
+		// console.log(moveValue);
 		// console.log(navigator.language);
 
-		const movSerialNumber = ((movements).indexOf(move))+1;
-		console.log(movSerialNumber);
+		const movSerialNumber = ((userAccount.movements).indexOf(move))+1;
+		// console.log(movSerialNumber);
 
 		const moveDate = tStamp;
 		console.log(moveDate);
@@ -204,26 +253,46 @@ const balanceMoves = function (userAccount) {
 }
 // balanceMoves(accounts[3]);
 
+// Sort out the Moves and display in UI
+btnSortMoves.addEventListener('click', () => {
+	// Sort moveWithTimeStamp
+	console.log(moveWithTimeStamp);
+	
+	const toSortMoveStamp = [];
+	moveWithTimeStamp.forEach((e)=>toSortMoveStamp.push(e));
+	
+	toSortMoveStamp.sort((a,b)=> a[0] - b[0]);
+	// console.log(toSortMoveStamp);
+
+	balanceMoves(userAccount, toSortMoveStamp);
+});
+
+
+// Login Check and Display data
 btnUserPass.addEventListener('click', (event)=>{
     event.preventDefault(); 
-// console.log(userName.value, passWord.value);
+	// console.log(userName.value, passWord.value);
 
-// Check USER and PIN
-	const userAccount = checkCredentials();
-	// console.log(userAccount);
+	// Check USER and PIN
+	userAccount = checkCredentials();
+	console.log(userAccount);
 	
-// Display Welcome Message
+	// Display Welcome Message
 	displayPage(userAccount);
 	
-// Change Welcome Message
+	// Change Welcome Message
 	changeWelcome(userAccount);
 	
-// LogOut after 10 minutes
+	// LogOut after 10 minutes
 	logOutTimer();
+
+	// retrieving move and timeStamp
+	retrieveMoveNTimeStamp(userAccount);
 	
-// Show all Balance Moves
-	balanceMoves(userAccount);
-	
+	// Show all Balance Moves
+	balanceMoves(userAccount, moveWithTimeStamp);
+
+	displayBalance();
 	
 });
 
