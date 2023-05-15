@@ -56,10 +56,17 @@ const btnSortMoves = document.querySelector('.btn--sort');
 const balanceValue = document.querySelector('.balance__value');
 const sumIn = document.querySelector('.summary__value--in');
 const sumOut = document.querySelector('.summary__value--out');
+const sumInt = document.querySelector('.summary__value--interest');
+const btnTransfer = document.querySelector('.form__btn--transfer');
+const transToUser = document.querySelector('.form__input--to');
+const transToUserAmt = document.querySelector('.form__input--amount');
 
 
 // User Account Details
 let userAccount;
+
+// toggle sort
+let toggleSort = 0;
 
 // Message before login
 const loggedOutMessage = welcomeAtLogin.textContent;
@@ -111,33 +118,43 @@ const intNumber = function (n) {
 // displayBalance
 const displayBalance = function () {
 	const moves = userAccount.movements;
-	const int = userAccount.interestRate;
+
+	const intrst = userAccount.interestRate;
+
+	// Calc Interest and Display
+	const interestTotal = moves
+		.filter((e)=>!String(e).startsWith('-'))
+		.map((e)=> (e * intrst)/100)
+		.reduce((ac,e)=>ac+e, 0);
+	// console.log(interestTotal);
+	const interestTotalIntl = intNumber(interestTotal);
+	sumInt.textContent = interestTotalIntl;
 	
 	const endBalance = moves
-	.reduce((acml, e)=>{ return acml + e; },0);
-	const endIntlBalance = intNumber(endBalance);			
-	console.log(endIntlBalance);
-	balanceValue.textContent = endIntlBalance;
+		.reduce((acml, e)=>{ return acml + e; },0);
+	const endIntlBalance = intNumber(endBalance+interestTotal);			
+	// console.log(endIntlBalance);
 	
+	balanceValue.textContent = endIntlBalance;
+
 
 	// Net Amount Out '-'
 	const netOut = moves.filter((e)=>String(e).startsWith('-'))
 	.reduce((ac,e)=>{return ac + e},0);
-	console.log(netOut);
-	sumOut.textContent = Math.abs(netOut);
-	
+	// console.log(netOut);
+	const netOutIntl = intNumber(Math.abs(netOut) );
+	sumOut.textContent = netOutIntl;
+
 
 	// Net Amount In '+'
 	const netIn = moves
 	.filter((e)=>!String(e).startsWith('-'))
 	.reduce((ac,e)=>{return ac + e},0);
-	console.log(netIn);
-	sumIn.textContent = netIn;
-
-	// Calc Interest and Display
-	// const
+	// console.log(netIn);
 	
-}
+	const netInIntl = intNumber(netIn);
+	sumIn.textContent = netInIntl;
+	}
 
 
 // Check USER and PIN
@@ -173,7 +190,9 @@ const changeWelcome = function (userAccount) {
 // Display Welcome Message
 const displayPage = function (userAccount) {
 	userName.value = '';
+	userName.blur();
 	passWord.value = '';
+	passWord.blur();
 	// console.log(userAccount);
 	
 	if (typeof userAccount === 'object'){
@@ -215,6 +234,35 @@ const retrieveMoveNTimeStamp = function (userAccount) {
 }
 // retrieveTimeStamp(accounts[0]);
 
+// Transfer amount from one to another account
+// find user account > add deposit with timestamp
+btnTransfer.addEventListener('click', function (e) {
+	e.preventDefault();
+
+	const userTrans = transToUser.value;
+	console.log(userTrans);
+	transToUser.value = '';
+	transToUser.blur();
+	
+	const transAmt = transToUserAmt.value;
+	console.log(transAmt);
+	transToUserAmt.value = '';
+	transToUserAmt.blur();
+
+	const userTransAc = accounts.map((item,i,arr)=> {
+        // console.log(item);
+
+        const nameOwnr = item.owner.split(' ')
+        .map((name)=>name.slice(0,1).toLowerCase()).join('');
+        // console.log(typeof nameOwnr, typeof itmPin);
+
+        // return false;
+        if (userTrans === nameOwnr) 
+        item.movements.push(transAmt);
+        item.timeStamp.push()
+    });    
+});
+// add withdrawal to existing > display with timestamp
 
 // Show all Balance Moves
 const balanceMoves = function (userAccount, array) {
@@ -256,15 +304,20 @@ const balanceMoves = function (userAccount, array) {
 // Sort out the Moves and display in UI
 btnSortMoves.addEventListener('click', () => {
 	// Sort moveWithTimeStamp
-	console.log(moveWithTimeStamp);
-	
-	const toSortMoveStamp = [];
-	moveWithTimeStamp.forEach((e)=>toSortMoveStamp.push(e));
-	
-	toSortMoveStamp.sort((a,b)=> a[0] - b[0]);
-	// console.log(toSortMoveStamp);
+	// console.log(moveWithTimeStamp);
 
-	balanceMoves(userAccount, toSortMoveStamp);
+	if (toggleSort === 0){
+		const sortedMoveStamp = [];
+		moveWithTimeStamp.forEach(
+			(e)=>sortedMoveStamp.push(e));
+		sortedMoveStamp.sort((a,b)=> a[0] - b[0]);
+		// console.log(toSortMoveStamp);
+		balanceMoves(userAccount, sortedMoveStamp);
+		toggleSort = 1;
+	} else {
+		balanceMoves(userAccount, moveWithTimeStamp);
+		toggleSort = 0;
+	}
 });
 
 
