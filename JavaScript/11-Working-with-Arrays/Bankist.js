@@ -111,19 +111,19 @@ const intNumber = function (n) {
 // displayBalance
 const displayBalance = function () {
 	const moves = userAccount.movements;
-	const intrst = userAccount.interestRate;
+	const int = userAccount.interestRate;
 	
 	const endBalance = moves
 	.reduce((acml, e)=>{ return acml + e; },0);
 	const endIntlBalance = intNumber(endBalance);			
-	// console.log(endIntlBalance);
+	console.log(endIntlBalance);
 	balanceValue.textContent = endIntlBalance;
 	
 
 	// Net Amount Out '-'
 	const netOut = moves.filter((e)=>String(e).startsWith('-'))
 	.reduce((ac,e)=>{return ac + e},0);
-	// console.log(netOut);
+	console.log(netOut);
 	sumOut.textContent = Math.abs(netOut);
 	
 
@@ -131,11 +131,11 @@ const displayBalance = function () {
 	const netIn = moves
 	.filter((e)=>!String(e).startsWith('-'))
 	.reduce((ac,e)=>{return ac + e},0);
-	// console.log(netIn);
+	console.log(netIn);
 	sumIn.textContent = netIn;
 
 	// Calc Interest and Display
-	const 
+	// const
 	
 }
 
