@@ -104,14 +104,15 @@ const logOutTimer = function () {
 // console.log(timerVar);
 
 // Internationalize Number
-const intNumber = function (n) {
+const intlNumber = function (n) {
 	const optionsObj = {
 		style:'currency',
 		currency: userAccount.currency,
 	}
-	const intlNumber = Intl.NumberFormat(userAccount.locale, optionsObj).format(n);
+	const newIntlNumber = new Intl
+	.NumberFormat(userAccount.locale, optionsObj).format(n);
 	// console.log(intlNumber);
-	return intlNumber ;
+	return newIntlNumber ;
 }
 
 
@@ -119,22 +120,23 @@ const intNumber = function (n) {
 const displayBalance = function () {
 	const moves = userAccount.movements;
 
-	const intrst = userAccount.interestRate;
+	const intrstR8 = userAccount.interestRate;
 
 	// Calc Interest and Display
 	const interestTotal = moves
 		.filter((e)=>!String(e).startsWith('-'))
-		.map((e)=> (e * intrst)/100)
+		.map((e)=> (e * intrstR8)/100)
 		.reduce((ac,e)=>ac+e, 0);
 	// console.log(interestTotal);
-	const interestTotalIntl = intNumber(interestTotal);
+	const interestTotalIntl = intlNumber(interestTotal);
+	// console.log(interestTotalIntl, typeof interestTotalIntl);
 	sumInt.textContent = interestTotalIntl;
-	
+
+	// Main Balance
 	const endBalance = moves
 		.reduce((acml, e)=>{ return acml + e; },0);
-	const endIntlBalance = intNumber(endBalance+interestTotal);			
+	const endIntlBalance = intlNumber(endBalance+interestTotal);
 	// console.log(endIntlBalance);
-	
 	balanceValue.textContent = endIntlBalance;
 
 
@@ -142,7 +144,7 @@ const displayBalance = function () {
 	const netOut = moves.filter((e)=>String(e).startsWith('-'))
 	.reduce((ac,e)=>{return ac + e},0);
 	// console.log(netOut);
-	const netOutIntl = intNumber(Math.abs(netOut) );
+	const netOutIntl = intlNumber(Math.abs(netOut) );
 	sumOut.textContent = netOutIntl;
 
 
@@ -152,9 +154,9 @@ const displayBalance = function () {
 	.reduce((ac,e)=>{return ac + e},0);
 	// console.log(netIn);
 	
-	const netInIntl = intNumber(netIn);
+	const netInIntl = intlNumber(netIn);
 	sumIn.textContent = netInIntl;
-	}
+};
 
 
 // Check USER and PIN
@@ -179,13 +181,13 @@ const checkCredentials = function () {
 	// console.log(typeof nmOwner); // object
 	return nmOwner ;
 	
-}
+};
 
 // Change Welcome Message
 const changeWelcome = function (userAccount) {
 	// Message after login
 	welcomeAtLogin.textContent = `Welcome, ${(userAccount.owner.split(' '))[0]}!`;
-}
+};
 
 // Display Welcome Message
 const displayPage = function (userAccount) {
@@ -199,7 +201,7 @@ const displayPage = function (userAccount) {
 		// console.log(event);
 		appMain.style.opacity = 1;
 	}
-}
+};
 
 // Create timestamp
 // for old entries or predefined entries -- 'long ago'
@@ -215,13 +217,28 @@ oldEntriesTimeStamp(accounts);
 
 // for new entries - generate timestamp - display it
 
+
+const genr8Date = function (userObject) {
+	const intDateObj = {
+		day:'numeric',
+		year:'numeric',
+		month:'numeric',
+}
+	const intlDate = new Intl
+		.DateTimeFormat(userObject.locale,intDateObj)
+		.format(new Date());
+		// console.log(intlDate, typeof intlDate);
+	return intlDate;
+}
+// genr8Date(accounts[0]);
+
 // Create an array of Moves with TimeStamp
 let moveWithTimeStamp = [];
 // console.log(moveWithTimeStamp);
 
-
 // Retrieve Timestamp object for Date
 const retrieveMoveNTimeStamp = function (userAccount) {
+	moveWithTimeStamp = [];
 	const {movements,timeStamp} = userAccount;
 	for(let i = 0; i < movements.length; i++) {
 		let move = movements[i];
@@ -232,37 +249,10 @@ const retrieveMoveNTimeStamp = function (userAccount) {
 	}
 	// console.log(moveWithTimeStamp);
 }
-// retrieveTimeStamp(accounts[0]);
+// retrieveMoveNTimeStamp(accounts[0]);
 
-// Transfer amount from one to another account
-// find user account > add deposit with timestamp
-btnTransfer.addEventListener('click', function (e) {
-	e.preventDefault();
 
-	const userTrans = transToUser.value;
-	console.log(userTrans);
-	transToUser.value = '';
-	transToUser.blur();
-	
-	const transAmt = transToUserAmt.value;
-	console.log(transAmt);
-	transToUserAmt.value = '';
-	transToUserAmt.blur();
 
-	const userTransAc = accounts.map((item,i,arr)=> {
-        // console.log(item);
-
-        const nameOwnr = item.owner.split(' ')
-        .map((name)=>name.slice(0,1).toLowerCase()).join('');
-        // console.log(typeof nameOwnr, typeof itmPin);
-
-        // return false;
-        if (userTrans === nameOwnr) 
-        item.movements.push(transAmt);
-        item.timeStamp.push()
-    });    
-});
-// add withdrawal to existing > display with timestamp
 
 // Show all Balance Moves
 const balanceMoves = function (userAccount, array) {
@@ -272,26 +262,31 @@ const balanceMoves = function (userAccount, array) {
 	for (let [move, tStamp] of array) {
 		// console.log(move, tStamp);
 		
-		let moveType =  String(move).startsWith('-') ? 'withdrawal' : 'deposit';
+		let moveType =  String(move)
+		.startsWith('-') ? 'withdrawal' : 'deposit';
 		// console.log(moveType);
 
 		const objOptions = {
 			style: 'currency',
 			currency: userAccount.currency,
 		}
-		let moveValue = new Intl.NumberFormat(userAccount.locale, objOptions).format(move);
+		let moveValue = new Intl
+		.NumberFormat(userAccount.locale, objOptions)
+		.format(move);
 		// console.log(moveValue);
 		// console.log(navigator.language);
 
-		const movSerialNumber = ((userAccount.movements).indexOf(move))+1;
+		const movSerialNumber = ((userAccount.movements)
+		.indexOf(move))+1;
 		// console.log(movSerialNumber);
 
 		const moveDate = tStamp;
 		console.log(moveDate);
 
-		const html =
-			`<div class="movements__row">
-			<div class="movements__type movements__type--${moveType}">${movSerialNumber} ${moveType}</div>
+		const html = `<div class="movements__row">
+			<div class="movements__type 
+			movements__type--${moveType}">
+			${movSerialNumber} ${moveType}</div>
 			<div class="movements__date">${moveDate}</div>
 			<div class="movements__value">${moveValue}</div>
 			</div>`;
@@ -300,6 +295,47 @@ const balanceMoves = function (userAccount, array) {
 	}
 }
 // balanceMoves(accounts[3]);
+
+// Transfer amount from one to another account
+btnTransfer.addEventListener('click', function (e) {
+	e.preventDefault();
+	let formatedDate;
+	
+// find user account > add deposit with timestamp
+	const userTrans = transToUser.value;
+	// console.log(userTrans);
+	transToUser.value = '';
+	transToUser.blur();
+	
+	const transAmt = transToUserAmt.value;
+	// console.log(transAmt);
+	transToUserAmt.value = '';
+	transToUserAmt.blur();
+
+	accounts.map((item,i,arr)=> {
+        // console.log(item);
+
+        const nameOwnr = item.owner.split(' ')
+        .map((name)=>name.slice(0,1).toLowerCase()).join('');
+        // console.log(typeof nameOwnr, typeof itmPin);
+
+        // return false;
+        if (userTrans === nameOwnr) 
+        	item.movements.push(+transAmt);
+        	formatedDate = genr8Date(item);
+        	item.timeStamp.push(formatedDate);
+        
+    });
+
+// add withdrawal to logged in user > display with timestamp   
+	 userAccount.movements.push(+(`-${transAmt}`));
+	 userAccount.timeStamp.push(formatedDate);
+	 retrieveMoveNTimeStamp(userAccount);
+	 balanceMoves(userAccount, moveWithTimeStamp);
+	 displayBalance();
+
+	 
+});
 
 // Sort out the Moves and display in UI
 btnSortMoves.addEventListener('click', () => {
