@@ -61,6 +61,13 @@ const btnTransfer = document.querySelector('.form__btn--transfer');
 const transToUser = document.querySelector('.form__input--to');
 const transToUserAmt = document.querySelector('.form__input--amount');
 const dateToday = document.querySelector('.date');
+const btnLoan = document.querySelector('.form__btn--loan');
+const loanAmount = document.querySelector('.form__input--loan-amount');
+const btnCloseAc = document.querySelector('.form__btn--close');
+const usrCloseAc = document.querySelector('.form__input--user');
+const pinCloseAc = document.querySelector('.form__input--pin');
+
+
 
 
 // User Account Details
@@ -68,6 +75,15 @@ let userAccount;
 
 // toggle sort
 let toggleSort = 0;
+
+// Check USER and PIN
+let usName;
+
+// Todays' date on page UI
+let dateNow;
+
+// Create an array of Moves with TimeStamp
+let moveWithTimeStamp = [];
 
 // Message before login
 const loggedOutMessage = welcomeAtLogin.textContent;
@@ -161,23 +177,33 @@ const displayBalance = function () {
 
 
 // Check USER and PIN
+// let usName;
+const matchCredsPin = function (item,usrpin) {
+	const itmPin = String(item.pin);
+	// console.log(itmOwner, itmPin, usName, psWord);
+	return usrpin === itmPin;
+}
+
+const matchCredsUsername = function (item,usrname) {
+    const itmOwner = item.owner;
+	const nameOwnr = itmOwner.split(' ')
+	.map((name)=>name.slice(0,1).toLowerCase()).join('');
+	// console.log(typeof nameOwnr, typeof itmPin);
+	return usrname === nameOwnr;
+}
+
 const checkCredentials = function () {
-	const usName = userName.value;
+	usName = userName.value;
 	const psWord = passWord.value;
 	// console.log(typeof usName, typeof psWord);
 
 	const [nmOwner] = accounts.filter(function (item) {
 		// console.log(item);
-		const itmOwner = item.owner;
-		const itmPin = String(item.pin);
-		// console.log(itmOwner, itmPin, usName, psWord);
-
-		const nameOwnr = itmOwner.split(' ')
-		.map((name)=>name.slice(0,1).toLowerCase()).join('');
-		// console.log(typeof nameOwnr, typeof itmPin);
-
-		// return false;
-		return usName === nameOwnr && psWord === itmPin;
+		const succPin = matchCredsPin(item,psWord);
+		
+		const succUnm = matchCredsUsername(item,usName);
+		
+		return (succPin && succUnm);
 	});
 	// console.log(typeof nmOwner); // object
 	return nmOwner ;
@@ -218,7 +244,6 @@ for (let ac of accounts) {
 } 
 
 // for new entries - generate timestamp - display it
-
 const genr8Date = function (ts) {
 	const intDateObj = {
 		day:'numeric',
@@ -238,38 +263,44 @@ const genr8Date = function (ts) {
 
 
 // Todays' date on page UI
-let dateNow;
+// let dateNow;
 const dateDisplayUI = () => {
 	dateNow = Date.now();
 	const formattedDate = genr8Date(dateNow);
 	dateToday.textContent = formattedDate;
 };
 
-// stop same account transfer????
 
 const timeWhen = function (tStamp) {
 	if (typeof tStamp === 'number') {
 		// console.log(tStamp);
-		const timeGen = new Date(tStamp);
-		
+				
 		const dayDiff = Math.trunc(Math.abs(
-		(new Date() - new Date('May 10,2023'))/(1000*60*60*24)));
-		console.log(dayDiff);
+		(Date.now() - tStamp)/(1000*60*60*24)));
+		// console.log(dayDiff);
 		// Timestamp is in milliseconds. So, converted to days.
 
-		if (dayDiff < 1) return genr8Date(timeGen);
-		if (dayDiff === 1) return 'Yesterday';
-		if (dayDiff >= 2 && dayDiff <= 7) return `${dayDiff} days ago`;
-		if (dayDiff >= 8 && dayDiff <= 14) return 'last week';
-		if (dayDiff >= 15 && dayDiff <= 28) return 'weeks ago';
-		if (dayDiff >= 28) return 'long ago';		
+		if (dayDiff < 1) {
+			return genr8Date(tStamp);
+		} else if (dayDiff === 1) {
+			return 'Yesterday';
+		} else if (dayDiff >= 2 && dayDiff <= 7) {
+			return `${dayDiff} days ago`;
+		} else if (dayDiff >= 8 && dayDiff <= 14) {
+			return 'last week';
+		} else if (dayDiff >= 15 && dayDiff <= 28) {
+			return 'weeks ago';
+		} else {
+			return 'long ago';
+		}
+				
 	} else {
 		return tStamp;
 	}
 };
 
 // Create an array of Moves with TimeStamp
-let moveWithTimeStamp = [];
+// let moveWithTimeStamp = [];
 // console.log(moveWithTimeStamp);
 
 // Retrieve Timestamp object for Date
@@ -286,8 +317,6 @@ const retrieveMoveNTimeStamp = function (userAccount) {
 	// console.log(moveWithTimeStamp);
 }
 // retrieveMoveNTimeStamp(accounts[0]);
-
-
 
 
 // Show all Balance Moves
@@ -317,7 +346,7 @@ const balanceMoves = function (userAccount, array) {
 		// console.log(movSerialNumber);
 
 		const moveDate = timeWhen(tStamp);
-		console.log(moveDate);
+		// console.log(moveDate);
 		
 
 		const html = `<div class="movements__row">
@@ -332,6 +361,7 @@ const balanceMoves = function (userAccount, array) {
 	}
 }
 // balanceMoves(accounts[3]);
+
 
 // Transfer amount from one to another account
 btnTransfer.addEventListener('click', function (e) {
@@ -351,26 +381,88 @@ btnTransfer.addEventListener('click', function (e) {
 
 	accounts.map((item,i,arr)=> {
         // console.log(item);
+        const nameOwnr = item.owner.split(' ')
+        .map((name)=>name.slice(0,1).toLowerCase()).join('');
+        // console.log(typeof nameOwnr, typeof itmPin);
 
-            const nameOwnr = item.owner.split(' ')
-            .map((name)=>name.slice(0,1).toLowerCase()).join('');
-            // console.log(typeof nameOwnr, typeof itmPin);
-
-            // return false;
-            if (userTrans === nameOwnr) 
+        // user account match and transfer
+        // stop same account transfer
+        if (userTrans === nameOwnr && userTrans !== usName) {
         	item.movements.push(+transAmt);
         	dateTimeStamp = Date.now(); //create timestamp 
-        	item.timeStamp.push(dateTimeStamp);        
-    	});
-
-// add withdrawal to logged in user > display with timestamp   
-	 userAccount.movements.push(+(`-${transAmt}`));
-	 userAccount.timeStamp.push(dateTimeStamp);
-	 retrieveMoveNTimeStamp(userAccount);
-	 balanceMoves(userAccount, moveWithTimeStamp);
-	 displayBalance();
-
+        	item.timeStamp.push(dateTimeStamp);
+// add withdrawal to logged in user > display with timestamp
+			userAccount.movements.push(+(`-${transAmt}`));
+			userAccount.timeStamp.push(dateTimeStamp);
+			retrieveMoveNTimeStamp(userAccount);
+			balanceMoves(userAccount, moveWithTimeStamp);
+			displayBalance();
+        }
+        
+    });
+    
 });
+
+
+// Request loan transfer to user account
+const grantLoan = function (event) {
+	event.preventDefault();
+	
+	const loanAmt = loanAmount.value;
+	loanAmount.value = '';
+	loanAmount.blur();
+
+	const statusLoan = userAccount.movements
+	.some((e,i,arr)=> e > (0.10*loanAmt));
+	// console.log(statusLoan);
+
+	if (statusLoan) {
+		// transfer to local useraccount
+		userAccount.movements.push(Number(loanAmt));
+		userAccount.timeStamp.push(Date.now());
+		retrieveMoveNTimeStamp(userAccount);
+		balanceMoves(userAccount, moveWithTimeStamp);
+		displayBalance();
+	}
+}
+
+btnLoan.addEventListener('click', grantLoan);
+
+
+// Close User Account 
+const acClose = function (event) {
+	event.preventDefault();
+	const usrname = usrCloseAc.value;
+	// console.log(usrname);
+	usrCloseAc.value = '';
+	usrCloseAc.blur();
+	
+	const usrpin = pinCloseAc.value;
+	// console.log(usrpin);
+	pinCloseAc.value = '';
+	pinCloseAc.blur();
+
+	const cnfmMatch = matchCredsUsername(userAccount, usrname);
+
+	const [nmOwner] = accounts.filter(function (item) {
+		// console.log(item);
+		const succPin = matchCredsPin(item,usrpin);
+		
+		const succUnm = matchCredsUsername(item,usrname);
+		
+		return (succPin && succUnm);
+	});
+	
+	if (cnfmMatch && nmOwner) {
+		const acIndex = accounts.shift({nmOwner}); //remove a/c
+		// console.log(acIndex);
+		clearInterval(timerVar);
+		appMain.style.opacity = 0;
+	}	
+}
+
+btnCloseAc.addEventListener('click', acClose);
+
 
 // Sort out the Moves and display in UI
 btnSortMoves.addEventListener('click', () => {
@@ -399,7 +491,7 @@ btnUserPass.addEventListener('click', (event)=>{
 
 	// Check USER and PIN
 	userAccount = checkCredentials();
-	console.log(userAccount);
+	// console.log(userAccount);
 	
 	// Display Welcome Message
 	displayPage(userAccount);
