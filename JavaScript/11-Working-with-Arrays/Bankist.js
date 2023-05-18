@@ -236,6 +236,7 @@ const genr8Date = function (ts) {
 }
 // genr8Date(accounts[0]);
 
+
 // Todays' date on page UI
 let dateNow;
 const dateDisplayUI = () => {
@@ -265,8 +266,7 @@ const timeWhen = function (tStamp) {
 	} else {
 		return tStamp;
 	}
-}
-
+};
 
 // Create an array of Moves with TimeStamp
 let moveWithTimeStamp = [];
@@ -352,17 +352,16 @@ btnTransfer.addEventListener('click', function (e) {
 	accounts.map((item,i,arr)=> {
         // console.log(item);
 
-        const nameOwnr = item.owner.split(' ')
-        .map((name)=>name.slice(0,1).toLowerCase()).join('');
-        // console.log(typeof nameOwnr, typeof itmPin);
+            const nameOwnr = item.owner.split(' ')
+            .map((name)=>name.slice(0,1).toLowerCase()).join('');
+            // console.log(typeof nameOwnr, typeof itmPin);
 
-        // return false;
-        if (userTrans === nameOwnr) 
+            // return false;
+            if (userTrans === nameOwnr) 
         	item.movements.push(+transAmt);
         	dateTimeStamp = Date.now(); //create timestamp 
-        	item.timeStamp.push(dateTimeStamp);
-        
-    });
+        	item.timeStamp.push(dateTimeStamp);        
+    	});
 
 // add withdrawal to logged in user > display with timestamp   
 	 userAccount.movements.push(+(`-${transAmt}`));
@@ -371,7 +370,6 @@ btnTransfer.addEventListener('click', function (e) {
 	 balanceMoves(userAccount, moveWithTimeStamp);
 	 displayBalance();
 
-	 
 });
 
 // Sort out the Moves and display in UI
