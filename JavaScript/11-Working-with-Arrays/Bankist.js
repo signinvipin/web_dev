@@ -41,7 +41,7 @@ const account4 = {
   locale:'en-GB',
 };
 
-const accounts = [account1, account2, account3, account4];
+let accounts = [account1, account2, account3, account4];
 
 // DOM Element Selection
 
@@ -73,7 +73,7 @@ const pinCloseAc = document.querySelector('.form__input--pin');
 // User Account Details
 let userAccount;
 
-// toggle sort
+// Toggle sort
 let toggleSort = 0;
 
 // Check USER and PIN
@@ -177,7 +177,6 @@ const displayBalance = function () {
 
 
 // Check USER and PIN
-// let usName;
 const matchCredsPin = function (item,usrpin) {
 	const itmPin = String(item.pin);
 	// console.log(itmOwner, itmPin, usName, psWord);
@@ -210,28 +209,32 @@ const checkCredentials = function () {
 	
 };
 
+
 // Change Welcome Message
 const changeWelcome = function (userAccount) {
 	// Message after login
 	welcomeAtLogin.textContent = `Welcome, ${(userAccount.owner.split(' '))[0]}!`;
 };
 
-// Display Welcome Message
-const displayPage = function (userAccount) {
+// Clear Login form after input
+const clearLoginForm = function () {
 	userName.value = '';
 	userName.blur();
 	passWord.value = '';
 	passWord.blur();
 	// console.log(userAccount);
-	
+};
+
+// Display Page
+const viewPage = function (userAccount) {	
 	if (typeof userAccount === 'object'){
 		// console.log(event);
 		appMain.style.opacity = 1;
 	}
 };
 
-// Create timestamp
 
+// Create timestamp
 // for old entries or predefined entries -- 'long ago'
 for (let ac of accounts) {
 	if (ac.movements ) {
@@ -263,7 +266,6 @@ const genr8Date = function (ts) {
 
 
 // Todays' date on page UI
-// let dateNow;
 const dateDisplayUI = () => {
 	dateNow = Date.now();
 	const formattedDate = genr8Date(dateNow);
@@ -299,9 +301,8 @@ const timeWhen = function (tStamp) {
 	}
 };
 
+
 // Create an array of Moves with TimeStamp
-// let moveWithTimeStamp = [];
-// console.log(moveWithTimeStamp);
 
 // Retrieve Timestamp object for Date
 const retrieveMoveNTimeStamp = function (userAccount) {
@@ -339,7 +340,6 @@ const balanceMoves = function (userAccount, array) {
 		.NumberFormat(userAccount.locale, objOptions)
 		.format(move);
 		// console.log(moveValue);
-		// console.log(navigator.language);
 
 		const movSerialNumber = ((userAccount.movements)
 		.indexOf(move))+1;
@@ -444,21 +444,22 @@ const acClose = function (event) {
 
 	const cnfmMatch = matchCredsUsername(userAccount, usrname);
 
-	const [nmOwner] = accounts.filter(function (item) {
+	const [namOwner] = accounts.filter(function (el) {
 		// console.log(item);
-		const succPin = matchCredsPin(item,usrpin);
+		const succPin = matchCredsPin(el,usrpin);
 		
-		const succUnm = matchCredsUsername(item,usrname);
+		const succUnm = matchCredsUsername(el,usrname);
 		
 		return (succPin && succUnm);
 	});
-	
-	if (cnfmMatch && nmOwner) {
-		const acIndex = accounts.shift({nmOwner}); //remove a/c
-		// console.log(acIndex);
-		clearInterval(timerVar);
-		appMain.style.opacity = 0;
-	}	
+
+    if (cnfmMatch && namOwner) {
+        accounts = accounts.filter((el)=>namOwner !== el);
+        clearInterval(timerVar);
+        welcomeAtLogin.textContent = loggedOutMessage;
+        userAccount = undefined;
+        appMain.style.opacity = 0;
+	}
 }
 
 btnCloseAc.addEventListener('click', acClose);
@@ -467,7 +468,6 @@ btnCloseAc.addEventListener('click', acClose);
 // Sort out the Moves and display in UI
 btnSortMoves.addEventListener('click', () => {
 	// Sort moveWithTimeStamp
-	// console.log(moveWithTimeStamp);
 
 	if (toggleSort === 0){
 		const sortedMoveStamp = [];
@@ -488,31 +488,38 @@ btnSortMoves.addEventListener('click', () => {
 btnUserPass.addEventListener('click', (event)=>{
     event.preventDefault();
 	// console.log(userName.value, passWord.value);
+    
+    // Check USER and PIN
+    const userObject = checkCredentials();
+    
+    clearLoginForm();
 
-	// Check USER and PIN
-	userAccount = checkCredentials();
-	// console.log(userAccount);
+	if (userObject !== undefined) {
+        userAccount = userObject;
+        // userAccount = checkCredentials();
+	    // console.log(userAccount);
 	
-	// Display Welcome Message
-	displayPage(userAccount);
+	    // Display Welcome Message
+	    viewPage(userAccount);
 	
-	// Change Welcome Message
-	changeWelcome(userAccount);
+	    // Change Welcome Message
+	    changeWelcome(userAccount);
 	
-	// LogOut after 10 minutes
-	logOutTimer();
+	    // LogOut after 10 minutes
+	    logOutTimer();
 
-	// retrieving move and timeStamp
-	retrieveMoveNTimeStamp(userAccount);
+	    // retrieving move and timeStamp
+	    retrieveMoveNTimeStamp(userAccount);
 	
-	// Show all Balance Moves
-	balanceMoves(userAccount, moveWithTimeStamp);
+	    // Show all Balance Moves
+	    balanceMoves(userAccount, moveWithTimeStamp);
 	
-	// Display balance, total deposit, total withdrawal, interest
-	displayBalance();
+	    // Display balance, total deposit, total withdrawal, interest
+	    displayBalance();
 
-	// Display date on page
-	dateDisplayUI();
+	    // Display date on page
+	    dateDisplayUI();
+    }
 	
 });
 
