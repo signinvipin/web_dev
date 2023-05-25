@@ -11,6 +11,7 @@ const navBarLinks = document.querySelectorAll('.nav__link');
 const navBar = document.querySelector('.nav');
 const barLogo = document.querySelector('.nav__logo');
 
+// Modal AND Overlay
 const modalViewToggle = () => {
   modal.classList.toggle('hidden');
   overlay.classList.toggle('hidden');
@@ -22,7 +23,8 @@ btnCloseModal.addEventListener('click', modalViewToggle);
 
 overlay.addEventListener('click', modalViewToggle);
 
-// Navigation bar links and logo opaque/focus feature
+// Navigation Bar links and logo opaque/focus feature
+/*
 // Way #1 - normal
 // opacity to links and logo eventlisteners
 const rOpacity = function () {
@@ -69,5 +71,59 @@ const mouseLeaveFunc = function () {
 // Navigation bar eventlisteners
 navBar.addEventListener('mouseenter', mouseEnterFunc);
 navBar.addEventListener('mouseleave', mouseLeaveFunc);
+*/
 
 // Way-#2 - e.target === lnk
+
+const mouseOver = function (e) {
+  if (e.target.classList.contains('nav__link') ||
+  e.target.classList.contains('nav__logo')) {
+    const link = e.target;
+	// console.log(link);
+
+	const navLinksAll = e.target.closest('.nav')
+	.querySelectorAll('.nav__link');
+
+	const navLogo = e.target.closest('.nav')
+	.querySelector('.nav__logo');
+
+	// console.log(navLinksAll, navLogo);
+
+	navLinksAll.forEach((el) =>{
+	  el.style.opacity = 0.5;
+	  if (el === link){
+	  	el.style.opacity = 1;
+	  }
+	});
+
+	navLogo.style.opacity = 0.5;
+	if (navLogo === link){
+		navLogo.style.opacity = 1;
+	}
+  }
+}
+
+const mouseOut = function (e) {
+  if (e.target.classList.contains('nav__link') ||
+  e.target.classList.contains('nav__logo')) {
+    const link = e.target;
+	// console.log(link);
+
+	const navLinksAll = e.target.closest('.nav')
+	.querySelectorAll('.nav__link');
+
+	const navLogo = e.target.closest('.nav')
+	.querySelector('.nav__logo');
+
+	// console.log(navLinksAll, navLogo);
+
+	navLinksAll.forEach((el) => el.style.opacity = 1);
+	navLogo.style.opacity = 1;
+  }
+}
+
+navBar.addEventListener('mouseover', mouseOver);
+navBar.addEventListener('mouseout', mouseOut);
+
+// Navigation bar link smooth scroll
+
