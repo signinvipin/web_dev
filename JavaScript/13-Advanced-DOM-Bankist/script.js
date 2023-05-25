@@ -126,4 +126,26 @@ navBar.addEventListener('mouseover', mouseOver);
 navBar.addEventListener('mouseout', mouseOut);
 
 // Navigation bar link smooth scroll
+navBarLinks.forEach((lnk) => {
+  lnk.addEventListener('click', function (e) {
+  	e.preventDefault();
+    const getLink = e.target.getAttribute('href');  // Possible e.target or 'this'
+    // console.log(getLink, typeof getLink);
+    const lnkElement = document.querySelector(getLink);
+    const getRects = lnkElement.getBoundingClientRect();
+    // console.log(getRects.left, getRects.top);
+
+    // Way #1
+  	// window.scrollTo(getRects.left + window.pageXOffset, getRects.top + window.pageYOffset);
+
+  	// Way #2
+  	// window.scrollTo({left: getRects.left + window.pageXOffset, 
+  	// top: getRects.top + window.pageYOffset, behaviour: 'smooth'});
+
+  	// Way #3
+  	lnkElement.scrollIntoView({behaviour:'smooth'});
+  });
+});
+
+// Scroll-To-Section Links
 
