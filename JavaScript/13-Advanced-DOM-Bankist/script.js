@@ -168,4 +168,17 @@ const goToSection = () => {
 	
 learnMore.addEventListener('click', goToSection);
 
+// Sticky Nav bar when page scroll
+const stickyNav = function () {
+// when value, 'pageYOffset = 0' increases, make 'sticky' else not
+  if (window.pageYOffset > 0){
+    navBar.classList.add('sticky');
+  } else {
+  	navBar.classList.remove('sticky');
+  }
+}
+
+document.addEventListener('scroll', stickyNav);
+
 // 
+
