@@ -10,7 +10,11 @@ const overlay = document.querySelector('.overlay');
 const navBarLinks = document.querySelectorAll('.nav__link');
 const navBar = document.querySelector('.nav');
 const barLogo = document.querySelector('.nav__logo');
+// scrollTo section
 const learnMore = document.querySelector('.btn--scroll-to');
+// operations tab and content
+const tabCont = document.querySelectorAll('.operations__tab');
+const opsCont = document.querySelectorAll('.operations__content');
 
 
 // Modal AND Overlay
@@ -20,10 +24,9 @@ const modalViewToggle = () => {
 };
 
 btnOpenModal.forEach(btn => btn.addEventListener('click', modalViewToggle));
-
 btnCloseModal.addEventListener('click', modalViewToggle);
-
 overlay.addEventListener('click', modalViewToggle);
+
 
 // Navigation Bar links and logo opaque/focus feature
 /*
@@ -76,7 +79,6 @@ navBar.addEventListener('mouseleave', mouseLeaveFunc);
 */
 
 // Way-#2 - e.target === lnk
-
 const mouseOver = function (e) {
   if (e.target.classList.contains('nav__link') ||
   e.target.classList.contains('nav__logo')) {
@@ -150,7 +152,6 @@ navBarLinks.forEach((lnk) => {
 });
 
 // Scroll-To-Section Links
-
 const goToSection = () => document.querySelector('#section--1')
   .scrollIntoView({behaviour:'smooth'});
   
@@ -168,6 +169,7 @@ const goToSection = () => {
 	
 learnMore.addEventListener('click', goToSection);
 
+
 // Sticky Nav bar when page scroll
 const stickyNav = function () {
 // when value, 'pageYOffset = 0' increases, make 'sticky' else not
@@ -180,5 +182,25 @@ const stickyNav = function () {
 
 document.addEventListener('scroll', stickyNav);
 
+
+// Show operations tab with content
+tabCont.forEach((tab) => {
+	tab.addEventListener('click', function (e) {
+		// e.preventDefault();
+		tabCont.forEach((t)=> t.classList.remove('operations__tab--active'));
+		opsCont.forEach((o)=> o.classList.remove('operations__content--active'));
+		
+		// console.log(e.target);
+		const tabClicked = e.target;
+		tabClicked.classList.add('operations__tab--active');
+		
+		const tabNo = tabClicked.getAttribute('data-tab');
+		// console.log(tabNo);
+		const getCont = document.querySelector(`.operations__content--${tabNo}`);
+		getCont.classList.add('operations__content--active');
+	});
+});
+
 // 
+
 
