@@ -10,6 +10,8 @@ const overlay = document.querySelector('.overlay');
 const navBarLinks = document.querySelectorAll('.nav__link');
 const navBar = document.querySelector('.nav');
 const barLogo = document.querySelector('.nav__logo');
+const learnMore = document.querySelector('.btn--scroll-to');
+
 
 // Modal AND Overlay
 const modalViewToggle = () => {
@@ -149,3 +151,21 @@ navBarLinks.forEach((lnk) => {
 
 // Scroll-To-Section Links
 
+const goToSection = () => document.querySelector('#section--1')
+  .scrollIntoView({behaviour:'smooth'});
+  
+// or, old way
+/*
+const goToSection = () => {
+  const sec1 = document.querySelector('#section--1');
+  const gRect = sec1.getBoundingClientRect();
+  window.scrollTo({
+  	left: gRect.left + window.pageXOffset,
+  	top: gRect.top + window.pageYOffset,
+  	behaviour:'smooth',
+  });
+} */
+	
+learnMore.addEventListener('click', goToSection);
+
+// 
