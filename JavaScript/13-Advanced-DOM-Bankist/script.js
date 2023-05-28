@@ -15,6 +15,8 @@ const learnMore = document.querySelector('.btn--scroll-to');
 // operations tab and content
 const tabCont = document.querySelectorAll('.operations__tab');
 const opsCont = document.querySelectorAll('.operations__content');
+// sticky nav bar
+const bodyHeader = document.querySelector('.header');
 
 
 // Modal AND Overlay
@@ -133,18 +135,25 @@ navBar.addEventListener('mouseout', mouseOut);
 navBarLinks.forEach((lnk) => {
   lnk.addEventListener('click', function (e) {
   	e.preventDefault();
+  	
+  	if(e.target.classList.contains('btn--show-modal')) return; // Keep href -'#' in check
+  	if(!e.target.classList.contains('nav__link')) return;
+  	
     const getLink = e.target.getAttribute('href');  // Possible e.target or 'this'
-    // console.log(getLink, typeof getLink);
+    // console.log(e.target, getLink, typeof getLink);
     const lnkElement = document.querySelector(getLink);
-    const getRects = lnkElement.getBoundingClientRect();
+    
+    // const getRects = lnkElement.getBoundingClientRect();
     // console.log(getRects.left, getRects.top);
 
     // Way #1
   	// window.scrollTo(getRects.left + window.pageXOffset, getRects.top + window.pageYOffset);
 
   	// Way #2
-  	// window.scrollTo({left: getRects.left + window.pageXOffset, 
-  	// top: getRects.top + window.pageYOffset, behaviour: 'smooth'});
+  	// window.scrollTo({
+  	  // left: getRects.left + window.pageXOffset,
+  	  // top: getRects.top + window.pageYOffset,
+  	  // behaviour: 'smooth'});
 
   	// Way #3
   	lnkElement.scrollIntoView({behaviour:'smooth'});
@@ -152,10 +161,8 @@ navBarLinks.forEach((lnk) => {
 });
 
 // Scroll-To-Section Links
-const goToSection = () => document.querySelector('#section--1')
-  .scrollIntoView({behaviour:'smooth'});
   
-// or, old way
+// Old way
 /*
 const goToSection = () => {
   const sec1 = document.querySelector('#section--1');
@@ -166,14 +173,28 @@ const goToSection = () => {
   	behaviour:'smooth',
   });
 } */
+// OR,
+// New way
+const goToSection = () => document.querySelector('#section--1')
+.scrollIntoView({behaviour:'smooth'});
 	
 learnMore.addEventListener('click', goToSection);
 
 
 // Sticky Nav bar when page scroll
+
+// Normal Coding - window-pageYOffset/scrollY triggers at every scroll - not prefered
+/*
 const stickyNav = function () {
+// Option 1
 // when value, 'pageYOffset = 0' increases, make 'sticky' else not
-  if (window.pageYOffset > 0){
+  // if (window.pageYOffset > 0){
+  
+// Option 2
+  // if (window.pageYOffset > navBar.offsetHeight) {
+
+// Option 3
+  if  (window.scrollY > navBar.offsetHeight) {
     navBar.classList.add('sticky');
   } else {
   	navBar.classList.remove('sticky');
@@ -181,25 +202,53 @@ const stickyNav = function () {
 }
 
 document.addEventListener('scroll', stickyNav);
+*/
+// Using IntersectionObserver API
+const obsCallBack = function (entries, observer) {
+  const [entry] = entries;
+  // console.log(entry);
+  if (!entry.isIntersecting) navBar.classList.add('sticky');
+  if (entry.isIntersecting) navBar.classList.remove('sticky');	
+}
+
+const obsOptions = {
+	root: null,
+	// rootMargin:'0px 0px 0px 0px', // set at least 1
+// callback() delay trigger, moves intersection line downwards
+	threshold:[0.95], // sets intersectionRatio, reduces intersecting area
+// callback() early trigger, moves intersection line upwards 
+}
+const stickyNavObserver = new IntersectionObserver(obsCallBack, obsOptions);
+// After sticky, nav remains sticky at all scroll points, so use of header
+stickyNavObserver.observe(bodyHeader); 
 
 
 // Show operations tab with content
-tabCont.forEach((tab) => {
-	tab.addEventListener('click', function (e) {
-		// e.preventDefault();
-		tabCont.forEach((t)=> t.classList.remove('operations__tab--active'));
-		opsCont.forEach((o)=> o.classList.remove('operations__content--active'));
-		
-		// console.log(e.target);
-		const tabClicked = e.target;
-		tabClicked.classList.add('operations__tab--active');
-		
-		const tabNo = tabClicked.getAttribute('data-tab');
-		// console.log(tabNo);
-		const getCont = document.querySelector(`.operations__content--${tabNo}`);
-		getCont.classList.add('operations__content--active');
-	});
-});
+const selectShow = function (e) {
+  // e.preventDefault();
+  // console.log(e.target);
+  let tabSelect;
+  if (e.target.classList.contains('operations__tab')) {
+    tabSelect = e.target;
+  }
+  if (e.target.firstChildElement === HTMLButtonElement.span) {
+    tabSelect = e.target.closest('.operations__tab');
+  }
+
+  if (tabSelect){
+    tabCont.forEach((t)=> t.classList.remove('operations__tab--active'));
+    opsCont.forEach((o)=> o.classList.remove('operations__content--active'));
+
+    const tabNo = tabSelect.dataset.tab;
+    const contSelect = document.querySelector(`.operations__content--${tabNo}`);
+
+    tabSelect.classList.add('operations__tab--active');
+    contSelect.classList.add('operations__content--active');
+  }
+}
+
+tabCont.forEach((tab) => tab.addEventListener('click', selectShow));
+
 
 // 
 
