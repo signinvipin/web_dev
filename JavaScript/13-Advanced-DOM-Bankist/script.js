@@ -280,6 +280,7 @@ sectionAll.forEach((sec) => {
   sec.classList.add('section--hidden');
 });
 
+
 // Image lazy loading
 const imgAll = document.querySelectorAll('.features__img');
 
@@ -308,7 +309,6 @@ imgAll.forEach((img) => {
 
 // Display Slides with Content
 // using style.'transform: translateX = %age'
-
 
 let slideNumber = 0; 
 
@@ -342,8 +342,6 @@ const changeSlide = function () {
   });
 }
 changeSlide();  // initialize at first visit
-
-
 
 const sliderLeft = function () {
   if (slideNumber === 0) return;
