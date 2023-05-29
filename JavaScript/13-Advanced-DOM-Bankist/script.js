@@ -250,6 +250,54 @@ const selectShow = function (e) {
 tabCont.forEach((tab) => tab.addEventListener('click', selectShow));
 
 
-// 
+// Delayed Section Loading
 
+const sectionAll = document.querySelectorAll('.section');
 
+// using IntersectionObserver API
+const sectionCallback = function (entries, observer) {
+	const [entry] = entries;
+	// console.log(entry);	
+	
+	if (!entry.isIntersecting) return;
+	if (entry.isIntersecting) entry.target.classList.remove('section--hidden');
+
+	observer.unobserve(entry.target);
+}
+const sectionObj = {
+	root:null,
+	rootMargin:'-200px',
+	threshold:[0],
+}
+const sectionObserver = new IntersectionObserver(sectionCallback, sectionObj);
+sectionAll.forEach((sec) => {
+  sectionObserver.observe(sec);
+  sec.classList.add('section--hidden');
+});
+
+// Image lazy loading
+const imgAll = document.querySelectorAll('.features__img');
+
+// using IntersectionObserver API
+const imgCallback = function (entries, observer) {
+	const [entry] = entries;
+	console.log(entry);
+	
+	if (!entry.isIntersecting) return;
+
+	entry.target.classList.remove('lazy-img');
+	entry.target.src = entry.target.dataset.src;
+
+	observer.unobserve(entry.target);
+}
+const imgObj = {
+	root:null,
+	// rootMargin:,
+	threshold:[0],
+}
+const imgObserver = new IntersectionObserver(imgCallback, imgObj);
+imgAll.forEach((img) => {
+  imgObserver.observe(img);
+});
+
+//  
