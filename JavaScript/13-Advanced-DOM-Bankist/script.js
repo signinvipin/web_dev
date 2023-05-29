@@ -17,6 +17,11 @@ const tabCont = document.querySelectorAll('.operations__tab');
 const opsCont = document.querySelectorAll('.operations__content');
 // sticky nav bar
 const bodyHeader = document.querySelector('.header');
+// slider 
+const btnSliderLeft = document.querySelector('.slider__btn--left');
+const btnSliderRight = document.querySelector('.slider__btn--right');
+const dotCont = document.querySelector('.dots');
+const slides = document.querySelectorAll('.slide');
 
 
 // Modal AND Overlay
@@ -281,12 +286,13 @@ const imgAll = document.querySelectorAll('.features__img');
 // using IntersectionObserver API
 const imgCallback = function (entries, observer) {
 	const [entry] = entries;
-	console.log(entry);
+	// console.log(entry);
 	
 	if (!entry.isIntersecting) return;
 
-	entry.target.classList.remove('lazy-img');
 	entry.target.src = entry.target.dataset.src;
+	entry.target.addEventListener('load',
+	  ()=>entry.target.classList.remove('lazy-img'));
 
 	observer.unobserve(entry.target);
 }
@@ -300,4 +306,55 @@ imgAll.forEach((img) => {
   imgObserver.observe(img);
 });
 
-//  
+// Display Slides with Content
+// using style.'transform: translateX = %age'
+
+
+let slideNumber = 0; 
+
+const addDots = (index) => {
+  const html = `<button class="dots__dot dot--${index}" data-slide="${index}"></button>`;
+  dotCont.insertAdjacentHTML('beforeend', html);
+}
+slides.forEach((_, i) => addDots(i));
+
+const dotEvLis = (e) => {
+  e.preventDefault();
+  slideNumber = e.target.dataset.slide;
+  // console.log(slideNumber);
+  changeSlide();
+}
+
+const actDots = function () {
+  const dotsAll = document.querySelectorAll('.dots__dot');
+  dotsAll.forEach((dot) => {
+    dot.classList.remove('dots__dot--active');
+    dot.addEventListener('click',dotEvLis);
+  });
+  
+  document.querySelector(`.dot--${slideNumber}`).classList.add('dots__dot--active');
+}
+
+const changeSlide = function () {
+  slides.forEach((slide, index) =>{
+    slide.style.transform = `translateX(${100*(index - slideNumber)}%)`;
+    actDots();
+  });
+}
+changeSlide();  // initialize at first visit
+
+
+
+const sliderLeft = function () {
+  if (slideNumber === 0) return;
+  slideNumber--;
+  changeSlide();
+}
+const sliderRight = function () {
+  if (slideNumber === slides.length - 1) return;
+  slideNumber++;
+  changeSlide();
+}
+
+btnSliderLeft.addEventListener('click', sliderLeft);
+btnSliderRight.addEventListener('click', sliderRight);
