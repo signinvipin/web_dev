@@ -444,7 +444,7 @@ const sortOps = () => {
 btnSortMoves.addEventListener('click', sortOps);
 
 // Login Check and Display data
-const veriyUser = event => {
+const verifyUser = event => {
   event.preventDefault();
   // console.log(userName.value, passWord.value);
 
