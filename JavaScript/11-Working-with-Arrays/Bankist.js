@@ -18,7 +18,6 @@ const account2 = {
   interestRate: 1.5,
   pin: 2222,
   currency: 'USD',
-  locale: 'en-US',
 };
 
 const account3 = {
@@ -160,6 +159,7 @@ const displayBalance = function () {
   const netInIntl = intlNumber(netIn);
   sumIn.textContent = netInIntl;
 };
+
 
 // Check USER and PIN
 const matchCredsPin = function (item, usrpin) {
@@ -444,7 +444,7 @@ const sortOps = () => {
 btnSortMoves.addEventListener('click', sortOps);
 
 // Login Check and Display data
-const veriyUser = event => {
+const verifyUser = event => {
   event.preventDefault();
   // console.log(userName.value, passWord.value);
 
