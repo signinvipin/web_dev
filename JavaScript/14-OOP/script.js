@@ -4,6 +4,7 @@ console.log('Object Oriented Programming');
 
 // Around ES5, Object Oriented Programming
 /*
+
 // Type - I, Function Constructor Object Based Classes and Inheritance: using function block and call on parentClass
 
 // creating parent class
@@ -59,8 +60,8 @@ console.log(childClassInstance.__proto__);
 // Calling property and method
 console.log(childClassInstance.country);
 childClassInstance.giveCountry();
-
-
+*/
+/*
 // Type-II, Object based Classes and Inheritance: using 'Object.create' and call method on objects' method
 console.log('***Parent Class***');
 
