@@ -10,3 +10,25 @@ const inputDistance = document.querySelector('.form__input--distance');
 const inputDuration = document.querySelector('.form__input--duration');
 const inputCadence = document.querySelector('.form__input--cadence');
 const inputElevation = document.querySelector('.form__input--elevation');
+
+function formView() {
+  form.classList.toggle('hidden');
+}
+
+function toggleCadElev() {
+  inputCadence.closest('.form__row').classList.toggle('form__row--hidden');
+  inputElevation.closest('.form__row').classList.toggle('form__row--hidden');
+}
+
+let type;
+formView();
+
+navigator.geolocation.getCurrentPosition(
+  pos => console.log(pos.coords),
+  alert('no position data available!')
+);
+
+inputType.addEventListener('change', function () {
+  console.log(inputType.classList.value);
+  toggleCadElev();
+});
