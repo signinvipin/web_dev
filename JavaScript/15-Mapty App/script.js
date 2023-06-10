@@ -12,51 +12,37 @@ const inputCadence = document.querySelector('.form__input--cadence');
 const inputElevation = document.querySelector('.form__input--elevation');
 
 /*
-var map = L.map('map').setView([51.505, -0.09], 13);
+// for making Map
+var map = L.map('map').setView([51.505, -0.09], 13); //zoom = 13
 
+// for Map presentation
 L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19;
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
 }).addTo(map);
 
+// for Marker
 L.marker([51.5, -0.09]).addTo(map)
     .bindPopup('A pretty CSS popup.<br> Easily customizable.')
     .openPopup();
+
+// for Popup
+var popup = L.popup()
+    .setLatLng([51.513, -0.09])
+    .setContent("I am a standalone popup.")
+    .openOn(map);
+
+// for event management
+var popup = L.popup();
+
+function onMapClick(e) {
+    popup.setLatLng(e.latlng)
+        .setContent("You clicked the map at " + e.latlng.toString())
+        .openOn(map);
+}
+
+map.on('click', onMapClick);
+
 */
 
-function formView() {
-  form.classList.toggle('hidden');
-}
-
-function toggleCadElev() {
-  inputCadence.closest('.form__row').classList.toggle('form__row--hidden');
-  inputElevation.closest('.form__row').classList.toggle('form__row--hidden');
-}
-
-let type;
-formView();
-
-inputType.addEventListener('change', function () {
-  console.log(inputType.classList.value);
-  toggleCadElev();
-});
-
-function loadMap(pos) {
-  console.log(pos);
-  const { longitude, latitude } = pos.coords;
-  console.log('lng' + longitude + ', lat ' + latitude);
-
-  const map = L.map('map').setView([latitude, longitude], 13);
-
-  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution:
-      '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-  }).addTo(map);
-}
-
-function showGeoLocation() {
-  navigator.geolocation.getCurrentPosition(
-    loadMap,
-    alert('Please allow access to your location.')
-  );
-}
-showGeoLocation();
+// steps running 1Km = 1045
