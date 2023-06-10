@@ -33,30 +33,79 @@ function toggleCadElev() {
 }
 
 let type;
-formView();
+let zoom = 13;
+
+function typeWorkout (){
+  if (inputCadence.closest('.form__row').classList.contains('form__row--hidden')) type = 'cycling';
+  if (inputElevation.closest('.form__row').classList.contains('form__row--hidden')) type = 'running';
+  console.log(type);
+}
+typeWorkout();
 
 inputType.addEventListener('change', function () {
-  console.log(inputType.classList.value);
+//  console.log(inputType.classList.value);
   toggleCadElev();
+  typeWorkout();
+  
 });
 
-function loadMap(pos) {
-  console.log(pos);
-  const { longitude, latitude } = pos.coords;
-  console.log('lng' + longitude + ', lat ' + latitude);
+function createMap(lat, lng, z){
+  return L.map('map').setView([lat, lng], z);
+}
 
-  const map = L.map('map').setView([latitude, longitude], 13);
-
-  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+function createTileLayer(map){
+  return L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution:
       '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
   }).addTo(map);
 }
 
+function createMarker(lat, lng, map){
+  return L.marker([lat, lng]).addTo(map);
+}
+
+function workOut(){
+  
+}
+
+
+
+function mouseClick (e){
+//  console.log(e);
+
+  const {lat, lng} = e.latlng;
+  console.log('lat '+ lat+', lng '+ lng);
+  formView();
+
+}
+
+function loadMap(pos) {
+  console.log(pos);
+
+  const {latitude, longitude} = pos.coords;
+  console.log('lat '+ latitude+', lng '+ longitude);
+
+  let map = createMap(latitude, longitude, zoom);
+
+  createTileLayer(map);
+
+  const marker = createMarker(latitude, longitude, map);
+  //add popup
+  marker.bindPopup(`Latitude: ${latitude.toFixed(2)},<br> Longitude: ${longitude.toFixed(2)}`)
+  .openPopup();
+
+  map.on('click', mouseClick);
+
+}
+
+
 function showGeoLocation() {
   navigator.geolocation.getCurrentPosition(
     loadMap,
-    alert('Please allow access to your location.')
+    //alert('Please allow access to your location.')
   );
 }
+
 showGeoLocation();
+
+
