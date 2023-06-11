@@ -47,36 +47,50 @@ map.on('click', onMapClick);
 
 // steps running 1Km = 1045
 
+// View/Unhide form
+/*
 function formView() {
   form.classList.toggle('hidden');
 }
+*/
 
+// toggle Cadence/Elevation
+/*
 function toggleCadElev() {
   inputCadence.closest('.form__row').classList.toggle('form__row--hidden');
   inputElevation.closest('.form__row').classList.toggle('form__row--hidden');
 }
-
+*/
 let type;
 let zoom = 13;
+let coOrdinates;
 
+// find type for Workout
+/*
 function typeWorkout (){
-  if (inputCadence.closest('.form__row').classList.contains('form__row--hidden')) type = 'cycling';
-  if (inputElevation.closest('.form__row').classList.contains('form__row--hidden')) type = 'running';
+  if (inputCadence.closest('.form__row').classList.contains('form__row--hidden')) type = 'Cycling';
+  if (inputElevation.closest('.form__row').classList.contains('form__row--hidden')) type = 'Running';
   console.log(type);
 }
 typeWorkout();
+*/
 
+// changing Running/Cycling and toggle Cadence/Elevation
+/*
 inputType.addEventListener('change', function () {
 //  console.log(inputType.classList.value);
   toggleCadElev();
   typeWorkout();
   
 });
+*/
 
-function createMap(lat, lng, z){
-  return L.map('map').setView([lat, lng], z);
+// Create a map
+function createMap(coOrdinates, z){
+  return L.map('map').setView(coOrdinates, z);
 }
-
+// Tile map layer
+// for localized map replace 'org' with 'in/hot/'
 function createTileLayer(map){
   return L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution:
@@ -84,49 +98,73 @@ function createTileLayer(map){
   }).addTo(map);
 }
 
-function createMarker(lat, lng, map){
-  return L.marker([lat, lng]).addTo(map);
+// create marker on map
+function createMarker(coOrdinates, map){
+  return L.marker(coOrdinates).addTo(map);
 }
+/*
+class workOut {
+  date = Date.now();
+  id = (date+'').slice(-10);
+  //console.log(_id);
 
-function workOut(){
+  constructor(coords,distance,duration){
+    this.coords = coords;
+    this.distance = distance;
+    this.duration = duration;
+  }
+
+  _setDesc () {
+    const workoutTitle = `${type} on ${months[this.date.getMonth()]} ${this.date.getDate()}`;
+    return workoutTitle;
+  }
+
   
 }
+*/
 
-
-
+// callback fn to click on map eventlistener
+/*
 function mouseClick (e){
-//  console.log(e);
+  // console.log(e);
 
   const {lat, lng} = e.latlng;
   console.log('lat '+ lat+', lng '+ lng);
   formView();
-
 }
+*/
 
-function loadMap(pos) {
-  console.log(pos);
 
-  const {latitude, longitude} = pos.coords;
-  console.log('lat '+ latitude+', lng '+ longitude);
 
-  let map = createMap(latitude, longitude, zoom);
+// load map on page
+function loadMap(position) {
+  console.log(position);
+
+  const {latitude, longitude} = position.coords;
+  coOrdinates = [latitude, longitude];
+  console.log(coOrdinates);
+
+  const map = createMap(coOrdinates, zoom);
+  console.log(map);
 
   createTileLayer(map);
 
-  const marker = createMarker(latitude, longitude, map);
+  const marker = createMarker(coOrdinates, map);
   //add popup
-  marker.bindPopup(`Latitude: ${latitude.toFixed(2)},<br> Longitude: ${longitude.toFixed(2)}`)
+  marker.bindPopup(`Your location <br> Latitude: ${latitude.toFixed(2)},<br> Longitude: ${longitude.toFixed(2)}`)
   .openPopup();
 
-  map.on('click', mouseClick);
+//  map.on('click', mouseClick);
 
 }
-
+console.log(map);
 
 function showGeoLocation() {
   navigator.geolocation.getCurrentPosition(
     loadMap,
-    //alert('Please allow access to your location.')
+    function () {
+      alert('Access to location not allowed.');
+    }
   );
 }
 
