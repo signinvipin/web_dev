@@ -88,3 +88,19 @@ const getCountryOrError = function (cName) {
 };
 getCountryOrError('india');
 */
+// Way #2 Using fetch().then().then().catch()
+/*
+const getCountryOrCatchError = function (cName) {
+  const promise = fetch(`https://restcountries.com/v3.1/name/${cName}`)
+    .then(res => res.json())
+    .then(data => console.log(data[0]))
+    .catch(err => console.log(err)) // Or use
+    // .catch(() => console.log('Failed to fetch'));
+
+    // use of finally() after catch()
+    .finally(() => console.log('Operation completed !'));
+};
+getCountryOrCatchError('india');
+*/
+
+// Way #3 create Error and throw Error
