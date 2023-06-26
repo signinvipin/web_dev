@@ -54,3 +54,22 @@ btn.addEventListener('click', getCountry);
 */
 
 // #2 using Promise
+//  fetch().then(response => response.json()).then(data => data)
+/*
+const getCountry = function (cName) {
+  let ndata;
+  const promise = fetch(`https://restcountries.com/v3.1/name/${cName}`)
+    .then(response => {
+      console.log(response);
+      return response.json();
+    })
+    .then(data => {
+      ndata = data;
+      console.log(ndata);
+    });
+  // return ndata;
+};
+// console.log(getCountry('canada')); // undefined if returned ndata
+
+getCountry('canada'); // create eventListener on click
+*/
