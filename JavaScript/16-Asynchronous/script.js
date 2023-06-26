@@ -88,7 +88,8 @@ const getCountryOrError = function (cName) {
 };
 getCountryOrError('india');
 */
-// Way #2 Using fetch().then().then().catch()
+// Way #2 Using fetch().then().then().catch().finally()
+// It catches error happened at any stage of execution.
 /*
 const getCountryOrCatchError = function (cName) {
   const promise = fetch(`https://restcountries.com/v3.1/name/${cName}`)
@@ -97,10 +98,23 @@ const getCountryOrCatchError = function (cName) {
     .catch(err => console.log(err)) // Or use
     // .catch(() => console.log('Failed to fetch'));
 
-    // use of finally() after catch()
+    // use of finally() after catch() (optional)
     .finally(() => console.log('Operation completed !'));
 };
 getCountryOrCatchError('india');
 */
 
-// Way #3 create Error and throw Error
+// Way #3 create Error using 'new Error' and throw Error
+/*
+const getCountryOrThrowError = function (cName) {
+  const prome = fetch(`https://restcountries.com/v3.1/name/${cName}`)
+    .then(resolve => {
+      console.dir(resolve);
+      if (!resolve.ok) throw new Error('Nothing to fetch');
+      return resolve.json();
+    })
+    .then(data => console.log(data[0]));
+};
+getCountryOrThrowError('');
+// getCountryOrThrowError('canada');
+*/
