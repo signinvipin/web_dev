@@ -73,3 +73,18 @@ const getCountry = function (cName) {
 
 getCountry('canada'); // create eventListener on click
 */
+// ***Error Handling***
+
+// Way #1 fetch.then(resolve callback fn, reject callback fn).then(data)
+/*
+const getCountryOrError = function (cName) {
+  fetch(`https://restcountries.com/v3.1/name/${cName}`)
+    .then(
+      response => response.json(),
+      error => console.log(error) // or,
+      // () => console.error('Failed to fetch');
+    )
+    .then(data => console.log(data[0]));
+};
+getCountryOrError('india');
+*/
