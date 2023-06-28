@@ -166,3 +166,13 @@ getPromLocReturn()
   .then(resolve => console.log(resolve))
   .catch(err => console.error(err));
 */
+
+// Creating Fullfilled or Rejected Promise
+/*
+// fullfilled Promise
+Promise.resolve('Yes! it has resolved.').then(resp => console.log(resp));
+// rejected Promise
+Promise.reject('Request has been rejected!').catch(err => console.log(err));
+*/
+
+// Consuming Promise - Async-await
