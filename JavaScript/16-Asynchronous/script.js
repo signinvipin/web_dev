@@ -118,3 +118,51 @@ const getCountryOrThrowError = function (cName) {
 getCountryOrThrowError('');
 // getCountryOrThrowError('canada');
 */
+
+// Creating Promise and Using Promise
+/*
+const promCreate = new Promise(function (resolve, reject) {
+  if (Math.random() > 0.5) {
+    resolve('You Won !');
+  } else {
+    reject('You have lost !');
+  }
+});
+
+promCreate.then(res => console.log(res)).catch(err => console.log(err));
+*/
+
+// Example - creating promise
+
+// Normal Way of Getting Current Position
+/*
+function getLoc() {
+  navigator.geolocation.getCurrentPosition(
+    pos => console.log(pos),
+    err => console.error(err)
+  );
+}
+getLoc();
+*/
+
+// Promisify getting Current Position
+/*
+// Way #1
+const getPromLoc = new Promise(function (resolve, reject) {
+  navigator.geolocation.getCurrentPosition(resolve, reject);
+});
+
+getPromLoc
+  .then(response => console.log(response))
+  .catch(err => console.error(err));
+
+// way#2 with function returning promise
+const getPromLocReturn = function () {
+  return new Promise(function (resolve, reject) {
+    navigator.geolocation.getCurrentPosition(resolve, reject);
+  });
+};
+getPromLocReturn()
+  .then(resolve => console.log(resolve))
+  .catch(err => console.error(err));
+*/
