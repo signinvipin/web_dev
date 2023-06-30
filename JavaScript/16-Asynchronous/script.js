@@ -323,3 +323,98 @@ whereAmI()
 */
 
 // Combinators
+
+const getJson = async function (url, error = 'No data') {
+  const prom = await fetch(url);
+  if (!prom.ok) throw new Error(error);
+  return prom.json();
+};
+// https://restcountries.com/v3.1/name/${'cName'}
+
+// Promise.all()
+// only returns all promises if all are resolved
+/*
+const getAll = async function () {
+  try {
+    const prom = await Promise.all([
+      getJson(`https://restcountries.com/v3.1/name/${'canada'}`),
+      getJson(`https://restcountries.com/v3.1/name/${'USA'}`),
+      getJson(`https://restcountries.com/v3.1/name/${'india'}`),
+      // getJson(`https://restcountries.com/v3.1/name/${''}`),
+    ]);
+    // console.log(prom);
+    return prom;
+  } catch (err) {
+    console.error(err);
+  }
+};
+getAll()
+  .then(res => {
+    // console.log(res);
+    res.map(d => console.log(d));
+  })
+  .catch(err => console.error(err));
+*/
+
+// Promise.allsettled()
+// returns all settled resolved or rejected;
+/*
+const getAllSettled = async function () {
+  try {
+    const prom = await Promise.allSettled([
+      getJson(`https://restcountries.com/v3.1/name/${'canada'}`),
+      getJson(`https://restcountries.com/v3.1/name/${'USA'}`),
+      getJson(`https://restcountries.com/v3.1/name/${''}`),
+    ]);
+    return prom;
+  } catch (error) {
+    console.error(error);
+  }
+};
+getAllSettled()
+  .then(res => {
+    res.map(d => console.log(d));
+  })
+  .catch(err => console.error(err));
+*/
+
+// Promise.race();
+// only returns first settled fulfilled/resolved
+/*
+const getRace = async function () {
+  try {
+    const prom = await Promise.race([
+      getJson(`https://restcountries.com/v3.1/name/${'USA'}`),
+      getJson(`https://restcountries.com/v3.1/name/${'canada'}`),
+      getJson(`https://restcountries.com/v3.1/name/${'india'}`),
+    ]);
+    return prom;
+  } catch (err) {
+    console.error(err);
+  }
+};
+getRace()
+  .then(res => {
+    res.map(el => console.log(el));
+  })
+  .catch(err => console.error(err));
+*/
+
+// Promise.any()
+// returns any promise resolved first
+const getAny = async function (a, b, c) {
+  try {
+    const prom = await Promise.any([
+      getJson(`https://restcountries.com/v3.1/name/${a}`),
+      getJson(`https://restcountries.com/v3.1/name/${b}`),
+      getJson(`https://restcountries.com/v3.1/name/${c}`),
+    ]);
+    return prom;
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+getAny('USA', 'india', 'canada')
+  .then(res => res.map(el => console.log(el)))
+  .catch(err => console.log(err));
