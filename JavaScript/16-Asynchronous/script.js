@@ -176,3 +176,150 @@ Promise.reject('Request has been rejected!').catch(err => console.log(err));
 */
 
 // Consuming Promise - Async-await
+/*
+// using async-await
+const getCountryAsync = async function (cName) {
+  const response = await fetch(`https://restcountries.com/v3.1/name/${cName}`);
+  const [data] = await response.json();
+  console.log(data);
+};
+getCountryAsync('canada');
+*/
+
+// Handling Errors
+/*
+const getCountryTryCatch = async function (cName) {
+  try {
+    const response = await fetch(
+      `https://restcountries.com/v3.1/name/${cName}`
+    );
+    console.log(response);
+    if (!response.ok) throw new Error('Nothing fetched!');
+
+    const data = await response.json();
+    if (!data) throw new Error('No data!');
+    // console.log(data);
+    return data;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+};
+*/
+
+// Using IIFE (Immediately Invoked Function Expression)
+/*
+(async function getDat() {
+  try {
+    const datCountry = await getCountryTryCatch('USA');
+    console.log(datCountry);
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
+})();
+*/
+
+// or,
+
+// Using fetch.then way
+/*
+getCountryTryCatch('canada')
+  .then(res => console.log(res))
+  .catch(err => console.log(err));
+*/
+
+// Example implementation
+/*
+const getGeoLoc = function () {
+  return new Promise(function (resolve, reject) {
+    navigator.geolocation.getCurrentPosition(resolve, reject);
+  });
+};
+
+async function getCountryReverseGeocode() {
+  try {
+    const getGeo = await getGeoLoc();
+    // console.log(getGeo.coords);
+    const { latitude: lat, longitude: lng } = getGeo.coords;
+    // console.log(latitude, longitude);
+    // console.log(lat, lng);
+    // const getRevGeo = false;
+    const getRevGeo = await fetch(
+      `https://geocode.maps.co/reverse?lat=${lat}&lon=${lng}`
+    );
+
+    if (!getRevGeo.ok) throw new Error('Problem getting data');
+    // when data not provided and is priced or throttled
+
+    const revData = await getRevGeo.json();
+    const revAdd = revData.address;
+    return `You are at ${revAdd.city}.`;
+    //returns undefined when revAdd is false
+  } catch (error) {
+    console.error(error.message);
+    throw error;
+  }
+}
+const resp = getCountryReverseGeocode(); // No await
+console.log(resp); // Results Promise pending
+
+getCountryReverseGeocode()
+  .then(response => console.log(response))
+  .catch(err => console.error(err));
+// Or,
+(async function () {
+  try {
+    const city = await getCountryReverseGeocode();
+    console.log(city);
+  } catch (err) {
+    console.error(err.message);
+    throw err;
+  }
+})();
+// Or,
+btn.addEventListener('click', function () {
+  getCountryReverseGeocode()
+    .then(response => console.log(response))
+    .catch(err => console.error(err));
+});
+
+
+//Tutorial
+const whereAmI = async function () {
+  try {
+    const pos = await getGeoLoc();
+    const { latitude: lat, longitude: lng } = pos.coords;
+
+    const resGeo = await fetch(
+      `https://geocode.maps.co/reverse?lat=${lat}&lon=${lng}`
+    );
+
+    if (!resGeo.ok) throw new Error('Problem Getting Data');
+
+    const dataGeo = await resGeo.json();
+    // console.log(dataGeo.address.city);
+    return `you are in ${dataGeo.address.city}`;
+  } catch (error) {
+    console.error(`${error.message}`);
+    throw error;
+  }
+};
+const ret = whereAmI();
+console.log(ret); //Promise pending
+
+whereAmI()
+  .then(res => console.log(res))
+  .catch(err => console.error(err)); // you are in {city name}
+
+(async function () {
+  try {
+    const res = await whereAmI();
+    console.log(res);
+  } catch (error) {
+    console.error(error.message);
+  }
+})();
+*/
+
+// Combinators
