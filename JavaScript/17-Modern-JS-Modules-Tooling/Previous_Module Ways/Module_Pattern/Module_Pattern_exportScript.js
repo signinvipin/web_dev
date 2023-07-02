@@ -1,6 +1,8 @@
-'use strict';
-
 // Old Module_Pattern can not import or export
+// But variables are global and can be accessed.
+// Scripts should be placed in sequence.
+
+console.log('Module_Pattern Global Variable Export');
 
 const favCar = function () {
   const allCars = [];
