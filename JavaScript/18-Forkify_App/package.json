@@ -1,0 +1,21 @@
+{
+  "name": "18-forkify_app",
+  "version": "1.0.0",
+  "description": "recipe app",
+  "main": "index.js",
+  "scripts": {
+    "start": "parcel index.html",
+    "build": "parcel build index.html"
+  },
+  "author": "Vipin",
+  "license": "ISC",
+  "dependencies": {
+    "core-js": "^3.31.1",
+    "regenerator-runtime": "^0.13.11"
+  },
+  "devDependencies": {
+    "@parcel/transformer-sass": "^2.9.3",
+    "parcel": "^2.9.3",
+    "sass": "^1.63.6"
+  }
+}
