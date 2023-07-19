@@ -579,13 +579,41 @@ function hmrAccept(bundle /*: ParcelRequire */ , id /*: string */ ) {
 var _webImmediateJs = require("core-js/modules/web.immediate.js");
 var _regeneratorRuntime = require("regenerator-runtime");
 var _modelJs = require("./model.js");
+var _reusablesJs = require("./reusables.js");
+var _configurationJs = require("./configuration.js");
 var _searchViewJs = require("./searchView.js");
+var _resultsViewJs = require("./resultsView.js");
+// A callback function to search form submit event
+const searchFunction = async function(e) {
+    try {
+        // Prevents auto reloading of page after submit
+        e.preventDefault();
+        const searchQuery = (0, _searchViewJs.searchMethods).getQuery();
+        (0, _searchViewJs.searchMethods).clearSearchField();
+        console.log("length of searchQuery is " + searchQuery.length);
+        if (!searchQuery || searchQuery.length < 3) return;
+        const arrData = await Promise.race([
+            (0, _modelJs.queryResults)(searchQuery),
+            (0, _reusablesJs.timeout)((0, _configurationJs.timePeriod))
+        ]);
+        const [[, status], [, results], [, { recipes }]] = arrData;
+        // console.log(status, results, recipes);
+        // assign data to softDataStorage
+        (0, _modelJs.softDataStorage).recipeList = recipes;
+        (0, _modelJs.softDataStorage).recentRequestStatus = status;
+        (0, _modelJs.softDataStorage).resultList = (0, _modelJs.generateResultsList)(recipes);
+    // console.log(softDataStorage);
+    } catch (err) {
+        console.error(`${err.message}`);
+    }
+};
+(0, _resultsViewJs.renderSpinner)();
 function init() {
-    (0, _searchViewJs.searchMethods).addSearchHandler((0, _searchViewJs.searchFunction));
+    (0, _searchViewJs.searchMethods).addSearchHandler(searchFunction);
 }
 init();
 
-},{"core-js/modules/web.immediate.js":"49tUX","regenerator-runtime":"dXNgZ","./model.js":"Y4A21","./searchView.js":"9M3GU"}],"49tUX":[function(require,module,exports) {
+},{"core-js/modules/web.immediate.js":"49tUX","regenerator-runtime":"dXNgZ","./model.js":"Y4A21","./searchView.js":"9M3GU","./reusables.js":"if9p6","./configuration.js":"eSmrz","./resultsView.js":"faCQd"}],"49tUX":[function(require,module,exports) {
 // TODO: Remove this module from `core-js@4` since it's split to modules listed below
 require("52e9b3eefbbce1ed");
 require("292fa64716f5b39e");
@@ -2489,6 +2517,7 @@ try {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "queryResults", ()=>queryResults);
+parcelHelpers.export(exports, "generateResultsList", ()=>generateResultsList);
 parcelHelpers.export(exports, "softDataStorage", ()=>softDataStorage);
 var _reusablesJs = require("./reusables.js");
 const queryResults = async function(searchQuery, key, id) {
@@ -2498,10 +2527,31 @@ const queryResults = async function(searchQuery, key, id) {
     const responseData = await fetch(urlLink);
     const jsonData = await responseData.json();
     const arrData = Object.entries(jsonData);
-    console.log(arrData);
+    // console.log(arrData);
     return arrData;
 };
-const softDataStorage = {};
+const generateResultsList = function(recipes) {
+    let listResults = [];
+    for (let { id, image_url, publisher, title, key } of recipes)// const dataResults = [id, image_url, publisher, title, key];
+    // console.log(dataResults);
+    (function() {
+        const resultsArray = {
+            userId: id,
+            imageURL: image_url,
+            recipePublisher: publisher,
+            recipeTitle: title
+        };
+        if (key) resultsArray.userKey = key;
+        listResults.push(resultsArray);
+    })(id, image_url, publisher, title, key);
+    // console.log(listResults);
+    return listResults;
+};
+const softDataStorage = {
+    recentRequestStatus: "",
+    recipeList: [],
+    resultList: []
+};
 const storeData = function(dataObject) {
 // add to local storage for tab reload event
 };
@@ -2584,19 +2634,19 @@ const getURL = function(searchQuery, key, id) {
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "allURLs", ()=>allURLs);
 parcelHelpers.export(exports, "timePeriod", ()=>timePeriod);
+parcelHelpers.export(exports, "key", ()=>key);
 const allURLs = "https://forkify-api.herokuapp.com/api/v2/recipes";
-const timePeriod = 2.5; /** User API Key */  // export const key = '';
+const timePeriod = 2.5;
+const key = "31721811-a6b8-4e16-b58d-7188c8e3bd8e";
 
 },{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"9M3GU":[function(require,module,exports) {
 // Search work in a class
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "searchMethods", ()=>searchMethods);
-parcelHelpers.export(exports, "searchFunction", ()=>searchFunction);
 var _mainViewJs = require("./mainView.js");
-var _reusablesJs = require("./reusables.js");
-var _modelJs = require("./model.js");
-var _configurationJs = require("./configuration.js");
+// import { queryResults, softData } from './model.js';
+// import { softDataStorage, generateResultsList } from './model.js';
 class searchView {
     getQuery() {
         const searchQuery = (0, _mainViewJs.parentElements).searchField.value;
@@ -2612,32 +2662,8 @@ class searchView {
     }
 }
 const searchMethods = new searchView();
-const searchFunction = async function(e) {
-    try {
-        // Prevents auto reloading of page after submit
-        e.preventDefault();
-        const searchQuery = searchMethods.getQuery();
-        searchMethods.clearSearchField();
-        console.log("length of searchQuery is " + searchQuery.length);
-        if (!searchQuery || searchQuery.length < 3) return;
-        const arrData = await Promise.race([
-            (0, _modelJs.queryResults)(searchQuery),
-            (0, _reusablesJs.timeout)((0, _configurationJs.timePeriod))
-        ]);
-        const [[, status], [, results], [, { recipes }]] = arrData;
-        console.log(status);
-        console.log(results);
-        console.log(recipes);
-        // assign data to softDataStorage
-        (0, _modelJs.softDataStorage).recipeList = recipes;
-        (0, _modelJs.softDataStorage).recentRequestStatus = status;
-        console.log((0, _modelJs.softDataStorage));
-    } catch (err) {
-        console.error(`${err.message}`);
-    }
-};
 
-},{"./mainView.js":"asXf2","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","./reusables.js":"if9p6","./model.js":"Y4A21","./configuration.js":"eSmrz"}],"asXf2":[function(require,module,exports) {
+},{"./mainView.js":"asXf2","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"asXf2":[function(require,module,exports) {
 // Rendering of view/content to DOM
 // take data and render
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
@@ -2646,11 +2672,70 @@ parcelHelpers.export(exports, "parentElements", ()=>parentElements);
 const parentElements = {
     recipeContainer: document.querySelector(".recipe"),
     searchForm: document.querySelector(".search"),
-    searchField: document.querySelector(".search__field")
+    searchField: document.querySelector(".search__field"),
+    resultsContainer: document.querySelector(".search-results"),
+    resultsListContainer: document.querySelector(".results")
 }; // const recipeContainer = document.querySelector('.recipe');
  // const searchForm = document.querySelector('.search');
  // const searchField = document.querySelector('.search__field');
 
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}]},["j9r0q","ebWYT"], "ebWYT", "parcelRequire410a")
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"faCQd":[function(require,module,exports) {
+// All results render and display
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "renderSpinner", ()=>renderSpinner);
+var _mainViewJs = require("./mainView.js");
+var _iconsSvg = require("../img/icons.svg");
+var _iconsSvgDefault = parcelHelpers.interopDefault(_iconsSvg);
+const renderSpinner = function() {
+    //   parentElements.resultsContainer.innerHTML = '';
+    const html = `<div class="spinner">
+                    <svg>
+                    <!--<use href="src/img/icons.svg#icon-loader"></use>-->
+                    <use href="${(0, _iconsSvgDefault.default)}#icon-loader"></use>
+                    </svg>
+                </div>`;
+    (0, _mainViewJs.parentElements).resultsContainer.insertAdjacentHTML("afterbegin", html);
+};
+
+},{"./mainView.js":"asXf2","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","../img/icons.svg":"8PWvx"}],"8PWvx":[function(require,module,exports) {
+module.exports = require("b37898b5bf0b13e0").getBundleURL("g05j8") + "icons.21bad73c.svg" + "?" + Date.now();
+
+},{"b37898b5bf0b13e0":"lgJ39"}],"lgJ39":[function(require,module,exports) {
+"use strict";
+var bundleURL = {};
+function getBundleURLCached(id) {
+    var value = bundleURL[id];
+    if (!value) {
+        value = getBundleURL();
+        bundleURL[id] = value;
+    }
+    return value;
+}
+function getBundleURL() {
+    try {
+        throw new Error();
+    } catch (err) {
+        var matches = ("" + err.stack).match(/(https?|file|ftp|(chrome|moz|safari-web)-extension):\/\/[^)\n]+/g);
+        if (matches) // The first two stack frames will be this function and getBundleURLCached.
+        // Use the 3rd one, which will be a runtime in the original bundle.
+        return getBaseURL(matches[2]);
+    }
+    return "/";
+}
+function getBaseURL(url) {
+    return ("" + url).replace(/^((?:https?|file|ftp|(chrome|moz|safari-web)-extension):\/\/.+)\/[^/]+$/, "$1") + "/";
+}
+// TODO: Replace uses with `new URL(url).origin` when ie11 is no longer supported.
+function getOrigin(url) {
+    var matches = ("" + url).match(/(https?|file|ftp|(chrome|moz|safari-web)-extension):\/\/[^/]+/);
+    if (!matches) throw new Error("Origin not found");
+    return matches[0];
+}
+exports.getBundleURL = getBundleURLCached;
+exports.getBaseURL = getBaseURL;
+exports.getOrigin = getOrigin;
+
+},{}]},["j9r0q","ebWYT"], "ebWYT", "parcelRequire410a")
 
 //# sourceMappingURL=index.739bf03c.js.map

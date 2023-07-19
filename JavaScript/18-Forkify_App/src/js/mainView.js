@@ -5,6 +5,8 @@ export const parentElements = {
   recipeContainer: document.querySelector('.recipe'),
   searchForm: document.querySelector('.search'),
   searchField: document.querySelector('.search__field'),
+  resultsContainer: document.querySelector('.search-results'),
+  resultsListContainer: document.querySelector('.results'),
 };
 
 // const recipeContainer = document.querySelector('.recipe');
