@@ -578,11 +578,13 @@ function hmrAccept(bundle /*: ParcelRequire */ , id /*: string */ ) {
 ///////////////////////////////////////
 var _webImmediateJs = require("core-js/modules/web.immediate.js");
 var _regeneratorRuntime = require("regenerator-runtime");
+var _mainViewJs = require("./mainView.js");
 var _modelJs = require("./model.js");
 var _reusablesJs = require("./reusables.js");
 var _configurationJs = require("./configuration.js");
 var _searchViewJs = require("./searchView.js");
 var _resultsViewJs = require("./resultsView.js");
+var _errorViewJs = require("./errorView.js");
 // A callback function to search form submit event
 const searchFunction = async function(e) {
     try {
@@ -591,13 +593,23 @@ const searchFunction = async function(e) {
         const searchQuery = (0, _searchViewJs.searchMethods).getQuery();
         (0, _searchViewJs.searchMethods).clearSearchField();
         console.log("length of searchQuery is " + searchQuery.length);
-        if (!searchQuery || searchQuery.length < 3) return;
+        if (!searchQuery || searchQuery.length < 3) {
+            (0, _errorViewJs.renderError)((0, _errorViewJs.errorMessage).noResults);
+            return;
+        }
+        if (!(0, _mainViewJs.parentTags).errorResults) {
+            (0, _resultsViewJs.emptyResultsContainer)();
+            (0, _resultsViewJs.renderSpinner)();
+        }
         const arrData = await Promise.race([
             (0, _modelJs.queryResults)(searchQuery),
             (0, _reusablesJs.timeout)((0, _configurationJs.timePeriod))
         ]);
+        console.log(arrData);
         const [[, status], [, results], [, { recipes }]] = arrData;
-        // console.log(status, results, recipes);
+        console.log(status, results, recipes);
+        if (arrData) (0, _resultsViewJs.emptyResultsContainer)();
+        // renderRecipeResults();
         // assign data to softDataStorage
         (0, _modelJs.softDataStorage).recipeList = recipes;
         (0, _modelJs.softDataStorage).recentRequestStatus = status;
@@ -605,15 +617,16 @@ const searchFunction = async function(e) {
     // console.log(softDataStorage);
     } catch (err) {
         console.error(`${err.message}`);
+        (0, _resultsViewJs.emptyResultsContainer)();
+        (0, _errorViewJs.renderError)(err.message);
     }
 };
-(0, _resultsViewJs.renderSpinner)();
 function init() {
     (0, _searchViewJs.searchMethods).addSearchHandler(searchFunction);
 }
 init();
 
-},{"core-js/modules/web.immediate.js":"49tUX","regenerator-runtime":"dXNgZ","./model.js":"Y4A21","./searchView.js":"9M3GU","./reusables.js":"if9p6","./configuration.js":"eSmrz","./resultsView.js":"faCQd"}],"49tUX":[function(require,module,exports) {
+},{"core-js/modules/web.immediate.js":"49tUX","regenerator-runtime":"dXNgZ","./model.js":"Y4A21","./searchView.js":"9M3GU","./reusables.js":"if9p6","./configuration.js":"eSmrz","./resultsView.js":"faCQd","./mainView.js":"asXf2","./errorView.js":"8pAzM"}],"49tUX":[function(require,module,exports) {
 // TODO: Remove this module from `core-js@4` since it's split to modules listed below
 require("52e9b3eefbbce1ed");
 require("292fa64716f5b39e");
@@ -2636,7 +2649,7 @@ parcelHelpers.export(exports, "allURLs", ()=>allURLs);
 parcelHelpers.export(exports, "timePeriod", ()=>timePeriod);
 parcelHelpers.export(exports, "key", ()=>key);
 const allURLs = "https://forkify-api.herokuapp.com/api/v2/recipes";
-const timePeriod = 2.5;
+const timePeriod = 1;
 const key = "31721811-a6b8-4e16-b58d-7188c8e3bd8e";
 
 },{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"9M3GU":[function(require,module,exports) {
@@ -2649,16 +2662,20 @@ var _mainViewJs = require("./mainView.js");
 // import { softDataStorage, generateResultsList } from './model.js';
 class searchView {
     getQuery() {
-        const searchQuery = (0, _mainViewJs.parentElements).searchField.value;
+        const searchQuery = (0, _mainViewJs.parentTags).searchField.value;
         // if (!searchQuery) return;
         // console.log(searchQuery);
         return searchQuery;
     }
     clearSearchField() {
-        (0, _mainViewJs.parentElements).searchField.value = "";
+        (0, _mainViewJs.parentTags).searchField.value = "";
+        (0, _mainViewJs.parentTags).searchField.blur();
+    }
+    focusSearchField() {
+        (0, _mainViewJs.parentTags).searchField.focus();
     }
     addSearchHandler(searchFunction) {
-        (0, _mainViewJs.parentElements).searchForm.addEventListener("submit", searchFunction);
+        (0, _mainViewJs.parentTags).searchForm.addEventListener("submit", searchFunction);
     }
 }
 const searchMethods = new searchView();
@@ -2668,13 +2685,15 @@ const searchMethods = new searchView();
 // take data and render
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "parentElements", ()=>parentElements);
-const parentElements = {
+parcelHelpers.export(exports, "parentTags", ()=>parentTags);
+const parentTags = {
     recipeContainer: document.querySelector(".recipe"),
     searchForm: document.querySelector(".search"),
     searchField: document.querySelector(".search__field"),
     resultsContainer: document.querySelector(".search-results"),
-    resultsListContainer: document.querySelector(".results")
+    resultsListContainer: document.querySelector(".results"),
+    resultsSpinner: document.querySelector(".spinner-results"),
+    errorResults: document.querySelector(".error-results")
 }; // const recipeContainer = document.querySelector('.recipe');
  // const searchForm = document.querySelector('.search');
  // const searchField = document.querySelector('.search__field');
@@ -2684,19 +2703,27 @@ const parentElements = {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "renderSpinner", ()=>renderSpinner);
+parcelHelpers.export(exports, "emptyResultsContainer", ()=>emptyResultsContainer);
 var _mainViewJs = require("./mainView.js");
 var _iconsSvg = require("../img/icons.svg");
 var _iconsSvgDefault = parcelHelpers.interopDefault(_iconsSvg);
 const renderSpinner = function() {
-    //   parentElements.resultsContainer.innerHTML = '';
     const html = `<div class="spinner">
                     <svg>
                     <!--<use href="src/img/icons.svg#icon-loader"></use>-->
                     <use href="${(0, _iconsSvgDefault.default)}#icon-loader"></use>
                     </svg>
                 </div>`;
-    (0, _mainViewJs.parentElements).resultsContainer.insertAdjacentHTML("afterbegin", html);
+    (0, _mainViewJs.parentTags).resultsContainer.insertAdjacentHTML("afterbegin", html);
 };
+const emptyResultsContainer = function() {
+    (0, _mainViewJs.parentTags).resultsContainer.innerHTML = "";
+}; /*
+// By changing HTML Class Attribute 'hidden'
+export const toggleResultsSpinner = function () {
+  parentElements.resultsSpinner.classList.toggle('hidden');
+};
+*/ 
 
 },{"./mainView.js":"asXf2","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","../img/icons.svg":"8PWvx"}],"8PWvx":[function(require,module,exports) {
 module.exports = require("b37898b5bf0b13e0").getBundleURL("g05j8") + "icons.21bad73c.svg" + "?" + Date.now();
@@ -2736,6 +2763,32 @@ exports.getBundleURL = getBundleURLCached;
 exports.getBaseURL = getBaseURL;
 exports.getOrigin = getOrigin;
 
-},{}]},["j9r0q","ebWYT"], "ebWYT", "parcelRequire410a")
+},{}],"8pAzM":[function(require,module,exports) {
+// Keeps all the error rendering
+// Imports
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "errorMessage", ()=>errorMessage);
+parcelHelpers.export(exports, "renderError", ()=>renderError);
+var _mainViewJs = require("./mainView.js");
+var _iconsSvg = require("../img/icons.svg");
+var _iconsSvgDefault = parcelHelpers.interopDefault(_iconsSvg);
+const errorMessage = {
+    noResults: "No recipes found for your query. Please try again!"
+};
+const renderError = function(error) {
+    const html = `<div class="error">
+                  <div>
+                    <svg>
+                      <!-- <use href="src/img/icons.svg#icon-alert-triangle"></use> -->
+                      <use href= "${(0, _iconsSvgDefault.default)}#icon-alert-triangle"></use>
+                    </svg>
+                  </div>
+                  <p>${error}</p>
+                </div>`;
+    (0, _mainViewJs.parentTags).resultsContainer.insertAdjacentHTML("afterbegin", html);
+};
+
+},{"./mainView.js":"asXf2","../img/icons.svg":"8PWvx","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}]},["j9r0q","ebWYT"], "ebWYT", "parcelRequire410a")
 
 //# sourceMappingURL=index.739bf03c.js.map

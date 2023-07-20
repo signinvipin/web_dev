@@ -1,24 +1,29 @@
 // Search work in a class
 
-import { parentElements } from './mainView.js';
+import { parentTags } from './mainView.js';
 // import { queryResults, softData } from './model.js';
 
 // import { softDataStorage, generateResultsList } from './model.js';
 
 class searchView {
   getQuery() {
-    const searchQuery = parentElements.searchField.value;
+    const searchQuery = parentTags.searchField.value;
     // if (!searchQuery) return;
     // console.log(searchQuery);
     return searchQuery;
   }
 
   clearSearchField() {
-    parentElements.searchField.value = '';
+    parentTags.searchField.value = '';
+    parentTags.searchField.blur();
+  }
+
+  focusSearchField() {
+    parentTags.searchField.focus();
   }
 
   addSearchHandler(searchFunction) {
-    parentElements.searchForm.addEventListener('submit', searchFunction);
+    parentTags.searchForm.addEventListener('submit', searchFunction);
   }
 }
 
