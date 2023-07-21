@@ -590,33 +590,46 @@ const searchFunction = async function(e) {
     try {
         // Prevents auto reloading of page after submit
         e.preventDefault();
+        // get search input
         const searchQuery = (0, _searchViewJs.searchMethods).getQuery();
         (0, _searchViewJs.searchMethods).clearSearchField();
         console.log("length of searchQuery is " + searchQuery.length);
+        // test search input
         if (!searchQuery || searchQuery.length < 3) {
+            // initParentTags();
+            (0, _resultsViewJs.emptyResultsContainer)();
             (0, _errorViewJs.renderError)((0, _errorViewJs.errorMessage).noResults);
             return;
         }
-        if (!(0, _mainViewJs.parentTags).errorResults) {
-            (0, _resultsViewJs.emptyResultsContainer)();
-            (0, _resultsViewJs.renderSpinner)();
-        }
+        // initialize parentTags
+        // initParentTags();
+        // console.log(parentTags.errorResults);
+        // render spinner
+        (0, _resultsViewJs.emptyResultsContainer)();
+        (0, _resultsViewJs.renderSpinner)();
+        // Retreive data from server
         const arrData = await Promise.race([
             (0, _modelJs.queryResults)(searchQuery),
             (0, _reusablesJs.timeout)((0, _configurationJs.timePeriod))
         ]);
         console.log(arrData);
+        console.log(arrData.flat().some((e)=>e === "results"));
+        // Data destructuring
         const [[, status], [, results], [, { recipes }]] = arrData;
         console.log(status, results, recipes);
-        if (arrData) (0, _resultsViewJs.emptyResultsContainer)();
+        // render results data
+        // initParentTags();
+        (0, _resultsViewJs.emptyResultsContainer)();
         // renderRecipeResults();
         // assign data to softDataStorage
         (0, _modelJs.softDataStorage).recipeList = recipes;
         (0, _modelJs.softDataStorage).recentRequestStatus = status;
         (0, _modelJs.softDataStorage).resultList = (0, _modelJs.generateResultsList)(recipes);
+        console.log((0, _modelJs.softDataStorage));
     // console.log(softDataStorage);
     } catch (err) {
         console.error(`${err.message}`);
+        // initParentTags();
         (0, _resultsViewJs.emptyResultsContainer)();
         (0, _errorViewJs.renderError)(err.message);
     }
@@ -2649,7 +2662,7 @@ parcelHelpers.export(exports, "allURLs", ()=>allURLs);
 parcelHelpers.export(exports, "timePeriod", ()=>timePeriod);
 parcelHelpers.export(exports, "key", ()=>key);
 const allURLs = "https://forkify-api.herokuapp.com/api/v2/recipes";
-const timePeriod = 1;
+const timePeriod = 3;
 const key = "31721811-a6b8-4e16-b58d-7188c8e3bd8e";
 
 },{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"9M3GU":[function(require,module,exports) {
@@ -2686,15 +2699,24 @@ const searchMethods = new searchView();
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "parentTags", ()=>parentTags);
-const parentTags = {
-    recipeContainer: document.querySelector(".recipe"),
-    searchForm: document.querySelector(".search"),
-    searchField: document.querySelector(".search__field"),
-    resultsContainer: document.querySelector(".search-results"),
-    resultsListContainer: document.querySelector(".results"),
-    resultsSpinner: document.querySelector(".spinner-results"),
-    errorResults: document.querySelector(".error-results")
-}; // const recipeContainer = document.querySelector('.recipe');
+parcelHelpers.export(exports, "initParentTags", ()=>initParentTags);
+let parentTags;
+const parentTagsFunction = function() {
+    return {
+        recipeContainer: document.querySelector(".recipe"),
+        searchForm: document.querySelector(".search"),
+        searchField: document.querySelector(".search__field"),
+        resultsContainer: document.querySelector(".search-results"),
+        resultsListContainer: document.querySelector(".results"),
+        spinnerResults: document.querySelector(".spinner"),
+        errorResults: document.querySelector(".error")
+    };
+};
+const initParentTags = function() {
+    parentTags = parentTagsFunction();
+    console.log(parentTags);
+};
+initParentTags(); // const recipeContainer = document.querySelector('.recipe');
  // const searchForm = document.querySelector('.search');
  // const searchField = document.querySelector('.search__field');
 
@@ -2703,6 +2725,7 @@ const parentTags = {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "renderSpinner", ()=>renderSpinner);
+parcelHelpers.export(exports, "renderRecipeResults", ()=>renderRecipeResults);
 parcelHelpers.export(exports, "emptyResultsContainer", ()=>emptyResultsContainer);
 var _mainViewJs = require("./mainView.js");
 var _iconsSvg = require("../img/icons.svg");
@@ -2716,12 +2739,34 @@ const renderSpinner = function() {
                 </div>`;
     (0, _mainViewJs.parentTags).resultsContainer.insertAdjacentHTML("afterbegin", html);
 };
+const renderRecipeResults = function() {
+    const html = `<li class="preview">
+                  <a class="preview__link preview__link--active" href="#23456">
+                    <figure class="preview__fig">
+                      <img src="src/img/test-1.jpg" alt="Test" />
+                    </figure>
+                    <div class="preview__data">
+                      <h4 class="preview__title">Pasta with Tomato Cream ...</h4>
+                      <p class="preview__publisher">The Pioneer Woman</p>
+                      <div class="preview__user-generated">
+                        <svg>
+                          <use href="src/img/icons.svg#icon-user"></use>
+                        </svg>
+                      </div>
+                    </div>
+                  </a>
+                </li>`;
+    (0, _mainViewJs.parentTags).resultsListContainer.insertAdjacentHTML("afterbegin", html);
+};
 const emptyResultsContainer = function() {
-    (0, _mainViewJs.parentTags).resultsContainer.innerHTML = "";
+    (0, _mainViewJs.initParentTags)();
+    (0, _mainViewJs.parentTags).resultsListContainer.innerHTML = "";
+    if ((0, _mainViewJs.parentTags).spinnerResults) (0, _mainViewJs.parentTags).spinnerResults.remove();
+    if ((0, _mainViewJs.parentTags).errorResults) (0, _mainViewJs.parentTags).errorResults.remove();
 }; /*
 // By changing HTML Class Attribute 'hidden'
 export const toggleResultsSpinner = function () {
-  parentElements.resultsSpinner.classList.toggle('hidden');
+  parentElements.spinnerResults.classList.toggle('hidden');
 };
 */ 
 
