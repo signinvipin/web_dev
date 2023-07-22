@@ -597,7 +597,7 @@ const searchFunction = async function(e) {
         // test search input
         if (!searchQuery || searchQuery.length < 3) {
             // initParentTags();
-            (0, _resultsViewJs.emptyResultsContainer)();
+            (0, _resultsViewJs.resultsViewMethods).emptyResultsContainer();
             (0, _errorViewJs.renderError)((0, _errorViewJs.errorMessage).noResults);
             return;
         }
@@ -605,35 +605,38 @@ const searchFunction = async function(e) {
         // initParentTags();
         // console.log(parentTags.errorResults);
         // render spinner
-        (0, _resultsViewJs.emptyResultsContainer)();
-        (0, _resultsViewJs.renderSpinner)();
+        (0, _resultsViewJs.resultsViewMethods).emptyResultsContainer();
+        (0, _resultsViewJs.resultsViewMethods).renderSpinner();
         // Retreive data from server
         const arrData = await Promise.race([
             (0, _modelJs.queryResults)(searchQuery),
             (0, _reusablesJs.timeout)((0, _configurationJs.timePeriod))
         ]);
         console.log(arrData);
-        console.log(arrData.flat().some((e)=>e === "results"));
+        const status = arrData.flat().some((e)=>e === "results");
+        console.log(status);
         // Data destructuring
-        const [[, status], [, results], [, { recipes }]] = arrData;
-        console.log(status, results, recipes);
+        const [, [, results], [, { recipes }]] = arrData;
+        console.log(results, recipes);
+        // assign data to softDataStorage
+        (0, _modelJs.softDataStorage).recipeReceived = recipes;
+        (0, _modelJs.softDataStorage).recentRequestStatus = status;
+        (0, _modelJs.softDataStorage).resultsListView = (0, _modelJs.generateResultsList)(recipes);
+        console.log((0, _modelJs.softDataStorage));
         // render results data
         // initParentTags();
-        (0, _resultsViewJs.emptyResultsContainer)();
-        // renderRecipeResults();
-        // assign data to softDataStorage
-        (0, _modelJs.softDataStorage).recipeList = recipes;
-        (0, _modelJs.softDataStorage).recentRequestStatus = status;
-        (0, _modelJs.softDataStorage).resultList = (0, _modelJs.generateResultsList)(recipes);
-        console.log((0, _modelJs.softDataStorage));
+        (0, _resultsViewJs.resultsViewMethods).emptyResultsContainer();
+        // resultsViewMethods.renderRecipeResults(softDataStorage.resultsListView);
+        (0, _resultsViewJs.resultsViewMethods).addResultsHandler((0, _modelJs.softDataStorage).resultsListView);
     // console.log(softDataStorage);
     } catch (err) {
         console.error(`${err.message}`);
         // initParentTags();
-        (0, _resultsViewJs.emptyResultsContainer)();
+        (0, _resultsViewJs.resultsViewMethods).emptyResultsContainer();
         (0, _errorViewJs.renderError)(err.message);
     }
 };
+const resultsPreviewFunction = function() {};
 function init() {
     (0, _searchViewJs.searchMethods).addSearchHandler(searchFunction);
 }
@@ -2575,8 +2578,8 @@ const generateResultsList = function(recipes) {
 };
 const softDataStorage = {
     recentRequestStatus: "",
-    recipeList: [],
-    resultList: []
+    recipeReceived: [],
+    resultsListView: []
 };
 const storeData = function(dataObject) {
 // add to local storage for tab reload event
@@ -2709,7 +2712,9 @@ const parentTagsFunction = function() {
         resultsContainer: document.querySelector(".search-results"),
         resultsListContainer: document.querySelector(".results"),
         spinnerResults: document.querySelector(".spinner"),
-        errorResults: document.querySelector(".error")
+        errorResults: document.querySelector(".error"),
+        previewLinks: document.querySelector(".preview__link"),
+        previewLinksAll: document.querySelectorAll(".preview__link")
     };
 };
 const initParentTags = function() {
@@ -2724,53 +2729,65 @@ initParentTags(); // const recipeContainer = document.querySelector('.recipe');
 // All results render and display
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "renderSpinner", ()=>renderSpinner);
-parcelHelpers.export(exports, "renderRecipeResults", ()=>renderRecipeResults);
-parcelHelpers.export(exports, "emptyResultsContainer", ()=>emptyResultsContainer);
+parcelHelpers.export(exports, "resultsViewMethods", ()=>resultsViewMethods);
 var _mainViewJs = require("./mainView.js");
 var _iconsSvg = require("../img/icons.svg");
 var _iconsSvgDefault = parcelHelpers.interopDefault(_iconsSvg);
-const renderSpinner = function() {
-    const html = `<div class="spinner">
-                    <svg>
-                    <!--<use href="src/img/icons.svg#icon-loader"></use>-->
-                    <use href="${(0, _iconsSvgDefault.default)}#icon-loader"></use>
-                    </svg>
-                </div>`;
-    (0, _mainViewJs.parentTags).resultsContainer.insertAdjacentHTML("afterbegin", html);
-};
-const renderRecipeResults = function() {
-    const html = `<li class="preview">
-                  <a class="preview__link preview__link--active" href="#23456">
-                    <figure class="preview__fig">
-                      <img src="src/img/test-1.jpg" alt="Test" />
-                    </figure>
-                    <div class="preview__data">
-                      <h4 class="preview__title">Pasta with Tomato Cream ...</h4>
-                      <p class="preview__publisher">The Pioneer Woman</p>
-                      <div class="preview__user-generated">
-                        <svg>
-                          <use href="src/img/icons.svg#icon-user"></use>
-                        </svg>
-                      </div>
-                    </div>
-                  </a>
-                </li>`;
-    (0, _mainViewJs.parentTags).resultsListContainer.insertAdjacentHTML("afterbegin", html);
-};
-const emptyResultsContainer = function() {
-    (0, _mainViewJs.initParentTags)();
-    (0, _mainViewJs.parentTags).resultsListContainer.innerHTML = "";
-    if ((0, _mainViewJs.parentTags).spinnerResults) (0, _mainViewJs.parentTags).spinnerResults.remove();
-    if ((0, _mainViewJs.parentTags).errorResults) (0, _mainViewJs.parentTags).errorResults.remove();
-}; /*
-// By changing HTML Class Attribute 'hidden'
-export const toggleResultsSpinner = function () {
-  parentElements.spinnerResults.classList.toggle('hidden');
-};
-*/ 
+var _faviconPng = require("../img/favicon.png");
+var _faviconPngDefault = parcelHelpers.interopDefault(_faviconPng);
+/** 'onerror' inline Jscript code for image load failure error handling, replacing failed image with set fallbackDefault.jpg.
+ * If in case fallbackDefault.img is not present to avoid ininite loop, use:
+ * 'this.error = null',  or
+ * 'if (this.src != 'Default.jpg')',
+ */ class resultsPreview {
+    // By Code insertion to HTML
+    renderSpinner() {
+        const html = `<div class="spinner">
+                      <svg>
+                      <!--<use href="src/img/icons.svg#icon-loader"></use>-->
+                      <use href="${(0, _iconsSvgDefault.default)}#icon-loader"></use>
+                      </svg>
+                  </div>`;
+        (0, _mainViewJs.parentTags).resultsContainer.insertAdjacentHTML("afterbegin", html);
+    }
+    renderRecipeResults(recipeList) {
+        for (let { userId, imageURL, recipeTitle, recipePublisher, userKey } of recipeList){
+            const html = `<li class="preview">
+                      <a class="preview__link preview__link--active" href="#${userId}">
+                        <figure class="preview__fig">
+                          <img src="${imageURL}" onerror = "this.onerror = null; this.src = '${(0, _faviconPngDefault.default)}'" alt="${recipeTitle}" />
+                        </figure>
+                        <div class="preview__data">
+                          <h4 class="preview__title">${recipeTitle}</h4>
+                          <p class="preview__publisher">${recipePublisher}</p>
+                          <div class="preview__user-generated ${userKey === undefined ? "hidden" : ""}">
+                            <svg>
+                              <use href="${(0, _iconsSvgDefault.default)}#icon-user"></use>
+                            </svg>
+                          </div>
+                        </div>
+                      </a>  
+                    </li>`;
+            (0, _mainViewJs.parentTags).resultsListContainer.insertAdjacentHTML("beforeend", html);
+        }
+    }
+    addResultsHandler = function(recipeList) {
+        this.renderRecipeResults(recipeList);
+        (0, _mainViewJs.initParentTags)();
+        console.log((0, _mainViewJs.parentTags).previewLinksAll);
+    };
+    // show error - remove list, spinner
+    emptyResultsContainer() {
+        (0, _mainViewJs.initParentTags)();
+        (0, _mainViewJs.parentTags).resultsListContainer.innerHTML = "";
+        // document.querySelector('.search-results').previousSibling.remove();
+        if ((0, _mainViewJs.parentTags).spinnerResults) (0, _mainViewJs.parentTags).spinnerResults.remove();
+        if ((0, _mainViewJs.parentTags).errorResults) (0, _mainViewJs.parentTags).errorResults.remove();
+    }
+}
+const resultsViewMethods = new resultsPreview();
 
-},{"./mainView.js":"asXf2","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","../img/icons.svg":"8PWvx"}],"8PWvx":[function(require,module,exports) {
+},{"./mainView.js":"asXf2","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","../img/icons.svg":"8PWvx","../img/favicon.png":"5s4km"}],"8PWvx":[function(require,module,exports) {
 module.exports = require("b37898b5bf0b13e0").getBundleURL("g05j8") + "icons.21bad73c.svg" + "?" + Date.now();
 
 },{"b37898b5bf0b13e0":"lgJ39"}],"lgJ39":[function(require,module,exports) {
@@ -2808,7 +2825,10 @@ exports.getBundleURL = getBundleURLCached;
 exports.getBaseURL = getBaseURL;
 exports.getOrigin = getOrigin;
 
-},{}],"8pAzM":[function(require,module,exports) {
+},{}],"5s4km":[function(require,module,exports) {
+module.exports = require("57f2b78b3f54553b").getBundleURL("g05j8") + "favicon.8b2f57bf.png" + "?" + Date.now();
+
+},{"57f2b78b3f54553b":"lgJ39"}],"8pAzM":[function(require,module,exports) {
 // Keeps all the error rendering
 // Imports
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");

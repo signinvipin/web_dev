@@ -47,8 +47,8 @@ export const generateResultsList = function (recipes) {
 
 export const softDataStorage = {
   recentRequestStatus: '',
-  recipeList: [],
-  resultList: [],
+  recipeReceived: [], // original recipe list received
+  resultsListView: [], // list of recipes for results view
 };
 
 const storeData = function (dataObject) {

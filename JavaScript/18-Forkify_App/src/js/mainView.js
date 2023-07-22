@@ -11,6 +11,8 @@ const parentTagsFunction = function () {
     resultsListContainer: document.querySelector('.results'),
     spinnerResults: document.querySelector('.spinner'),
     errorResults: document.querySelector('.error'),
+    previewLinks: document.querySelector('.preview__link'),
+    previewLinksAll: document.querySelectorAll('.preview__link'),
   };
 };
 

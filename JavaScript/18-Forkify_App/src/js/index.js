@@ -9,11 +9,7 @@ import { queryResults, softDataStorage, generateResultsList } from './model.js';
 import { timeout } from './reusables.js';
 import { timePeriod } from './configuration.js';
 import { searchMethods } from './searchView.js';
-import {
-  renderSpinner,
-  emptyResultsContainer,
-  renderRecipeResults,
-} from './resultsView.js';
+import { resultsViewMethods } from './resultsView.js';
 import { renderError, errorMessage } from './errorView.js';
 
 // A callback function to search form submit event
@@ -30,7 +26,7 @@ const searchFunction = async function (e) {
     // test search input
     if (!searchQuery || searchQuery.length < 3) {
       // initParentTags();
-      emptyResultsContainer();
+      resultsViewMethods.emptyResultsContainer();
       renderError(errorMessage.noResults);
       return;
     }
@@ -40,8 +36,8 @@ const searchFunction = async function (e) {
     // console.log(parentTags.errorResults);
 
     // render spinner
-    emptyResultsContainer();
-    renderSpinner();
+    resultsViewMethods.emptyResultsContainer();
+    resultsViewMethods.renderSpinner();
 
     // Retreive data from server
     const arrData = await Promise.race([
@@ -49,31 +45,35 @@ const searchFunction = async function (e) {
       timeout(timePeriod),
     ]);
     console.log(arrData);
-    console.log(arrData.flat().some(e => e === 'results'));
+    const status = arrData.flat().some(e => e === 'results');
+    console.log(status);
 
     // Data destructuring
-    const [[, status], [, results], [, { recipes }]] = arrData;
-    console.log(status, results, recipes);
+    const [, [, results], [, { recipes }]] = arrData;
+    console.log(results, recipes);
+
+    // assign data to softDataStorage
+    softDataStorage.recipeReceived = recipes;
+    softDataStorage.recentRequestStatus = status;
+    softDataStorage.resultsListView = generateResultsList(recipes);
+    console.log(softDataStorage);
 
     // render results data
     // initParentTags();
-    emptyResultsContainer();
-    // renderRecipeResults();
-
-    // assign data to softDataStorage
-    softDataStorage.recipeList = recipes;
-    softDataStorage.recentRequestStatus = status;
-    softDataStorage.resultList = generateResultsList(recipes);
-    console.log(softDataStorage);
+    resultsViewMethods.emptyResultsContainer();
+    // resultsViewMethods.renderRecipeResults(softDataStorage.resultsListView);
+    resultsViewMethods.addResultsHandler(softDataStorage.resultsListView);
 
     // console.log(softDataStorage);
   } catch (err) {
     console.error(`${err.message}`);
     // initParentTags();
-    emptyResultsContainer();
+    resultsViewMethods.emptyResultsContainer();
     renderError(err.message);
   }
 };
+
+const resultsPreviewFunction = function () {};
 
 function init() {
   searchMethods.addSearchHandler(searchFunction);
