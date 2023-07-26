@@ -1,7 +1,7 @@
 // Reusable Functions
 
 /** All Imports */
-import { allURLs } from './configuration.js';
+import { baseURL } from './configuration.js';
 
 /**
  * This function runs a timeout timer for async requests made to
@@ -19,38 +19,55 @@ export const timeout = function (seconds) {
   });
 };
 
+// get data for selected recipe
+export const getData = async function (url) {
+  console.log(url);
+  const resp = await fetch(url);
+
+  if (!resp.ok) throw new Error('Invalid Response. Please try again!');
+  const { data } = await resp.json();
+  return data.recipe;
+};
+
+// Post Data
+export const postData = async function () {};
+
 /**
  * This function generates operation ready URL as per the availability of search query, recipe #id and user API key.
  * @param {string} searchQuery The query submitted at the search bar.
  * @param {number} key The user API key if Provided by user.
- * @param {number | string} id The #id of the recipe to be fetched.
+ * @param {number | string} hashId The #id of the recipe to be fetched.
  * @returns The string form of complete request url.
  */
-export const getURL = function (searchQuery, key, id) {
+export const getURL = function (
+  searchQuery = undefined,
+  key = undefined,
+  hashId = undefined
+) {
   // console.log(searchQuery);
   try {
     let apiURL;
     const queryKeyURL = `?search=${searchQuery}&key=${key}`;
-    const recipeIdKeyURL = `/${id}}?key=${key}`;
+    const recipeIdKeyURL = `/${hashId}?key=${key}`;
     const queryURL = `?search=${searchQuery}`;
-    const recipeIdURL = `/${id}`;
+    const recipeIdURL = `/${hashId}`;
     const keyURL = `?key=${key}`;
 
     if (searchQuery && key) {
       // Querying with key
-      apiURL = `${allURLs}${queryKeyURL}`;
-    } else if (id && key) {
+      apiURL = `${baseURL}${queryKeyURL}`;
+    } else if (hashId && key) {
       // Tab reload after browser exiting with key and recipe #id
-      apiURL = `${allURLs}${recipeIdKeyURL}`;
+      apiURL = `${baseURL}${recipeIdKeyURL}`;
     } else if (searchQuery) {
       // Querying without key
-      apiURL = `${allURLs}${queryURL}`;
-    } else if (id) {
+      apiURL = `${baseURL}${queryURL}`;
+    } else if (hashId) {
       // Tab reload after browser exit event
-      apiURL = `${allURLs}${recipeIdURL}`;
+      apiURL = `${baseURL}${recipeIdURL}`;
     } else if (key) {
       // POST request
-      apiURL = `${allURLs}${keyURL}`;
+      apiURL = `${baseURL}${keyURL}`;
     } else {
       throw new Error('No input received!');
       // return;

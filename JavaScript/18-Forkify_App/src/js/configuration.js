@@ -1,7 +1,7 @@
 // All the configuration values for app
 
 /** All the URLs to communicate to API. */
-export const allURLs = 'https://forkify-api.herokuapp.com/api/v2/recipes';
+export const baseURL = 'https://forkify-api.herokuapp.com/api/v2/recipes';
 export const timePeriod = 3;
 
 /** User API Key */

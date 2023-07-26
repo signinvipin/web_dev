@@ -45,9 +45,15 @@ export const generateResultsList = function (recipes) {
   return listResults;
 };
 
+const generateCurrentRecipeData = function (data) {
+  console.log(data);
+};
+
 export const softDataStorage = {
   recentRequestStatus: '',
-  recipeReceived: [], // original recipe list received
+  currentRecipe: '',
+  currentRecipeData: {},
+  allRecipeReceived: [], // original recipe list received
   resultsListView: [], // list of recipes for results view
 };
 

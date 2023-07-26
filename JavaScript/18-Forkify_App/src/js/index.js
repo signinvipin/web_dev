@@ -11,6 +11,43 @@ import { timePeriod } from './configuration.js';
 import { searchMethods } from './searchView.js';
 import { resultsViewMethods } from './resultsView.js';
 import { renderError, errorMessage } from './errorView.js';
+import { recipeViewMethods } from './recipeView.js';
+
+const recipeFunction = function () {
+  // Add click, select, make selected active and retreive href '#hashvalue'
+
+  document.querySelectorAll('.preview__link').forEach(el => {
+    const resultsRecipeSelection = function (event) {
+      event.preventDefault();
+
+      // select recipe in results
+      // return href for softDataStorage
+      softDataStorage.currentRecipe =
+        resultsViewMethods.resultsSelection(event);
+      console.log(softDataStorage.currentRecipe);
+
+      // fetch n display recipe
+      const fetchRecipe = async function () {
+        try {
+          softDataStorage.currentRecipeData =
+            await recipeViewMethods.getRecipeData();
+          console.log(softDataStorage.currentRecipeData);
+        } catch (err) {
+          console.error(err.message);
+          // errorView.renderRecipeError();
+        }
+      };
+      fetchRecipe();
+    };
+
+    el.addEventListener('click', resultsRecipeSelection);
+  });
+};
+
+const resultsFunction = function () {
+  resultsViewMethods.renderResults(softDataStorage.resultsListView);
+  initParentTags();
+};
 
 // A callback function to search form submit event
 const searchFunction = async function (e) {
@@ -25,16 +62,12 @@ const searchFunction = async function (e) {
 
     // test search input
     if (!searchQuery || searchQuery.length < 3) {
-      // initParentTags();
       resultsViewMethods.emptyResultsContainer();
       renderError(errorMessage.noResults);
       return;
     }
 
     // initialize parentTags
-    // initParentTags();
-    // console.log(parentTags.errorResults);
-
     // render spinner
     resultsViewMethods.emptyResultsContainer();
     resultsViewMethods.renderSpinner();
@@ -59,24 +92,17 @@ const searchFunction = async function (e) {
     console.log(softDataStorage);
 
     // render results data
-    // initParentTags();
     resultsViewMethods.emptyResultsContainer();
-    // resultsViewMethods.renderRecipeResults(softDataStorage.resultsListView);
-    resultsViewMethods.addResultsHandler(softDataStorage.resultsListView);
+    resultsFunction();
 
-    // console.log(softDataStorage);
+    // select recipe and display
+    recipeFunction();
   } catch (err) {
     console.error(`${err.message}`);
-    // initParentTags();
+
     resultsViewMethods.emptyResultsContainer();
     renderError(err.message);
   }
 };
 
-const resultsPreviewFunction = function () {};
-
-function init() {
-  searchMethods.addSearchHandler(searchFunction);
-}
-
-init();
+searchMethods.addSearchHandler(searchFunction);

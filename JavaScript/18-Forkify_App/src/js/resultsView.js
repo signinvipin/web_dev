@@ -21,16 +21,9 @@ class resultsPreview {
     parentTags.resultsContainer.insertAdjacentHTML('afterbegin', html);
   }
 
-  renderRecipeResults(recipeList) {
-    for (let {
-      userId,
-      imageURL,
-      recipeTitle,
-      recipePublisher,
-      userKey = undefined,
-    } of recipeList) {
-      const html = `<li class="preview">
-                      <a class="preview__link preview__link--active" href="#${userId}">
+  renderRecipeResults(userId, imageURL, recipeTitle, recipePublisher, userKey) {
+    const html = `<li class="preview">
+                      <a class="preview__link" href="#${userId}">
                         <figure class="preview__fig">
                           <img src="${imageURL}" onerror = "this.onerror = null; this.src = '${imgError}'" alt="${recipeTitle}" />
                         </figure>
@@ -47,15 +40,43 @@ class resultsPreview {
                         </div>
                       </a>  
                     </li>`;
-      parentTags.resultsListContainer.insertAdjacentHTML('beforeend', html);
+    parentTags.resultsListContainer.insertAdjacentHTML('beforeend', html);
+  }
+
+  renderResults(data) {
+    for (let {
+      userId,
+      imageURL,
+      recipeTitle,
+      recipePublisher,
+      userKey = undefined,
+    } of data) {
+      resultsViewMethods.renderRecipeResults(
+        userId,
+        imageURL,
+        recipeTitle,
+        recipePublisher,
+        userKey
+      );
     }
   }
 
-  addResultsHandler = function (recipeList) {
-    this.renderRecipeResults(recipeList);
-    initParentTags();
-    console.log(parentTags.previewLinksAll);
-  };
+  // addResultsHandler(resultsFunction) {
+  //   parentTags.resultsContainer.addEventListener('change', resultsFunction);
+  // }
+
+  resultsSelection(event) {
+    document.querySelectorAll('.preview__link').forEach(item => {
+      // console.log(e);
+      item.classList.remove('preview__link--active');
+    });
+
+    const recipeTarget = event.target.closest('.preview__link');
+    recipeTarget.classList.add('preview__link--active');
+
+    const href = event.target.closest('.preview__link').getAttribute('href');
+    return href.slice(1);
+  }
 
   // show error - remove list, spinner
   emptyResultsContainer() {
