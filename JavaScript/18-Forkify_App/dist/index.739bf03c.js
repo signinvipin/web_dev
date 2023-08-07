@@ -576,43 +576,73 @@ function hmrAccept(bundle /*: ParcelRequire */ , id /*: string */ ) {
 },{}],"ebWYT":[function(require,module,exports) {
 // https://forkify-api.herokuapp.com/v2
 ///////////////////////////////////////
-var _webImmediateJs = require("core-js/modules/web.immediate.js");
+var _webImmediateJs = require("core-js/modules/web.immediate.js"); // bookmarkViewMethods;
 var _regeneratorRuntime = require("regenerator-runtime");
 var _mainViewJs = require("./mainView.js");
 var _modelJs = require("./model.js");
-var _reusablesJs = require("./reusables.js");
+var _reusableViewJs = require("./reusableView.js");
 var _configurationJs = require("./configuration.js");
 var _searchViewJs = require("./searchView.js");
 var _resultsViewJs = require("./resultsView.js");
 var _errorViewJs = require("./errorView.js");
 var _recipeViewJs = require("./recipeView.js");
+var _bookMarkViewJs = require("./bookMarkView.js");
+const resultsRecipeSelection = function(event) {
+    event.preventDefault();
+    // select recipe in results
+    // return href for softDataStorage
+    (0, _modelJs.softDataStorage).currentRecipe = (0, _resultsViewJs.resultsViewMethods).resultsSelection(event);
+    console.log((0, _modelJs.softDataStorage).currentRecipe);
+    // loading spinner
+    (0, _reusableViewJs.emptyContainer)((0, _mainViewJs.parentTags).recipeContainer);
+    (0, _reusableViewJs.renderSpinner)((0, _mainViewJs.parentTags).recipeContainer);
+    // fetch n display recipe
+    const fetchRecipe = async function() {
+        try {
+            const recipeData = await (0, _recipeViewJs.recipeViewMethods).getRecipeData();
+            (0, _modelJs.softDataStorage).currentRecipeData = (0, _modelJs.generateCurrentRecipeData)(recipeData);
+            console.log((0, _modelJs.softDataStorage).resultsListView);
+            (0, _reusableViewJs.emptyContainer)((0, _mainViewJs.parentTags).recipeContainer);
+            console.log((0, _modelJs.softDataStorage));
+            (0, _recipeViewJs.recipeViewMethods).renderRecipe((0, _modelJs.softDataStorage).currentRecipeData.sourceURL, (0, _modelJs.softDataStorage).currentRecipeData.recipePublisher, (0, _modelJs.softDataStorage).currentRecipeData.recipeServings, (0, _modelJs.softDataStorage).currentRecipeData.cookingTime, (0, _modelJs.softDataStorage).currentRecipeData.recipeTitle, (0, _modelJs.softDataStorage).currentRecipeData.imageURL, (0, _modelJs.softDataStorage).currentRecipe);
+            (0, _mainViewJs.initParentTags)();
+            (0, _bookMarkViewJs.bookmarkViewMethods).renderRecipeBookmarkIcon((0, _modelJs.softDataStorage));
+            (0, _bookMarkViewJs.bookmarkViewMethods).btnClickListener((0, _modelJs.softDataStorage), resultsRecipeSelection);
+            (0, _recipeViewJs.recipeViewMethods).renderIngredients((0, _modelJs.softDataStorage).currentRecipeData.recipeIngredients);
+        } catch (err) {
+            console.error(err.message);
+            (0, _reusableViewJs.emptyContainer)((0, _mainViewJs.parentTags).recipeContainer);
+            (0, _errorViewJs.renderError)(err.message, (0, _mainViewJs.parentTags).recipeContainer);
+        }
+    };
+    fetchRecipe();
+};
 const recipeFunction = function() {
     // Add click, select, make selected active and retreive href '#hashvalue'
     document.querySelectorAll(".preview__link").forEach((el)=>{
-        const resultsRecipeSelection = function(event) {
-            event.preventDefault();
-            // select recipe in results
-            // return href for softDataStorage
-            (0, _modelJs.softDataStorage).currentRecipe = (0, _resultsViewJs.resultsViewMethods).resultsSelection(event);
-            console.log((0, _modelJs.softDataStorage).currentRecipe);
-            // fetch n display recipe
-            const fetchRecipe = async function() {
-                try {
-                    (0, _modelJs.softDataStorage).currentRecipeData = await (0, _recipeViewJs.recipeViewMethods).getRecipeData();
-                    console.log((0, _modelJs.softDataStorage).currentRecipeData);
-                } catch (err) {
-                    console.error(err.message);
-                // errorView.renderRecipeError();
-                }
-            };
-            fetchRecipe();
-        };
         el.addEventListener("click", resultsRecipeSelection);
     });
 };
 const resultsFunction = function() {
-    (0, _resultsViewJs.resultsViewMethods).renderResults((0, _modelJs.softDataStorage).resultsListView);
-    (0, _mainViewJs.initParentTags)();
+    let pageCounter = 1;
+    const clickEventListener = function() {
+        // add event listener to page navigation buttons
+        const btnClick = (btn)=>{
+            btn.addEventListener("click", function() {
+                if (btn === (0, _mainViewJs.parentTags).btnPrevious) pageCounter -= 1;
+                if (btn === (0, _mainViewJs.parentTags).btnNext) pageCounter += 1;
+                (0, _resultsViewJs.resultsViewMethods).paginateResults((0, _modelJs.softDataStorage).resultsListView, pageCounter, clickEventListener, recipeFunction);
+            });
+        };
+        if ((0, _mainViewJs.parentTags).btnPrevious && (0, _mainViewJs.parentTags).btnNext) {
+            btnClick((0, _mainViewJs.parentTags).btnPrevious);
+            btnClick((0, _mainViewJs.parentTags).btnNext);
+        }
+        if ((0, _mainViewJs.parentTags).btnNext) btnClick((0, _mainViewJs.parentTags).btnNext);
+        if ((0, _mainViewJs.parentTags).btnPrevious) btnClick((0, _mainViewJs.parentTags).btnPrevious);
+    // add event listener to recipes
+    };
+    (0, _resultsViewJs.resultsViewMethods).paginateResults((0, _modelJs.softDataStorage).resultsListView, pageCounter, clickEventListener, recipeFunction);
 };
 // A callback function to search form submit event
 const searchFunction = async function(e) {
@@ -625,19 +655,20 @@ const searchFunction = async function(e) {
         console.log("length of searchQuery is " + searchQuery.length);
         // test search input
         if (!searchQuery || searchQuery.length < 3) {
-            (0, _resultsViewJs.resultsViewMethods).emptyResultsContainer();
-            (0, _errorViewJs.renderError)((0, _errorViewJs.errorMessage).noResults);
+            (0, _reusableViewJs.emptyContainer)((0, _mainViewJs.parentTags).resultsListContainer);
+            (0, _errorViewJs.renderError)((0, _errorViewJs.errorMessage).noResults, (0, _mainViewJs.parentTags).resultsContainer);
             return;
         }
         // initialize parentTags
         // render spinner
-        (0, _resultsViewJs.resultsViewMethods).emptyResultsContainer();
-        (0, _resultsViewJs.resultsViewMethods).renderSpinner();
+        (0, _reusableViewJs.emptyContainer)((0, _mainViewJs.parentTags).resultsListContainer);
+        (0, _reusableViewJs.renderSpinner)((0, _mainViewJs.parentTags).resultsContainer);
         // Retreive data from server
         const arrData = await Promise.race([
             (0, _modelJs.queryResults)(searchQuery),
-            (0, _reusablesJs.timeout)((0, _configurationJs.timePeriod))
+            (0, _reusableViewJs.timeout)((0, _configurationJs.timePeriod))
         ]);
+        if (!arrData) throw new Error("Please connect to internet and try again!");
         console.log(arrData);
         const status = arrData.flat().some((e)=>e === "results");
         console.log(status);
@@ -650,24 +681,24 @@ const searchFunction = async function(e) {
         (0, _modelJs.softDataStorage).resultsListView = (0, _modelJs.generateResultsList)(recipes);
         console.log((0, _modelJs.softDataStorage));
         // render results data
-        (0, _resultsViewJs.resultsViewMethods).emptyResultsContainer();
+        (0, _reusableViewJs.emptyContainer)((0, _mainViewJs.parentTags).resultsListContainer);
         resultsFunction();
-        // select recipe and display
-        recipeFunction();
     } catch (err) {
         console.error(`${err.message}`);
-        (0, _resultsViewJs.resultsViewMethods).emptyResultsContainer();
-        (0, _errorViewJs.renderError)(err.message);
+        (0, _reusableViewJs.emptyContainer)((0, _mainViewJs.parentTags).resultsListContainer);
+        (0, _errorViewJs.renderError)(err.message, (0, _mainViewJs.parentTags).resultsContainer);
     }
 };
 (0, _searchViewJs.searchMethods).addSearchHandler(searchFunction);
 
-},{"core-js/modules/web.immediate.js":"49tUX","regenerator-runtime":"dXNgZ","./model.js":"Y4A21","./searchView.js":"9M3GU","./reusables.js":"if9p6","./configuration.js":"eSmrz","./resultsView.js":"faCQd","./mainView.js":"asXf2","./errorView.js":"8pAzM","./recipeView.js":"jSwDy"}],"49tUX":[function(require,module,exports) {
+},{"core-js/modules/web.immediate.js":"49tUX","regenerator-runtime":"dXNgZ","./mainView.js":"asXf2","./model.js":"Y4A21","./reusableView.js":"2nI8H","./configuration.js":"eSmrz","./searchView.js":"9M3GU","./resultsView.js":"faCQd","./errorView.js":"8pAzM","./recipeView.js":"jSwDy","./bookMarkView.js":"KHTJv"}],"49tUX":[function(require,module,exports) {
+"use strict";
 // TODO: Remove this module from `core-js@4` since it's split to modules listed below
 require("52e9b3eefbbce1ed");
 require("292fa64716f5b39e");
 
 },{"52e9b3eefbbce1ed":"fOGFr","292fa64716f5b39e":"l7FDS"}],"fOGFr":[function(require,module,exports) {
+"use strict";
 var $ = require("79389288a80b279c");
 var global = require("22a078687be7e1b6");
 var clearImmediate = require("84ba5ca62b8b14c9").clear;
@@ -683,6 +714,7 @@ $({
 });
 
 },{"79389288a80b279c":"dIGt4","22a078687be7e1b6":"i8HOC","84ba5ca62b8b14c9":"7jDg7"}],"dIGt4":[function(require,module,exports) {
+"use strict";
 var global = require("6643b6592ad59b23");
 var getOwnPropertyDescriptor = require("2ec751f39e500b85").f;
 var createNonEnumerableProperty = require("b4567636b28a3b3a");
@@ -732,6 +764,7 @@ var isForced = require("f0e2e697f04e8ad9");
 
 },{"6643b6592ad59b23":"i8HOC","2ec751f39e500b85":"lk5NI","b4567636b28a3b3a":"8CL42","50460aa43dd4048a":"6XwEX","581238c99f8c2c30":"ggjnO","566a383894c688bc":"9Z12i","f0e2e697f04e8ad9":"6uTCZ"}],"i8HOC":[function(require,module,exports) {
 var global = arguments[3];
+"use strict";
 var check = function(it) {
     return it && it.Math == Math && it;
 };
@@ -744,6 +777,7 @@ function() {
 }() || this || Function("return this")();
 
 },{}],"lk5NI":[function(require,module,exports) {
+"use strict";
 var DESCRIPTORS = require("c04e6fb248689dba");
 var call = require("553ec943aa2a4554");
 var propertyIsEnumerableModule = require("bbc5e69071aa2fbd");
@@ -766,6 +800,7 @@ exports.f = DESCRIPTORS ? $getOwnPropertyDescriptor : function getOwnPropertyDes
 };
 
 },{"c04e6fb248689dba":"92ZIi","553ec943aa2a4554":"d7JlP","bbc5e69071aa2fbd":"7SuiS","1d2ffbfd99e01f41":"1lpav","c4ea69a78a643d87":"jLWwQ","8ab18ff766aa2ab9":"5XWKd","3761c5d34b7aa48f":"gC2Q5","c4dfcc26308f1b4a":"qS9uN"}],"92ZIi":[function(require,module,exports) {
+"use strict";
 var fails = require("735b783268fd06c0");
 // Detect IE8's incomplete defineProperty implementation
 module.exports = !fails(function() {
@@ -778,6 +813,7 @@ module.exports = !fails(function() {
 });
 
 },{"735b783268fd06c0":"hL6D2"}],"hL6D2":[function(require,module,exports) {
+"use strict";
 module.exports = function(exec) {
     try {
         return !!exec();
@@ -787,6 +823,7 @@ module.exports = function(exec) {
 };
 
 },{}],"d7JlP":[function(require,module,exports) {
+"use strict";
 var NATIVE_BIND = require("44e025d030d66023");
 var call = Function.prototype.call;
 module.exports = NATIVE_BIND ? call.bind(call) : function() {
@@ -794,6 +831,7 @@ module.exports = NATIVE_BIND ? call.bind(call) : function() {
 };
 
 },{"44e025d030d66023":"i16Dq"}],"i16Dq":[function(require,module,exports) {
+"use strict";
 var fails = require("2642aa7619056f20");
 module.exports = !fails(function() {
     // eslint-disable-next-line es/no-function-prototype-bind -- safe
@@ -819,6 +857,7 @@ exports.f = NASHORN_BUG ? function propertyIsEnumerable(V) {
 } : $propertyIsEnumerable;
 
 },{}],"1lpav":[function(require,module,exports) {
+"use strict";
 module.exports = function(bitmap, value) {
     return {
         enumerable: !(bitmap & 1),
@@ -829,6 +868,7 @@ module.exports = function(bitmap, value) {
 };
 
 },{}],"jLWwQ":[function(require,module,exports) {
+"use strict";
 // toObject with fallback for non-array-like ES3 strings
 var IndexedObject = require("9d8f8f50ac9468eb");
 var requireObjectCoercible = require("f7224aed72953ac4");
@@ -837,6 +877,7 @@ module.exports = function(it) {
 };
 
 },{"9d8f8f50ac9468eb":"kPk5h","f7224aed72953ac4":"fOR0B"}],"kPk5h":[function(require,module,exports) {
+"use strict";
 var uncurryThis = require("7ba7e65983d7b662");
 var fails = require("df551e12a7c872dd");
 var classof = require("1d34ea813cebff9c");
@@ -852,6 +893,7 @@ module.exports = fails(function() {
 } : $Object;
 
 },{"7ba7e65983d7b662":"7GlkT","df551e12a7c872dd":"hL6D2","1d34ea813cebff9c":"bdfmm"}],"7GlkT":[function(require,module,exports) {
+"use strict";
 var NATIVE_BIND = require("829dd7a4e960cf9e");
 var FunctionPrototype = Function.prototype;
 var call = FunctionPrototype.call;
@@ -863,6 +905,7 @@ module.exports = NATIVE_BIND ? uncurryThisWithBind : function(fn) {
 };
 
 },{"829dd7a4e960cf9e":"i16Dq"}],"bdfmm":[function(require,module,exports) {
+"use strict";
 var uncurryThis = require("1c71c3f6daac476c");
 var toString = uncurryThis({}.toString);
 var stringSlice = uncurryThis("".slice);
@@ -871,6 +914,7 @@ module.exports = function(it) {
 };
 
 },{"1c71c3f6daac476c":"7GlkT"}],"fOR0B":[function(require,module,exports) {
+"use strict";
 var isNullOrUndefined = require("74607922ed30019f");
 var $TypeError = TypeError;
 // `RequireObjectCoercible` abstract operation
@@ -881,6 +925,7 @@ module.exports = function(it) {
 };
 
 },{"74607922ed30019f":"gM5ar"}],"gM5ar":[function(require,module,exports) {
+"use strict";
 // we can't use just `it == null` since of `document.all` special case
 // https://tc39.es/ecma262/#sec-IsHTMLDDA-internal-slot-aec
 module.exports = function(it) {
@@ -888,6 +933,7 @@ module.exports = function(it) {
 };
 
 },{}],"5XWKd":[function(require,module,exports) {
+"use strict";
 var toPrimitive = require("53a3a67ac381c4e8");
 var isSymbol = require("b992ca9cdcf7937b");
 // `ToPropertyKey` abstract operation
@@ -898,6 +944,7 @@ module.exports = function(argument) {
 };
 
 },{"53a3a67ac381c4e8":"a2mK1","b992ca9cdcf7937b":"4aV4F"}],"a2mK1":[function(require,module,exports) {
+"use strict";
 var call = require("70235907dc93b4b0");
 var isObject = require("46fb53dace408c8e");
 var isSymbol = require("677bdc4d74d2f983");
@@ -923,6 +970,7 @@ module.exports = function(input, pref) {
 };
 
 },{"70235907dc93b4b0":"d7JlP","46fb53dace408c8e":"Z0pBo","677bdc4d74d2f983":"4aV4F","80395bcde336a28b":"9Zfiw","49552a7324952190":"7MME2","aea01c71276624bf":"gTwyA"}],"Z0pBo":[function(require,module,exports) {
+"use strict";
 var isCallable = require("f87cee1cb79cbcca");
 var $documentAll = require("319a7447e596d6da");
 var documentAll = $documentAll.all;
@@ -933,6 +981,7 @@ module.exports = $documentAll.IS_HTMLDDA ? function(it) {
 };
 
 },{"f87cee1cb79cbcca":"l3Kyn","319a7447e596d6da":"5MHqB"}],"l3Kyn":[function(require,module,exports) {
+"use strict";
 var $documentAll = require("ca3b3b4ae4b8328f");
 var documentAll = $documentAll.all;
 // `IsCallable` abstract operation
@@ -944,6 +993,7 @@ module.exports = $documentAll.IS_HTMLDDA ? function(argument) {
 };
 
 },{"ca3b3b4ae4b8328f":"5MHqB"}],"5MHqB":[function(require,module,exports) {
+"use strict";
 var documentAll = typeof document == "object" && document.all;
 // https://tc39.es/ecma262/#sec-IsHTMLDDA-internal-slot
 // eslint-disable-next-line unicorn/no-typeof-undefined -- required for testing
@@ -954,6 +1004,7 @@ module.exports = {
 };
 
 },{}],"4aV4F":[function(require,module,exports) {
+"use strict";
 var getBuiltIn = require("6b6c481cdfb7df35");
 var isCallable = require("2af44fcbdbf14c83");
 var isPrototypeOf = require("76e903e830c40e7c");
@@ -967,6 +1018,7 @@ module.exports = USE_SYMBOL_AS_UID ? function(it) {
 };
 
 },{"6b6c481cdfb7df35":"6ZUSY","2af44fcbdbf14c83":"l3Kyn","76e903e830c40e7c":"3jtKQ","7e2fe930b3598e22":"2Ye8Q"}],"6ZUSY":[function(require,module,exports) {
+"use strict";
 var global = require("dd9e9ae04e8684f7");
 var isCallable = require("f1d62079325906cb");
 var aFunction = function(argument) {
@@ -977,14 +1029,17 @@ module.exports = function(namespace, method) {
 };
 
 },{"dd9e9ae04e8684f7":"i8HOC","f1d62079325906cb":"l3Kyn"}],"3jtKQ":[function(require,module,exports) {
+"use strict";
 var uncurryThis = require("83f14842ef67e16a");
 module.exports = uncurryThis({}.isPrototypeOf);
 
 },{"83f14842ef67e16a":"7GlkT"}],"2Ye8Q":[function(require,module,exports) {
+"use strict";
 /* eslint-disable es/no-symbol -- required for testing */ var NATIVE_SYMBOL = require("da4a972af0214ea0");
 module.exports = NATIVE_SYMBOL && !Symbol.sham && typeof Symbol.iterator == "symbol";
 
 },{"da4a972af0214ea0":"8KyTD"}],"8KyTD":[function(require,module,exports) {
+"use strict";
 /* eslint-disable es/no-symbol -- required for testing */ var V8_VERSION = require("ecc4d354cb42bea8");
 var fails = require("b37df495bcdc1d99");
 var global = require("d8adff9188ad5fee");
@@ -1001,6 +1056,7 @@ module.exports = !!Object.getOwnPropertySymbols && !fails(function() {
 });
 
 },{"ecc4d354cb42bea8":"bjFlO","b37df495bcdc1d99":"hL6D2","d8adff9188ad5fee":"i8HOC"}],"bjFlO":[function(require,module,exports) {
+"use strict";
 var global = require("705d79ce07ed8cf");
 var userAgent = require("5afb83a49cd74e4c");
 var process = global.process;
@@ -1026,9 +1082,11 @@ if (!version && userAgent) {
 module.exports = version;
 
 },{"705d79ce07ed8cf":"i8HOC","5afb83a49cd74e4c":"73xBt"}],"73xBt":[function(require,module,exports) {
+"use strict";
 module.exports = typeof navigator != "undefined" && String(navigator.userAgent) || "";
 
 },{}],"9Zfiw":[function(require,module,exports) {
+"use strict";
 var aCallable = require("bbfed17b24e215f4");
 var isNullOrUndefined = require("492a86e2970f6a26");
 // `GetMethod` abstract operation
@@ -1039,6 +1097,7 @@ module.exports = function(V, P) {
 };
 
 },{"bbfed17b24e215f4":"gOMir","492a86e2970f6a26":"gM5ar"}],"gOMir":[function(require,module,exports) {
+"use strict";
 var isCallable = require("4094667126ecac05");
 var tryToString = require("fce2a7573db493fa");
 var $TypeError = TypeError;
@@ -1049,6 +1108,7 @@ module.exports = function(argument) {
 };
 
 },{"4094667126ecac05":"l3Kyn","fce2a7573db493fa":"4O7d7"}],"4O7d7":[function(require,module,exports) {
+"use strict";
 var $String = String;
 module.exports = function(argument) {
     try {
@@ -1059,6 +1119,7 @@ module.exports = function(argument) {
 };
 
 },{}],"7MME2":[function(require,module,exports) {
+"use strict";
 var call = require("abe9ca006f56626e");
 var isCallable = require("c96b3a89fec6248a");
 var isObject = require("551615fda0214f1b");
@@ -1074,6 +1135,7 @@ module.exports = function(input, pref) {
 };
 
 },{"abe9ca006f56626e":"d7JlP","c96b3a89fec6248a":"l3Kyn","551615fda0214f1b":"Z0pBo"}],"gTwyA":[function(require,module,exports) {
+"use strict";
 var global = require("dbe74e87464035e3");
 var shared = require("6a2cda01df6b4c79");
 var hasOwn = require("dccc28ffa5beeb54");
@@ -1089,22 +1151,25 @@ module.exports = function(name) {
 };
 
 },{"dbe74e87464035e3":"i8HOC","6a2cda01df6b4c79":"i1mHK","dccc28ffa5beeb54":"gC2Q5","48d6af1225853d44":"a3SEE","9f762329148684":"8KyTD","1ce268781e409df2":"2Ye8Q"}],"i1mHK":[function(require,module,exports) {
+"use strict";
 var IS_PURE = require("fe5f96cb4b2826a2");
 var store = require("84eeed9891aafe14");
 (module.exports = function(key, value) {
     return store[key] || (store[key] = value !== undefined ? value : {});
 })("versions", []).push({
-    version: "3.31.1",
+    version: "3.32.0",
     mode: IS_PURE ? "pure" : "global",
     copyright: "\xa9 2014-2023 Denis Pushkarev (zloirock.ru)",
-    license: "https://github.com/zloirock/core-js/blob/v3.31.1/LICENSE",
+    license: "https://github.com/zloirock/core-js/blob/v3.32.0/LICENSE",
     source: "https://github.com/zloirock/core-js"
 });
 
 },{"fe5f96cb4b2826a2":"5ZsyC","84eeed9891aafe14":"l4ncH"}],"5ZsyC":[function(require,module,exports) {
+"use strict";
 module.exports = false;
 
 },{}],"l4ncH":[function(require,module,exports) {
+"use strict";
 var global = require("8756de416b94afec");
 var defineGlobalProperty = require("dfb72a1d809f7b02");
 var SHARED = "__core-js_shared__";
@@ -1112,6 +1177,7 @@ var store = global[SHARED] || defineGlobalProperty(SHARED, {});
 module.exports = store;
 
 },{"8756de416b94afec":"i8HOC","dfb72a1d809f7b02":"ggjnO"}],"ggjnO":[function(require,module,exports) {
+"use strict";
 var global = require("70259c1dd4aa0e14");
 // eslint-disable-next-line es/no-object-defineproperty -- safe
 var defineProperty = Object.defineProperty;
@@ -1129,6 +1195,7 @@ module.exports = function(key, value) {
 };
 
 },{"70259c1dd4aa0e14":"i8HOC"}],"gC2Q5":[function(require,module,exports) {
+"use strict";
 var uncurryThis = require("f5dcaa60a713971f");
 var toObject = require("ab17c4f45fcf0841");
 var hasOwnProperty = uncurryThis({}.hasOwnProperty);
@@ -1140,6 +1207,7 @@ module.exports = Object.hasOwn || function hasOwn(it, key) {
 };
 
 },{"f5dcaa60a713971f":"7GlkT","ab17c4f45fcf0841":"5cb35"}],"5cb35":[function(require,module,exports) {
+"use strict";
 var requireObjectCoercible = require("f45a7b5dcdc4a410");
 var $Object = Object;
 // `ToObject` abstract operation
@@ -1149,6 +1217,7 @@ module.exports = function(argument) {
 };
 
 },{"f45a7b5dcdc4a410":"fOR0B"}],"a3SEE":[function(require,module,exports) {
+"use strict";
 var uncurryThis = require("5da0fe4507da20a3");
 var id = 0;
 var postfix = Math.random();
@@ -1158,6 +1227,7 @@ module.exports = function(key) {
 };
 
 },{"5da0fe4507da20a3":"7GlkT"}],"qS9uN":[function(require,module,exports) {
+"use strict";
 var DESCRIPTORS = require("9b4278b13c076bf");
 var fails = require("8aee5d88a5f9b6b5");
 var createElement = require("1db4d60148afcf21");
@@ -1172,6 +1242,7 @@ module.exports = !DESCRIPTORS && !fails(function() {
 });
 
 },{"9b4278b13c076bf":"92ZIi","8aee5d88a5f9b6b5":"hL6D2","1db4d60148afcf21":"4bOHl"}],"4bOHl":[function(require,module,exports) {
+"use strict";
 var global = require("f5891d48afd7ec83");
 var isObject = require("824df78b2e007250");
 var document = global.document;
@@ -1182,6 +1253,7 @@ module.exports = function(it) {
 };
 
 },{"f5891d48afd7ec83":"i8HOC","824df78b2e007250":"Z0pBo"}],"8CL42":[function(require,module,exports) {
+"use strict";
 var DESCRIPTORS = require("a8753383ef98ee18");
 var definePropertyModule = require("189ab650b8f71085");
 var createPropertyDescriptor = require("1168c8162aa30435");
@@ -1193,6 +1265,7 @@ module.exports = DESCRIPTORS ? function(object, key, value) {
 };
 
 },{"a8753383ef98ee18":"92ZIi","189ab650b8f71085":"iJR4w","1168c8162aa30435":"1lpav"}],"iJR4w":[function(require,module,exports) {
+"use strict";
 var DESCRIPTORS = require("ca50eb9163928400");
 var IE8_DOM_DEFINE = require("d482f9e5478795e8");
 var V8_PROTOTYPE_DEFINE_BUG = require("b6ad7537efb06f4b");
@@ -1237,6 +1310,7 @@ exports.f = DESCRIPTORS ? V8_PROTOTYPE_DEFINE_BUG ? function defineProperty(O, P
 };
 
 },{"ca50eb9163928400":"92ZIi","d482f9e5478795e8":"qS9uN","b6ad7537efb06f4b":"ka1Un","16365a73399e7fe7":"4isCr","fab1d366c47796d9":"5XWKd"}],"ka1Un":[function(require,module,exports) {
+"use strict";
 var DESCRIPTORS = require("b22a5a2de93e3ad2");
 var fails = require("249a5b857c2dfccd");
 // V8 ~ Chrome 36-
@@ -1250,6 +1324,7 @@ module.exports = DESCRIPTORS && fails(function() {
 });
 
 },{"b22a5a2de93e3ad2":"92ZIi","249a5b857c2dfccd":"hL6D2"}],"4isCr":[function(require,module,exports) {
+"use strict";
 var isObject = require("2b6c6258a0a6082f");
 var $String = String;
 var $TypeError = TypeError;
@@ -1260,6 +1335,7 @@ module.exports = function(argument) {
 };
 
 },{"2b6c6258a0a6082f":"Z0pBo"}],"6XwEX":[function(require,module,exports) {
+"use strict";
 var isCallable = require("99ee13632b3fa68");
 var definePropertyModule = require("9ebb3e3004fccc0a");
 var makeBuiltIn = require("f10cc812a3094053");
@@ -1289,6 +1365,7 @@ module.exports = function(O, key, value, options) {
 };
 
 },{"99ee13632b3fa68":"l3Kyn","9ebb3e3004fccc0a":"iJR4w","f10cc812a3094053":"cTB4k","d354802d852d9c2b":"ggjnO"}],"cTB4k":[function(require,module,exports) {
+"use strict";
 var uncurryThis = require("ca84677f1ebd1804");
 var fails = require("13360f2842eba261");
 var isCallable = require("103e488c0928755a");
@@ -1343,6 +1420,7 @@ Function.prototype.toString = makeBuiltIn(function toString() {
 }, "toString");
 
 },{"ca84677f1ebd1804":"7GlkT","13360f2842eba261":"hL6D2","103e488c0928755a":"l3Kyn","cbf9b0e0779cc368":"gC2Q5","3f2eb7efeae2f72b":"92ZIi","548b10f284264c72":"l6Kgd","358f00f3103bd55b":"9jh7O","9b2ce14119fd2412":"7AMlF"}],"l6Kgd":[function(require,module,exports) {
+"use strict";
 var DESCRIPTORS = require("8ad2bacb0e20b95c");
 var hasOwn = require("4eabfd8f83afc9d5");
 var FunctionPrototype = Function.prototype;
@@ -1359,6 +1437,7 @@ module.exports = {
 };
 
 },{"8ad2bacb0e20b95c":"92ZIi","4eabfd8f83afc9d5":"gC2Q5"}],"9jh7O":[function(require,module,exports) {
+"use strict";
 var uncurryThis = require("26e26db98367212e");
 var isCallable = require("40ed9a4f6ae66648");
 var store = require("485d48d6f4c6739e");
@@ -1370,6 +1449,7 @@ if (!isCallable(store.inspectSource)) store.inspectSource = function(it) {
 module.exports = store.inspectSource;
 
 },{"26e26db98367212e":"7GlkT","40ed9a4f6ae66648":"l3Kyn","485d48d6f4c6739e":"l4ncH"}],"7AMlF":[function(require,module,exports) {
+"use strict";
 var NATIVE_WEAK_MAP = require("d3f0c9f3327b2fd6");
 var global = require("ca46b44b6201ccd7");
 var isObject = require("f82e6cc0ac249fa5");
@@ -1434,12 +1514,14 @@ module.exports = {
 };
 
 },{"d3f0c9f3327b2fd6":"2PZTl","ca46b44b6201ccd7":"i8HOC","f82e6cc0ac249fa5":"Z0pBo","c0ae163eea4ef97":"8CL42","6dea7358344877bb":"gC2Q5","3e035a1241da2f0":"l4ncH","88d6ccc27e779e5a":"eAjGz","d40b9b3abdbb956e":"661m4"}],"2PZTl":[function(require,module,exports) {
+"use strict";
 var global = require("6bd2547a42528a9c");
 var isCallable = require("aa77fff8d5ef0565");
 var WeakMap = global.WeakMap;
 module.exports = isCallable(WeakMap) && /native code/.test(String(WeakMap));
 
 },{"6bd2547a42528a9c":"i8HOC","aa77fff8d5ef0565":"l3Kyn"}],"eAjGz":[function(require,module,exports) {
+"use strict";
 var shared = require("dbc8182adeb8c92f");
 var uid = require("90b4ffb58508a6e5");
 var keys = shared("keys");
@@ -1448,9 +1530,11 @@ module.exports = function(key) {
 };
 
 },{"dbc8182adeb8c92f":"i1mHK","90b4ffb58508a6e5":"a3SEE"}],"661m4":[function(require,module,exports) {
+"use strict";
 module.exports = {};
 
 },{}],"9Z12i":[function(require,module,exports) {
+"use strict";
 var hasOwn = require("d91d786cc71453ce");
 var ownKeys = require("88cb809f98beddc6");
 var getOwnPropertyDescriptorModule = require("10ea642aad5f7c21");
@@ -1466,6 +1550,7 @@ module.exports = function(target, source, exceptions) {
 };
 
 },{"d91d786cc71453ce":"gC2Q5","88cb809f98beddc6":"1CX1A","10ea642aad5f7c21":"lk5NI","39ff598ce822187e":"iJR4w"}],"1CX1A":[function(require,module,exports) {
+"use strict";
 var getBuiltIn = require("3cc1e4329d869e34");
 var uncurryThis = require("2b8e77cbdbe3db7a");
 var getOwnPropertyNamesModule = require("d703bcb62fcda216");
@@ -1480,6 +1565,7 @@ module.exports = getBuiltIn("Reflect", "ownKeys") || function ownKeys(it) {
 };
 
 },{"3cc1e4329d869e34":"6ZUSY","2b8e77cbdbe3db7a":"7GlkT","d703bcb62fcda216":"fjY04","157674bad2772c6d":"4DWO3","a09e060b9cae3c6c":"4isCr"}],"fjY04":[function(require,module,exports) {
+"use strict";
 var internalObjectKeys = require("6d8591e17a49376c");
 var enumBugKeys = require("2c933f93dd98f385");
 var hiddenKeys = enumBugKeys.concat("length", "prototype");
@@ -1491,6 +1577,7 @@ exports.f = Object.getOwnPropertyNames || function getOwnPropertyNames(O) {
 };
 
 },{"6d8591e17a49376c":"hl5T1","2c933f93dd98f385":"9RnJm"}],"hl5T1":[function(require,module,exports) {
+"use strict";
 var uncurryThis = require("363ee0e6bb4f46a7");
 var hasOwn = require("3183fe0b0bf6f6ac");
 var toIndexedObject = require("28192ac12e934672");
@@ -1509,6 +1596,7 @@ module.exports = function(object, names) {
 };
 
 },{"363ee0e6bb4f46a7":"7GlkT","3183fe0b0bf6f6ac":"gC2Q5","28192ac12e934672":"jLWwQ","a5f9c5d8e993ccd6":"n5IsC","57775908f1581bc6":"661m4"}],"n5IsC":[function(require,module,exports) {
+"use strict";
 var toIndexedObject = require("d5dcbcd68ac5acd0");
 var toAbsoluteIndex = require("212b13aecfa48226");
 var lengthOfArrayLike = require("e5a8b3e1da4c5637");
@@ -1543,6 +1631,7 @@ module.exports = {
 };
 
 },{"d5dcbcd68ac5acd0":"jLWwQ","212b13aecfa48226":"5yh27","e5a8b3e1da4c5637":"lY4mS"}],"5yh27":[function(require,module,exports) {
+"use strict";
 var toIntegerOrInfinity = require("72fe0a53ad43912c");
 var max = Math.max;
 var min = Math.min;
@@ -1555,6 +1644,7 @@ module.exports = function(index, length) {
 };
 
 },{"72fe0a53ad43912c":"kLXGe"}],"kLXGe":[function(require,module,exports) {
+"use strict";
 var trunc = require("3403cba02b5f61d8");
 // `ToIntegerOrInfinity` abstract operation
 // https://tc39.es/ecma262/#sec-tointegerorinfinity
@@ -1565,6 +1655,7 @@ module.exports = function(argument) {
 };
 
 },{"3403cba02b5f61d8":"7O8gb"}],"7O8gb":[function(require,module,exports) {
+"use strict";
 var ceil = Math.ceil;
 var floor = Math.floor;
 // `Math.trunc` method
@@ -1576,6 +1667,7 @@ module.exports = Math.trunc || function trunc(x) {
 };
 
 },{}],"lY4mS":[function(require,module,exports) {
+"use strict";
 var toLength = require("23d9716c54a2ab90");
 // `LengthOfArrayLike` abstract operation
 // https://tc39.es/ecma262/#sec-lengthofarraylike
@@ -1584,6 +1676,7 @@ module.exports = function(obj) {
 };
 
 },{"23d9716c54a2ab90":"fU04N"}],"fU04N":[function(require,module,exports) {
+"use strict";
 var toIntegerOrInfinity = require("c48d3a8b8ac52b0b");
 var min = Math.min;
 // `ToLength` abstract operation
@@ -1593,6 +1686,7 @@ module.exports = function(argument) {
 };
 
 },{"c48d3a8b8ac52b0b":"kLXGe"}],"9RnJm":[function(require,module,exports) {
+"use strict";
 // IE8- don't enum bug keys
 module.exports = [
     "constructor",
@@ -1605,10 +1699,12 @@ module.exports = [
 ];
 
 },{}],"4DWO3":[function(require,module,exports) {
+"use strict";
 // eslint-disable-next-line es/no-object-getownpropertysymbols -- safe
 exports.f = Object.getOwnPropertySymbols;
 
 },{}],"6uTCZ":[function(require,module,exports) {
+"use strict";
 var fails = require("10299561ea0c7870");
 var isCallable = require("8b1ecdaf59f07210");
 var replacement = /#|\.prototype\./;
@@ -1625,6 +1721,7 @@ var POLYFILL = isForced.POLYFILL = "P";
 module.exports = isForced;
 
 },{"10299561ea0c7870":"hL6D2","8b1ecdaf59f07210":"l3Kyn"}],"7jDg7":[function(require,module,exports) {
+"use strict";
 var global = require("1e8ed58235e9956a");
 var apply = require("e574be68c288c7c8");
 var bind = require("df212787338802d3");
@@ -1720,6 +1817,7 @@ module.exports = {
 };
 
 },{"1e8ed58235e9956a":"i8HOC","e574be68c288c7c8":"148ka","df212787338802d3":"7vpmS","afdf018c2d01bbc6":"l3Kyn","35a3e849940fd612":"gC2Q5","b8bf5434d2248ca7":"hL6D2","731f9370cc21fc3b":"2pze4","ec358060964e4bde":"RsFXo","907adb6d219da7a3":"4bOHl","f398561ebd49a798":"b9O3D","fdfdeccf85e81d4f":"bzGah","fcf929779abbf29c":"2Jcp4"}],"148ka":[function(require,module,exports) {
+"use strict";
 var NATIVE_BIND = require("d07466971ded2aca");
 var FunctionPrototype = Function.prototype;
 var apply = FunctionPrototype.apply;
@@ -1730,6 +1828,7 @@ module.exports = typeof Reflect == "object" && Reflect.apply || (NATIVE_BIND ? c
 });
 
 },{"d07466971ded2aca":"i16Dq"}],"7vpmS":[function(require,module,exports) {
+"use strict";
 var uncurryThis = require("92f6f475baa85665");
 var aCallable = require("547ee4f9dab0cc76");
 var NATIVE_BIND = require("5acd31cba656d393");
@@ -1743,6 +1842,7 @@ module.exports = function(fn, that) {
 };
 
 },{"92f6f475baa85665":"5Hioa","547ee4f9dab0cc76":"gOMir","5acd31cba656d393":"i16Dq"}],"5Hioa":[function(require,module,exports) {
+"use strict";
 var classofRaw = require("8e77093015e1e67f");
 var uncurryThis = require("9daa4dbbca634c9e");
 module.exports = function(fn) {
@@ -1753,14 +1853,17 @@ module.exports = function(fn) {
 };
 
 },{"8e77093015e1e67f":"bdfmm","9daa4dbbca634c9e":"7GlkT"}],"2pze4":[function(require,module,exports) {
+"use strict";
 var getBuiltIn = require("14cb391fa4a0dda8");
 module.exports = getBuiltIn("document", "documentElement");
 
 },{"14cb391fa4a0dda8":"6ZUSY"}],"RsFXo":[function(require,module,exports) {
+"use strict";
 var uncurryThis = require("5250b5c9324ccbe");
 module.exports = uncurryThis([].slice);
 
 },{"5250b5c9324ccbe":"7GlkT"}],"b9O3D":[function(require,module,exports) {
+"use strict";
 var $TypeError = TypeError;
 module.exports = function(passed, required) {
     if (passed < required) throw $TypeError("Not enough arguments");
@@ -1768,12 +1871,14 @@ module.exports = function(passed, required) {
 };
 
 },{}],"bzGah":[function(require,module,exports) {
+"use strict";
 var userAgent = require("d96985a79ddda108");
 // eslint-disable-next-line redos/no-vulnerable -- safe
 module.exports = /(?:ipad|iphone|ipod).*applewebkit/i.test(userAgent);
 
 },{"d96985a79ddda108":"73xBt"}],"2Jcp4":[function(require,module,exports) {
 var process = require("3a08b2d1e5e27538");
+"use strict";
 var classof = require("779f783a397f138");
 module.exports = typeof process != "undefined" && classof(process) == "process";
 
@@ -1923,6 +2028,7 @@ process.umask = function() {
 };
 
 },{}],"l7FDS":[function(require,module,exports) {
+"use strict";
 var $ = require("33581c362196ed1f");
 var global = require("9a84e40db4964af6");
 var setTask = require("4219ce460223bd08").set;
@@ -1972,6 +2078,7 @@ module.exports = function(scheduler, hasTimeArg) {
 };
 
 },{"373dd417176da2c5":"i8HOC","a68ecfcbf29c46f6":"148ka","7087588d33667af2":"l3Kyn","7679d27a979f2651":"2BA6V","7493ba8d8bb8623d":"73xBt","cff2c830bdea4f24":"RsFXo","58a74f00cee1ac64":"b9O3D"}],"2BA6V":[function(require,module,exports) {
+"use strict";
 /* global Bun -- Deno case */ module.exports = typeof Bun == "function" && Bun && typeof Bun.version == "string";
 
 },{}],"dXNgZ":[function(require,module,exports) {
@@ -2561,55 +2668,43 @@ try {
     else Function("r", "regeneratorRuntime = r")(runtime);
 }
 
-},{}],"Y4A21":[function(require,module,exports) {
-// Data handling for app
+},{}],"asXf2":[function(require,module,exports) {
+// Rendering of view/content to DOM
+// take data and render
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "queryResults", ()=>queryResults);
-parcelHelpers.export(exports, "generateResultsList", ()=>generateResultsList);
-parcelHelpers.export(exports, "softDataStorage", ()=>softDataStorage);
-var _reusablesJs = require("./reusables.js");
-const queryResults = async function(searchQuery, key, id) {
-    // if (searchQuery === '') return;
-    const urlLink = (0, _reusablesJs.getURL)(searchQuery, key, id);
-    // if (!urlLink) return;
-    const responseData = await fetch(urlLink);
-    const jsonData = await responseData.json();
-    const arrData = Object.entries(jsonData);
-    // console.log(arrData);
-    return arrData;
+parcelHelpers.export(exports, "parentTags", ()=>parentTags);
+parcelHelpers.export(exports, "initParentTags", ()=>initParentTags);
+let parentTags;
+const parentTagsFunction = function() {
+    return {
+        recipeContainer: document.querySelector(".recipe"),
+        searchForm: document.querySelector(".search"),
+        searchField: document.querySelector(".search__field"),
+        resultsContainer: document.querySelector(".search-results"),
+        resultsListContainer: document.querySelector(".results"),
+        loadSpinner: document.querySelector(".spinner"),
+        loadError: document.querySelector(".error"),
+        previewLinksAll: document.querySelectorAll(".preview__link"),
+        ingredientList: document.querySelector(".recipe__ingredient-list"),
+        btnPrevious: document.querySelector(".pagination__btn--prev"),
+        btnNext: document.querySelector(".pagination__btn--next"),
+        paginationContainer: document.querySelector(".pagination"),
+        btnBookmark: document.querySelector(".btn--round"),
+        btnNavBookmarkList: document.querySelector(".bookmarks__list"),
+        btnServingIncrease: document.querySelector(".btn--increase-servings"),
+        btnServingDecrease: document.querySelector(".btn--decrease-servings")
+    };
 };
-const generateResultsList = function(recipes) {
-    let listResults = [];
-    for (let { id, image_url, publisher, title, key } of recipes)// const dataResults = [id, image_url, publisher, title, key];
-    // console.log(dataResults);
-    (function() {
-        const resultsArray = {
-            userId: id,
-            imageURL: image_url,
-            recipePublisher: publisher,
-            recipeTitle: title
-        };
-        if (key) resultsArray.userKey = key;
-        listResults.push(resultsArray);
-    })(id, image_url, publisher, title, key);
-    // console.log(listResults);
-    return listResults;
+const initParentTags = function() {
+    parentTags = parentTagsFunction();
+// console.log(parentTags);
 };
-const generateCurrentRecipeData = function(data) {};
-const softDataStorage = {
-    recentRequestStatus: "",
-    currentRecipe: "",
-    currentRecipeData: "",
-    allRecipeReceived: [],
-    resultsListView: []
-};
-const storeData = function(dataObject) {
-// add to local storage for tab reload event
-};
-storeData(softDataStorage);
+initParentTags(); // const recipeContainer = document.querySelector('.recipe');
+ // const searchForm = document.querySelector('.search');
+ // const searchField = document.querySelector('.search__field');
 
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","./reusables.js":"if9p6"}],"gkKU3":[function(require,module,exports) {
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"gkKU3":[function(require,module,exports) {
 exports.interopDefault = function(a) {
     return a && a.__esModule ? a : {
         default: a
@@ -2639,14 +2734,86 @@ exports.export = function(dest, destName, get) {
     });
 };
 
-},{}],"if9p6":[function(require,module,exports) {
+},{}],"Y4A21":[function(require,module,exports) {
+// Data handling for app
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "queryResults", ()=>queryResults);
+parcelHelpers.export(exports, "generateResultsList", ()=>generateResultsList);
+parcelHelpers.export(exports, "generateCurrentRecipeData", ()=>generateCurrentRecipeData);
+parcelHelpers.export(exports, "softDataStorage", ()=>softDataStorage);
+var _reusableViewJs = require("./reusableView.js");
+const queryResults = async function(searchQuery, key, id) {
+    try {
+        // if (searchQuery === '') return;
+        const urlLink = (0, _reusableViewJs.getURL)(searchQuery, key, id);
+        // if (!urlLink) return;
+        const responseData = await fetch(urlLink);
+        const jsonData = await responseData.json();
+        const arrData = Object.entries(jsonData);
+        // console.log(arrData);
+        return arrData;
+    } catch (err) {
+        console.error(err.message);
+    }
+};
+const generateResultsList = function(recipes) {
+    let listResults = [];
+    for (let { id, image_url, publisher, title, key } of recipes)// const dataResults = [id, image_url, publisher, title, key];
+    // console.log(dataResults);
+    (function() {
+        const resultsArray = {
+            recpId: id,
+            imageURL: image_url,
+            recipePublisher: publisher,
+            recipeTitle: title
+        };
+        if (key) resultsArray.userKey = key;
+        listResults.push(resultsArray);
+    })(id, image_url, publisher, title, key);
+    // console.log(listResults);
+    return listResults;
+};
+const generateCurrentRecipeData = function(data) {
+    // console.log(data);
+    return {
+        cookingTime: data.cooking_time,
+        recipeId: data.id,
+        imageURL: data.image_url,
+        recipeIngredients: data.ingredients,
+        recipePublisher: data.publisher,
+        recipeServings: data.servings,
+        sourceURL: data.source_url,
+        recipeTitle: data.title
+    };
+};
+const softDataStorage = {
+    recentRequestStatus: "",
+    currentRecipe: "",
+    currentRecipeData: {},
+    allRecipeReceived: [],
+    resultsListView: [],
+    bookmarksList: new Set()
+};
+const storeData = function(dataObject) {
+// add to local storage for tab reload event
+};
+storeData(softDataStorage);
+
+},{"./reusableView.js":"2nI8H","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"2nI8H":[function(require,module,exports) {
 // Reusable Functions
 /** All Imports */ var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "timeout", ()=>timeout);
 parcelHelpers.export(exports, "getData", ()=>getData);
+parcelHelpers.export(exports, "postData", ()=>postData);
 parcelHelpers.export(exports, "getURL", ()=>getURL);
+parcelHelpers.export(exports, "renderSpinner", ()=>renderSpinner);
+parcelHelpers.export(exports, "emptyContainer", ()=>emptyContainer);
 var _configurationJs = require("./configuration.js");
+var _iconsSvg = require("../img/icons.svg");
+var _iconsSvgDefault = parcelHelpers.interopDefault(_iconsSvg);
+var _mainViewJs = require("./mainView.js");
 const timeout = function(seconds) {
     return new Promise(function(_, reject) {
         setTimeout(function() {
@@ -2655,28 +2822,29 @@ const timeout = function(seconds) {
     });
 };
 const getData = async function(url) {
-    console.log(url);
+    // console.log(url);
     const resp = await fetch(url);
     if (!resp.ok) throw new Error("Invalid Response. Please try again!");
     const { data } = await resp.json();
     return data.recipe;
 };
-const getURL = function(searchQuery, key, idHash) {
+const postData = async function() {};
+const getURL = function(searchQuery, key, hashId) {
     // console.log(searchQuery);
     try {
         let apiURL;
         const queryKeyURL = `?search=${searchQuery}&key=${key}`;
-        const recipeIdKeyURL = `/${idHash}?key=${key}`;
+        const recipeIdKeyURL = `/${hashId}?key=${key}`;
         const queryURL = `?search=${searchQuery}`;
-        const recipeIdURL = `/${idHash}`;
+        const recipeIdURL = `/${hashId}`;
         const keyURL = `?key=${key}`;
         if (searchQuery && key) // Querying with key
         apiURL = `${0, _configurationJs.baseURL}${queryKeyURL}`;
-        else if (idHash && key) // Tab reload after browser exiting with key and recipe #id
+        else if (hashId && key) // Tab reload after browser exiting with key and recipe #id
         apiURL = `${0, _configurationJs.baseURL}${recipeIdKeyURL}`;
         else if (searchQuery) // Querying without key
         apiURL = `${0, _configurationJs.baseURL}${queryURL}`;
-        else if (idHash) // Tab reload after browser exit event
+        else if (hashId) // Tab reload after browser exit event
         apiURL = `${0, _configurationJs.baseURL}${recipeIdURL}`;
         else if (key) // POST request
         apiURL = `${0, _configurationJs.baseURL}${keyURL}`;
@@ -2687,8 +2855,24 @@ const getURL = function(searchQuery, key, idHash) {
     // return err;
     }
 };
+const renderSpinner = function(containerHtml) {
+    const html = `<div class="spinner">
+                    <svg>
+                    <!--<use href="src/img/icons.svg#icon-loader"></use>-->
+                    <use href="${(0, _iconsSvgDefault.default)}#icon-loader"></use>
+                    </svg>
+                </div>`;
+    containerHtml.insertAdjacentHTML("afterbegin", html);
+};
+const emptyContainer = function(container) {
+    (0, _mainViewJs.initParentTags)();
+    container.innerHTML = "";
+    // document.querySelector('.search-results').previousSibling.remove();
+    if ((0, _mainViewJs.parentTags).loadSpinner) (0, _mainViewJs.parentTags).loadSpinner.remove();
+    if ((0, _mainViewJs.parentTags).loadError) (0, _mainViewJs.parentTags).loadError.remove();
+};
 
-},{"./configuration.js":"eSmrz","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"eSmrz":[function(require,module,exports) {
+},{"./configuration.js":"eSmrz","../img/icons.svg":"8PWvx","./mainView.js":"asXf2","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"eSmrz":[function(require,module,exports) {
 // All the configuration values for app
 /** All the URLs to communicate to API. */ var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
@@ -2699,135 +2883,7 @@ const baseURL = "https://forkify-api.herokuapp.com/api/v2/recipes";
 const timePeriod = 3;
 const key = "31721811-a6b8-4e16-b58d-7188c8e3bd8e";
 
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"9M3GU":[function(require,module,exports) {
-// Search work in a class
-var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "searchMethods", ()=>searchMethods);
-var _mainViewJs = require("./mainView.js");
-// import { queryResults, softData } from './model.js';
-// import { softDataStorage, generateResultsList } from './model.js';
-class searchView {
-    getQuery() {
-        const searchQuery = (0, _mainViewJs.parentTags).searchField.value;
-        // if (!searchQuery) return;
-        // console.log(searchQuery);
-        return searchQuery;
-    }
-    clearSearchField() {
-        (0, _mainViewJs.parentTags).searchField.value = "";
-        (0, _mainViewJs.parentTags).searchField.blur();
-    }
-    focusSearchField() {
-        (0, _mainViewJs.parentTags).searchField.focus();
-    }
-    addSearchHandler(searchFunction) {
-        (0, _mainViewJs.parentTags).searchForm.addEventListener("submit", searchFunction);
-    }
-}
-const searchMethods = new searchView();
-
-},{"./mainView.js":"asXf2","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"asXf2":[function(require,module,exports) {
-// Rendering of view/content to DOM
-// take data and render
-var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "parentTags", ()=>parentTags);
-parcelHelpers.export(exports, "initParentTags", ()=>initParentTags);
-let parentTags;
-const parentTagsFunction = function() {
-    return {
-        recipeContainer: document.querySelector(".recipe"),
-        searchForm: document.querySelector(".search"),
-        searchField: document.querySelector(".search__field"),
-        resultsContainer: document.querySelector(".search-results"),
-        resultsListContainer: document.querySelector(".results"),
-        spinnerResults: document.querySelector(".spinner"),
-        errorResults: document.querySelector(".error"),
-        // previewLinks: document.querySelector('.preview__link'),
-        previewLinksAll: document.querySelectorAll(".preview__link")
-    };
-};
-const initParentTags = function() {
-    parentTags = parentTagsFunction();
-    console.log(parentTags);
-};
-initParentTags(); // const recipeContainer = document.querySelector('.recipe');
- // const searchForm = document.querySelector('.search');
- // const searchField = document.querySelector('.search__field');
-
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"faCQd":[function(require,module,exports) {
-// All results render and display
-var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "resultsViewMethods", ()=>resultsViewMethods);
-var _mainViewJs = require("./mainView.js");
-var _iconsSvg = require("../img/icons.svg");
-var _iconsSvgDefault = parcelHelpers.interopDefault(_iconsSvg);
-var _faviconPng = require("../img/favicon.png");
-var _faviconPngDefault = parcelHelpers.interopDefault(_faviconPng);
-/** 'onerror' inline Jscript code for image load failure error handling, replacing failed image with set fallbackDefault.jpg.
- * If in case fallbackDefault.img is not present to avoid ininite loop, use:
- * 'this.error = null',  or
- * 'if (this.src != 'Default.jpg')',
- */ class resultsPreview {
-    // By Code insertion to HTML
-    renderSpinner() {
-        const html = `<div class="spinner">
-                      <svg>
-                      <!--<use href="src/img/icons.svg#icon-loader"></use>-->
-                      <use href="${(0, _iconsSvgDefault.default)}#icon-loader"></use>
-                      </svg>
-                  </div>`;
-        (0, _mainViewJs.parentTags).resultsContainer.insertAdjacentHTML("afterbegin", html);
-    }
-    renderRecipeResults(userId, imageURL, recipeTitle, recipePublisher, userKey) {
-        const html = `<li class="preview">
-                      <a class="preview__link" href="#${userId}">
-                        <figure class="preview__fig">
-                          <img src="${imageURL}" onerror = "this.onerror = null; this.src = '${(0, _faviconPngDefault.default)}'" alt="${recipeTitle}" />
-                        </figure>
-                        <div class="preview__data">
-                          <h4 class="preview__title">${recipeTitle}</h4>
-                          <p class="preview__publisher">${recipePublisher}</p>
-                          <div class="preview__user-generated ${userKey === undefined ? "hidden" : ""}">
-                            <svg>
-                              <use href="${(0, _iconsSvgDefault.default)}#icon-user"></use>
-                            </svg>
-                          </div>
-                        </div>
-                      </a>  
-                    </li>`;
-        (0, _mainViewJs.parentTags).resultsListContainer.insertAdjacentHTML("beforeend", html);
-    }
-    renderResults(data) {
-        for (let { userId, imageURL, recipeTitle, recipePublisher, userKey } of data)resultsViewMethods.renderRecipeResults(userId, imageURL, recipeTitle, recipePublisher, userKey);
-    }
-    // addResultsHandler(resultsFunction) {
-    //   parentTags.resultsContainer.addEventListener('change', resultsFunction);
-    // }
-    resultsSelection(event) {
-        document.querySelectorAll(".preview__link").forEach((item)=>{
-            // console.log(e);
-            item.classList.remove("preview__link--active");
-        });
-        const recipeTarget = event.target.closest(".preview__link");
-        recipeTarget.classList.add("preview__link--active");
-        const href = event.target.closest(".preview__link").getAttribute("href");
-        return href.slice(1);
-    }
-    // show error - remove list, spinner
-    emptyResultsContainer() {
-        (0, _mainViewJs.initParentTags)();
-        (0, _mainViewJs.parentTags).resultsListContainer.innerHTML = "";
-        // document.querySelector('.search-results').previousSibling.remove();
-        if ((0, _mainViewJs.parentTags).spinnerResults) (0, _mainViewJs.parentTags).spinnerResults.remove();
-        if ((0, _mainViewJs.parentTags).errorResults) (0, _mainViewJs.parentTags).errorResults.remove();
-    }
-}
-const resultsViewMethods = new resultsPreview();
-
-},{"./mainView.js":"asXf2","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","../img/icons.svg":"8PWvx","../img/favicon.png":"5s4km"}],"8PWvx":[function(require,module,exports) {
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"8PWvx":[function(require,module,exports) {
 module.exports = require("b37898b5bf0b13e0").getBundleURL("g05j8") + "icons.21bad73c.svg" + "?" + Date.now();
 
 },{"b37898b5bf0b13e0":"lgJ39"}],"lgJ39":[function(require,module,exports) {
@@ -2865,7 +2921,175 @@ exports.getBundleURL = getBundleURLCached;
 exports.getBaseURL = getBaseURL;
 exports.getOrigin = getOrigin;
 
-},{}],"5s4km":[function(require,module,exports) {
+},{}],"9M3GU":[function(require,module,exports) {
+// Search work in a class
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "searchMethods", ()=>searchMethods);
+var _mainViewJs = require("./mainView.js");
+// import { queryResults, softData } from './model.js';
+// import { softDataStorage, generateResultsList } from './model.js';
+class searchView {
+    getQuery() {
+        const searchQuery = (0, _mainViewJs.parentTags).searchField.value;
+        // if (!searchQuery) return;
+        // console.log(searchQuery);
+        return searchQuery;
+    }
+    clearSearchField() {
+        (0, _mainViewJs.parentTags).searchField.value = "";
+        (0, _mainViewJs.parentTags).searchField.blur();
+    }
+    focusSearchField() {
+        (0, _mainViewJs.parentTags).searchField.focus();
+    }
+    addSearchHandler(searchFunction) {
+        (0, _mainViewJs.parentTags).searchForm.addEventListener("submit", searchFunction);
+    }
+}
+const searchMethods = new searchView();
+
+},{"./mainView.js":"asXf2","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"faCQd":[function(require,module,exports) {
+// All results render and display
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "resultsViewMethods", ()=>resultsViewMethods);
+var _mainViewJs = require("./mainView.js");
+var _iconsSvg = require("../img/icons.svg");
+var _iconsSvgDefault = parcelHelpers.interopDefault(_iconsSvg);
+var _faviconPng = require("../img/favicon.png");
+var _faviconPngDefault = parcelHelpers.interopDefault(_faviconPng);
+var _reusableViewJs = require("./reusableView.js");
+var _modelJs = require("./model.js");
+/** 'onerror' inline Jscript code for image load failure error handling, replacing failed image with set fallbackDefault.jpg.
+ * If in case fallbackDefault.img is not present to avoid ininite loop, use:
+ * 'this.error = null',  or
+ * 'if (this.src != 'Default.jpg')',
+ */ class resultsPreview {
+    // By Code insertion to HTML
+    renderRecipeResults(recpId, imageURL, recipeTitle, recipePublisher, userKey) {
+        const html = `<li class="preview">
+                      <a class="preview__link" href="#${recpId}">
+                        <figure class="preview__fig">
+                          <img src="${imageURL}" onerror = "this.onerror = null; this.src = '${(0, _faviconPngDefault.default)}'" alt="${recipeTitle}" />
+                        </figure>
+                        <div class="preview__data">
+                          <h4 class="preview__title">${recipeTitle}</h4>
+                          <p class="preview__publisher">${recipePublisher}</p>
+                          <div class="preview__user-generated ${userKey === undefined ? "hidden" : ""}">
+                            <svg>
+                              <use href="${(0, _iconsSvgDefault.default)}#icon-user"></use>
+                            </svg>
+                          </div>
+                        </div>
+                      </a>  
+                    </li>`;
+        (0, _mainViewJs.parentTags).resultsListContainer.insertAdjacentHTML("beforeend", html);
+    }
+    renderResults(data) {
+        for (let { recpId, imageURL, recipeTitle, recipePublisher, userKey } of data)resultsViewMethods.renderRecipeResults(recpId, imageURL, recipeTitle, recipePublisher, userKey);
+    }
+    // addResultsHandler(resultsFunction) {
+    //   parentTags.resultsContainer.addEventListener('change', resultsFunction);
+    // }
+    resultsSelection(event) {
+        document.querySelectorAll(".preview__link").forEach((item)=>{
+            // console.log(e);
+            item.classList.remove("preview__link--active");
+        });
+        const recipeTarget = event.target.closest(".preview__link");
+        recipeTarget.classList.add("preview__link--active");
+        const href = event.target.closest(".preview__link").getAttribute("href");
+        const recipeId = href.slice(1);
+        const [currentRecipeOwner] = (0, _modelJs.softDataStorage).resultsListView.filter((el)=>el.recpId === recipeId);
+        return currentRecipeOwner;
+    }
+    // render navigation
+    resultsNavPrevNext(pageCounter, clickEventListener) {
+        (0, _mainViewJs.parentTags).paginationContainer.innerHTML = "";
+        const html = `<button class="btn--inline pagination__btn--prev">
+                    <svg class="search__icon">
+                      <use href="${(0, _iconsSvgDefault.default)}#icon-arrow-left"></use>
+                    </svg>
+                    <span>${"Page " + (pageCounter - 1)}</span>
+                  </button>
+                  <button class="btn--inline pagination__btn--next">
+                    <span>${"Page " + (pageCounter + 1)}</span>
+                    <svg class="search__icon">
+                      <use href="${(0, _iconsSvgDefault.default)}#icon-arrow-right"></use>
+                    </svg>
+                  </button>`;
+        (0, _mainViewJs.parentTags).paginationContainer.insertAdjacentHTML("afterbegin", html);
+        (0, _mainViewJs.initParentTags)();
+        clickEventListener();
+    }
+    resultsNavPrevious(pageCounter, clickEventListener) {
+        (0, _mainViewJs.parentTags).paginationContainer.innerHTML = "";
+        const html = `<button class="btn--inline pagination__btn--prev">
+                    <svg class="search__icon">
+                      <use href="${(0, _iconsSvgDefault.default)}#icon-arrow-left"></use>
+                    </svg>
+                    <span>${"Page " + (pageCounter - 1)}</span>
+                  </button>`;
+        (0, _mainViewJs.parentTags).paginationContainer.insertAdjacentHTML("afterbegin", html);
+        (0, _mainViewJs.initParentTags)();
+        clickEventListener();
+    }
+    resultsNavNext(pageCounter, clickEventListener) {
+        (0, _mainViewJs.parentTags).paginationContainer.innerHTML = "";
+        const html = `<button class="btn--inline pagination__btn--next">
+                    <span>${"Page " + (pageCounter + 1)}</span>
+                    <svg class="search__icon">
+                      <use href="${(0, _iconsSvgDefault.default)}#icon-arrow-right"></use>
+                    </svg>
+                  </button>`;
+        (0, _mainViewJs.parentTags).paginationContainer.insertAdjacentHTML("afterbegin", html);
+        (0, _mainViewJs.initParentTags)();
+        clickEventListener();
+    }
+    paginateResults(data, pageCounter, clickEventListener, recipeFunction) {
+        console.log(data.length);
+        const pageTotal = Math.ceil(data.length / 10);
+        console.log("Total Pages " + pageTotal);
+        const self = this;
+        // if pageTotal is 4
+        const pageEnd = pageTotal; // 4
+        const pageStart = pageTotal - (pageTotal - 1); // 1
+        console.log("pageStart " + pageStart + ", pageEnd " + pageEnd);
+        // 0-10 , 10-20...
+        let startSlice = 10 * (pageCounter - 1);
+        let endSlice = 10 * pageCounter;
+        const renderData = ()=>{
+            console.log(startSlice, endSlice);
+            const recipe = data.slice(startSlice, endSlice);
+            // console.log(recipe);
+            return recipe;
+        };
+        // console.log(renderData());
+        // console.log(this);
+        if (pageCounter === pageStart) {
+            (0, _mainViewJs.parentTags).resultsListContainer.innerHTML = "";
+            this.renderResults(renderData());
+            recipeFunction();
+            this.resultsNavNext(pageCounter, clickEventListener);
+        }
+        if (pageCounter === pageEnd) {
+            (0, _mainViewJs.parentTags).resultsListContainer.innerHTML = "";
+            this.renderResults(renderData());
+            recipeFunction();
+            this.resultsNavPrevious(pageCounter, clickEventListener);
+        }
+        if (pageCounter > pageStart && pageCounter < pageEnd) {
+            (0, _mainViewJs.parentTags).resultsListContainer.innerHTML = "";
+            this.renderResults(renderData());
+            recipeFunction();
+            this.resultsNavPrevNext(pageCounter, clickEventListener);
+        }
+    }
+}
+const resultsViewMethods = new resultsPreview();
+
+},{"./mainView.js":"asXf2","../img/icons.svg":"8PWvx","../img/favicon.png":"5s4km","./reusableView.js":"2nI8H","./model.js":"Y4A21","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"5s4km":[function(require,module,exports) {
 module.exports = require("57f2b78b3f54553b").getBundleURL("g05j8") + "favicon.8b2f57bf.png" + "?" + Date.now();
 
 },{"57f2b78b3f54553b":"lgJ39"}],"8pAzM":[function(require,module,exports) {
@@ -2881,7 +3105,7 @@ var _iconsSvgDefault = parcelHelpers.interopDefault(_iconsSvg);
 const errorMessage = {
     noResults: "No recipes found for your query. Please try again!"
 };
-const renderError = function(error) {
+const renderError = function(error, containerHtml) {
     const html = `<div class="error">
                   <div>
                     <svg>
@@ -2891,7 +3115,7 @@ const renderError = function(error) {
                   </div>
                   <p>${error}</p>
                 </div>`;
-    (0, _mainViewJs.parentTags).resultsContainer.insertAdjacentHTML("afterbegin", html);
+    containerHtml.insertAdjacentHTML("afterbegin", html);
 };
 
 },{"./mainView.js":"asXf2","../img/icons.svg":"8PWvx","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"jSwDy":[function(require,module,exports) {
@@ -2899,19 +3123,479 @@ const renderError = function(error) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "recipeViewMethods", ()=>recipeViewMethods);
-var _reusablesJs = require("./reusables.js");
+var _reusableViewJs = require("./reusableView.js");
 var _configurationJs = require("./configuration.js");
 var _modelJs = require("./model.js");
+var _iconsSvg = require("../img/icons.svg");
+var _iconsSvgDefault = parcelHelpers.interopDefault(_iconsSvg);
+var _mainViewJs = require("./mainView.js");
+var _fractional = require("fractional");
 class recipeView {
     async getRecipeData() {
         return await Promise.race([
-            (0, _reusablesJs.getData)((0, _reusablesJs.getURL)(undefined, (0, _configurationJs.key), (0, _modelJs.softDataStorage).currentRecipe)),
-            (0, _reusablesJs.timeout)((0, _configurationJs.timePeriod))
+            (0, _reusableViewJs.getData)((0, _reusableViewJs.getURL)(undefined, (0, _configurationJs.key), (0, _modelJs.softDataStorage).currentRecipe.recpId)),
+            (0, _reusableViewJs.timeout)((0, _configurationJs.timePeriod))
         ]);
+    }
+    renderRecipe(sourceURL, recipePublisher, recipeServings, cookingTime, recipeTitle, imageURL, data1) {
+        const html = `<figure class="recipe__fig">
+      <img src="${imageURL}" alt="Tomato" class="recipe__img" />
+      <h1 class="recipe__title">
+        <span>${recipeTitle}</span>
+      </h1>
+    </figure>
+
+    <div class="recipe__details">
+      <div class="recipe__info">
+        <svg class="recipe__info-icon">
+          <use href="${(0, _iconsSvgDefault.default)}#icon-clock"></use>
+        </svg>
+        <span class="recipe__info-data recipe__info-data--minutes">${cookingTime}</span>
+        <span class="recipe__info-text">minutes</span>
+      </div>
+      <div class="recipe__info">
+        <svg class="recipe__info-icon">
+          <use href="${(0, _iconsSvgDefault.default)}#icon-users"></use>
+        </svg>
+        <span class="recipe__info-data recipe__info-data--people">${recipeServings}</span>
+        <span class="recipe__info-text">servings</span>
+
+        <div class="recipe__info-buttons">
+          <button class="btn--tiny btn--decrease-servings">
+            <svg>
+              <use href="${(0, _iconsSvgDefault.default)}#icon-minus-circle"></use>
+            </svg>
+          </button>
+          <button class="btn--tiny btn--increase-servings">
+            <svg>
+              <use href="${(0, _iconsSvgDefault.default)}#icon-plus-circle"></use>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="recipe__user-generated ${data1.userKey ? "" : "hidden"}">
+        <svg>
+          <use href="${(0, _iconsSvgDefault.default)}#icon-user"></use>
+        </svg>
+      </div>
+      <button class="btn--round">
+        <svg class="">
+          <use href="${(0, _iconsSvgDefault.default)}#icon-bookmark-fill"></use>
+        </svg>
+      </button>
+    </div>
+
+    <div class="recipe__ingredients">
+      <h2 class="heading--2">Recipe ingredients</h2>
+      <ul class="recipe__ingredient-list">
+        
+      </ul>
+    </div>
+
+    <div class="recipe__directions">
+      <h2 class="heading--2">How to cook it</h2>
+      <p class="recipe__directions-text">
+        This recipe was carefully designed and tested by
+        <span class="recipe__publisher">${recipePublisher}</span>. Please check out
+        directions at their website.
+      </p>
+      <a
+        class="btn--small recipe__btn"
+        href="${sourceURL}"
+        target="_blank"
+      >
+        <span>Directions</span>
+        <svg class="search__icon">
+          <use href="${(0, _iconsSvgDefault.default)}#icon-arrow-right"></use>
+        </svg>
+      </a>
+    </div>`;
+        (0, _mainViewJs.parentTags).recipeContainer.insertAdjacentHTML("beforeend", html);
+    }
+    ingredientList(quantity, unit, description) {
+        const html = `<li class="recipe__ingredient">
+                    <svg class="recipe__icon">
+                      <use href="${(0, _iconsSvgDefault.default)}#icon-check"></use>
+                    </svg>
+                    <div class="recipe__quantity">${quantity === null ? "" : quantity}</div>
+                    <div class="recipe__description">
+                      <span class="recipe__unit">${unit}</span> ${description}
+                    </div>
+                  </li>`;
+        (0, _mainViewJs.parentTags).ingredientList.insertAdjacentHTML("beforeend", html);
+    }
+    renderIngredients(data1) {
+        let servingsCount1 = 4;
+        for (let { quantity, unit, description } of data1){
+            // console.log(quantity, unit, description);
+            // fractional data conversion
+            quantity = quantity === null ? "" : new (0, _fractional.Fraction)(quantity);
+            recipeViewMethods.ingredientList(quantity, unit, description);
+        }
+    }
+    addClickServings() {
+        (0, _mainViewJs.parentTags).btnServingIncrease.addEventListener("click", function() {
+            servingsCount += 1;
+            renderIngredients(data);
+        });
+        (0, _mainViewJs.parentTags).btnServingDecrease.addEventListener("click", function() {
+            if (servingsCount > 4) servingsCount -= 1;
+        });
     }
 }
 const recipeViewMethods = new recipeView();
 
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","./reusables.js":"if9p6","./configuration.js":"eSmrz","./model.js":"Y4A21"}]},["j9r0q","ebWYT"], "ebWYT", "parcelRequire410a")
+},{"./reusableView.js":"2nI8H","./configuration.js":"eSmrz","./model.js":"Y4A21","../img/icons.svg":"8PWvx","./mainView.js":"asXf2","fractional":"3SU56","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"3SU56":[function(require,module,exports) {
+/*
+fraction.js
+A Javascript fraction library.
+
+Copyright (c) 2009  Erik Garrison <erik@hypervolu.me>
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+
+*/ /* Fractions */ /* 
+ *
+ * Fraction objects are comprised of a numerator and a denomenator.  These
+ * values can be accessed at fraction.numerator and fraction.denomenator.
+ *
+ * Fractions are always returned and stored in lowest-form normalized format.
+ * This is accomplished via Fraction.normalize.
+ *
+ * The following mathematical operations on fractions are supported:
+ *
+ * Fraction.equals
+ * Fraction.add
+ * Fraction.subtract
+ * Fraction.multiply
+ * Fraction.divide
+ *
+ * These operations accept both numbers and fraction objects.  (Best results
+ * are guaranteed when the input is a fraction object.)  They all return a new
+ * Fraction object.
+ *
+ * Usage:
+ *
+ * TODO
+ *
+ */ /*
+ * The Fraction constructor takes one of:
+ *   an explicit numerator (integer) and denominator (integer),
+ *   a string representation of the fraction (string),
+ *   or a floating-point number (float)
+ *
+ * These initialization methods are provided for convenience.  Because of
+ * rounding issues the best results will be given when the fraction is
+ * constructed from an explicit integer numerator and denomenator, and not a
+ * decimal number.
+ *
+ *
+ * e.g. new Fraction(1, 2) --> 1/2
+ *      new Fraction('1/2') --> 1/2
+ *      new Fraction('2 3/4') --> 11/4  (prints as 2 3/4)
+ *
+ */ Fraction = function(numerator, denominator) {
+    /* double argument invocation */ if (typeof numerator !== "undefined" && denominator) {
+        if (typeof numerator === "number" && typeof denominator === "number") {
+            this.numerator = numerator;
+            this.denominator = denominator;
+        } else if (typeof numerator === "string" && typeof denominator === "string") {
+            // what are they?
+            // hmm....
+            // assume they are ints?
+            this.numerator = parseInt(numerator);
+            this.denominator = parseInt(denominator);
+        }
+    /* single-argument invocation */ } else if (typeof denominator === "undefined") {
+        num = numerator; // swap variable names for legibility
+        if (typeof num === "number") {
+            this.numerator = num;
+            this.denominator = 1;
+        } else if (typeof num === "string") {
+            var a, b; // hold the first and second part of the fraction, e.g. a = '1' and b = '2/3' in 1 2/3
+            // or a = '2/3' and b = undefined if we are just passed a single-part number
+            var arr = num.split(" ");
+            if (arr[0]) a = arr[0];
+            if (arr[1]) b = arr[1];
+            /* compound fraction e.g. 'A B/C' */ //  if a is an integer ...
+            if (a % 1 === 0 && b && b.match("/")) return new Fraction(a).add(new Fraction(b));
+            else if (a && !b) {
+                /* simple fraction e.g. 'A/B' */ if (typeof a === "string" && a.match("/")) {
+                    // it's not a whole number... it's actually a fraction without a whole part written
+                    var f = a.split("/");
+                    this.numerator = f[0];
+                    this.denominator = f[1];
+                /* string floating point */ } else if (typeof a === "string" && a.match(".")) return new Fraction(parseFloat(a));
+                else {
+                    this.numerator = parseInt(a);
+                    this.denominator = 1;
+                }
+            } else return undefined; // could not parse
+        }
+    }
+    this.normalize();
+};
+Fraction.prototype.clone = function() {
+    return new Fraction(this.numerator, this.denominator);
+};
+/* pretty-printer, converts fractions into whole numbers and fractions */ Fraction.prototype.toString = function() {
+    if (this.denominator === "NaN") return "NaN";
+    var wholepart = this.numerator / this.denominator > 0 ? Math.floor(this.numerator / this.denominator) : Math.ceil(this.numerator / this.denominator);
+    var numerator = this.numerator % this.denominator;
+    var denominator = this.denominator;
+    var result = [];
+    if (wholepart != 0) result.push(wholepart);
+    if (numerator != 0) result.push((wholepart === 0 ? numerator : Math.abs(numerator)) + "/" + denominator);
+    return result.length > 0 ? result.join(" ") : 0;
+};
+/* destructively rescale the fraction by some integral factor */ Fraction.prototype.rescale = function(factor) {
+    this.numerator *= factor;
+    this.denominator *= factor;
+    return this;
+};
+Fraction.prototype.add = function(b) {
+    var a = this.clone();
+    if (b instanceof Fraction) b = b.clone();
+    else b = new Fraction(b);
+    td = a.denominator;
+    a.rescale(b.denominator);
+    b.rescale(td);
+    a.numerator += b.numerator;
+    return a.normalize();
+};
+Fraction.prototype.subtract = function(b) {
+    var a = this.clone();
+    if (b instanceof Fraction) b = b.clone(); // we scale our argument destructively, so clone
+    else b = new Fraction(b);
+    td = a.denominator;
+    a.rescale(b.denominator);
+    b.rescale(td);
+    a.numerator -= b.numerator;
+    return a.normalize();
+};
+Fraction.prototype.multiply = function(b) {
+    var a = this.clone();
+    if (b instanceof Fraction) {
+        a.numerator *= b.numerator;
+        a.denominator *= b.denominator;
+    } else if (typeof b === "number") a.numerator *= b;
+    else return a.multiply(new Fraction(b));
+    return a.normalize();
+};
+Fraction.prototype.divide = function(b) {
+    var a = this.clone();
+    if (b instanceof Fraction) {
+        a.numerator *= b.denominator;
+        a.denominator *= b.numerator;
+    } else if (typeof b === "number") a.denominator *= b;
+    else return a.divide(new Fraction(b));
+    return a.normalize();
+};
+Fraction.prototype.equals = function(b) {
+    if (!(b instanceof Fraction)) b = new Fraction(b);
+    // fractions that are equal should have equal normalized forms
+    var a = this.clone().normalize();
+    var b = b.clone().normalize();
+    return a.numerator === b.numerator && a.denominator === b.denominator;
+};
+/* Utility functions */ /* Destructively normalize the fraction to its smallest representation. 
+ * e.g. 4/16 -> 1/4, 14/28 -> 1/2, etc.
+ * This is called after all math ops.
+ */ Fraction.prototype.normalize = function() {
+    var isFloat = function(n) {
+        return typeof n === "number" && (n > 0 && n % 1 > 0 && n % 1 < 1 || n < 0 && n % -1 < 0 && n % -1 > -1);
+    };
+    var roundToPlaces = function(n, places) {
+        if (!places) return Math.round(n);
+        else {
+            var scalar = Math.pow(10, places);
+            return Math.round(n * scalar) / scalar;
+        }
+    };
+    return function() {
+        // XXX hackish.  Is there a better way to address this issue?
+        //
+        /* first check if we have decimals, and if we do eliminate them
+         * multiply by the 10 ^ number of decimal places in the number
+         * round the number to nine decimal places
+         * to avoid js floating point funnies
+         */ if (isFloat(this.denominator)) {
+            var rounded = roundToPlaces(this.denominator, 9);
+            var scaleup = Math.pow(10, rounded.toString().split(".")[1].length);
+            this.denominator = Math.round(this.denominator * scaleup); // this !!! should be a whole number
+            //this.numerator *= scaleup;
+            this.numerator *= scaleup;
+        }
+        if (isFloat(this.numerator)) {
+            var rounded = roundToPlaces(this.numerator, 9);
+            var scaleup = Math.pow(10, rounded.toString().split(".")[1].length);
+            this.numerator = Math.round(this.numerator * scaleup); // this !!! should be a whole number
+            //this.numerator *= scaleup;
+            this.denominator *= scaleup;
+        }
+        var gcf = Fraction.gcf(this.numerator, this.denominator);
+        this.numerator /= gcf;
+        this.denominator /= gcf;
+        if (this.numerator < 0 && this.denominator < 0 || this.numerator > 0 && this.denominator < 0) {
+            this.numerator *= -1;
+            this.denominator *= -1;
+        }
+        return this;
+    };
+}();
+/* Takes two numbers and returns their greatest common factor.
+ */ Fraction.gcf = function(a, b) {
+    var common_factors = [];
+    var fa = Fraction.primeFactors(a);
+    var fb = Fraction.primeFactors(b);
+    // for each factor in fa
+    // if it's also in fb
+    // put it into the common factors
+    fa.forEach(function(factor) {
+        var i = fb.indexOf(factor);
+        if (i >= 0) {
+            common_factors.push(factor);
+            fb.splice(i, 1); // remove from fb
+        }
+    });
+    if (common_factors.length === 0) return 1;
+    var gcf = function() {
+        var r = common_factors[0];
+        var i;
+        for(i = 1; i < common_factors.length; i++)r = r * common_factors[i];
+        return r;
+    }();
+    return gcf;
+};
+// Adapted from: 
+// http://www.btinternet.com/~se16/js/factor.htm
+Fraction.primeFactors = function(n) {
+    var num1 = Math.abs(n);
+    var factors = [];
+    var _factor = 2; // first potential prime factor
+    while(_factor * _factor <= num1)if (num1 % _factor === 0) {
+        factors.push(_factor); // so keep it
+        num1 = num1 / _factor; // and divide our search point by it
+    } else _factor++; // and increment
+    if (num1 != 1) factors.push(num1); //    so it too should be recorded
+    return factors; // Return the prime factors
+};
+module.exports.Fraction = Fraction;
+
+},{}],"KHTJv":[function(require,module,exports) {
+// keeps Bookmark functionality Code
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "bookmarkViewMethods", ()=>bookmarkViewMethods);
+var _mainViewJs = require("./mainView.js");
+var _iconsSvg = require("../img/icons.svg");
+var _iconsSvgDefault = parcelHelpers.interopDefault(_iconsSvg);
+class bookmarkView {
+    insertBookmarkMessage() {
+        (0, _mainViewJs.parentTags).btnNavBookmarkList.innerHTML = "";
+        const htmlMessage = `<div class="message">
+                          <div>
+                            <svg>
+                              <use href="${(0, _iconsSvgDefault.default)}#icon-smile"></use>
+                            </svg>
+                          </div>
+                          <p>
+                            No bookmarks yet. Find a nice recipe and bookmark it :)
+                          </p>
+                        </div>`;
+        (0, _mainViewJs.parentTags).btnNavBookmarkList.insertAdjacentHTML("afterbegin", htmlMessage);
+    }
+    insertBookmarks(data) {
+        const htmlBookmark = `<li class="preview">
+                    <a class="preview__link" href="#${data.recpId}">
+                      <figure class="preview__fig">
+                        <img src="${data.imageURL}" alt="${data.recipeTitle}" />
+                      </figure>
+                      <div class="preview__data">
+                        <h4 class="preview__name">${data.recipeTitle}</h4>
+                        <p class="preview__publisher">${data.recipePublisher}</p>
+                      </div>
+                    </a>
+                  </li>`;
+        (0, _mainViewJs.parentTags).btnNavBookmarkList.insertAdjacentHTML("afterbegin", htmlBookmark);
+    }
+    renderBookmarkList(data, resultsRecipeSelection) {
+        if (data.bookmarksList.size > 0) {
+            (0, _mainViewJs.parentTags).btnNavBookmarkList.innerHTML = "";
+            for (let bookmark of data.bookmarksList.values()){
+                console.log(bookmark);
+                this.insertBookmarks(bookmark);
+            }
+            document.querySelectorAll(".preview__link").forEach((el)=>el.addEventListener("click", function(event) {
+                    event.preventDefault();
+                    resultsRecipeSelection(event);
+                }));
+        }
+        if (data.bookmarksList.size === 0) this.insertBookmarkMessage();
+        (0, _mainViewJs.initParentTags)();
+    }
+    recipeBookmarkedCheck(data) {
+        console.log(data.bookmarksList.size);
+        // check if recipe present in Set or not
+        return data.bookmarksList.has(data.currentRecipe);
+    }
+    renderRecipeBookmarkIcon(data) {
+        const htmlBookmarkFill = `<svg class="">
+                                <use href="${(0, _iconsSvgDefault.default)}#icon-bookmark-fill"></use>
+                              </svg>`;
+        const htmlBookmark = `<svg class="">
+                              <use href="${(0, _iconsSvgDefault.default)}#icon-bookmark"></use>
+                          </svg>`;
+        const recipePresent = this.recipeBookmarkedCheck(data);
+        console.log("recipePresent - " + recipePresent);
+        if (recipePresent) (0, _mainViewJs.parentTags).btnBookmark.innerHTML = htmlBookmarkFill;
+        if (!recipePresent) (0, _mainViewJs.parentTags).btnBookmark.innerHTML = htmlBookmark;
+        (0, _mainViewJs.initParentTags)();
+    }
+    removeBookmarkRecipe(data) {
+        // remove item from Set
+        data.bookmarksList.delete(data.currentRecipe);
+        console.log(data.bookmarksList);
+    }
+    btnClickListener(data, resultsRecipeSelection) {
+        const self = this;
+        (0, _mainViewJs.parentTags).btnBookmark.addEventListener("click", function() {
+            const iconType = (0, _mainViewJs.parentTags).btnBookmark.firstElementChild.firstElementChild.getAttribute("href").slice(55);
+            if (iconType === "icon-bookmark-fill") {
+                self.removeBookmarkRecipe(data);
+                self.renderRecipeBookmarkIcon(data);
+                self.renderBookmarkList(data, resultsRecipeSelection);
+                console.log("remove bookmark triggered");
+                return;
+            }
+            data.bookmarksList.add(data.currentRecipe);
+            // console.log(data.bookmarksList);
+            self.renderRecipeBookmarkIcon(data);
+            self.renderBookmarkList(data, resultsRecipeSelection);
+            console.log("add bookmark triggered");
+            return;
+        });
+    }
+}
+const bookmarkViewMethods = new bookmarkView();
+
+},{"./mainView.js":"asXf2","../img/icons.svg":"8PWvx","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}]},["j9r0q","ebWYT"], "ebWYT", "parcelRequire410a")
 
 //# sourceMappingURL=index.739bf03c.js.map

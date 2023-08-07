@@ -1,6 +1,6 @@
 // Data handling for app
 
-import { getURL } from './reusables.js';
+import { getURL } from './reusableView.js';
 
 // console.log(getURL('cake'));
 
@@ -9,15 +9,20 @@ export const queryResults = async function (
   key = undefined,
   id = undefined
 ) {
-  // if (searchQuery === '') return;
-  const urlLink = getURL(searchQuery, key, id);
-  // if (!urlLink) return;
-  const responseData = await fetch(urlLink);
-  const jsonData = await responseData.json();
-  const arrData = Object.entries(jsonData);
-  // console.log(arrData);
+  try {
+    // if (searchQuery === '') return;
+    const urlLink = getURL(searchQuery, key, id);
+    // if (!urlLink) return;
+    const responseData = await fetch(urlLink);
 
-  return arrData;
+    const jsonData = await responseData.json();
+    const arrData = Object.entries(jsonData);
+    // console.log(arrData);
+
+    return arrData;
+  } catch (err) {
+    console.error(err.message);
+  }
 };
 
 export const generateResultsList = function (recipes) {
@@ -29,7 +34,7 @@ export const generateResultsList = function (recipes) {
 
     (function () {
       const resultsArray = {
-        userId: id,
+        recpId: id,
         imageURL: image_url,
         recipePublisher: publisher,
         recipeTitle: title,
@@ -45,8 +50,18 @@ export const generateResultsList = function (recipes) {
   return listResults;
 };
 
-const generateCurrentRecipeData = function (data) {
-  console.log(data);
+export const generateCurrentRecipeData = function (data) {
+  // console.log(data);
+  return {
+    cookingTime: data.cooking_time,
+    recipeId: data.id,
+    imageURL: data.image_url,
+    recipeIngredients: data.ingredients,
+    recipePublisher: data.publisher,
+    recipeServings: data.servings,
+    sourceURL: data.source_url,
+    recipeTitle: data.title,
+  };
 };
 
 export const softDataStorage = {
@@ -55,6 +70,7 @@ export const softDataStorage = {
   currentRecipeData: {},
   allRecipeReceived: [], // original recipe list received
   resultsListView: [], // list of recipes for results view
+  bookmarksList: new Set(),
 };
 
 const storeData = function (dataObject) {

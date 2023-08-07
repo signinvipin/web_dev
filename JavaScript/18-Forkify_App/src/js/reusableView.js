@@ -2,6 +2,8 @@
 
 /** All Imports */
 import { baseURL } from './configuration.js';
+import icons from '../img/icons.svg';
+import { parentTags, initParentTags } from './mainView.js';
 
 /**
  * This function runs a timeout timer for async requests made to
@@ -21,7 +23,7 @@ export const timeout = function (seconds) {
 
 // get data for selected recipe
 export const getData = async function (url) {
-  console.log(url);
+  // console.log(url);
   const resp = await fetch(url);
 
   if (!resp.ok) throw new Error('Invalid Response. Please try again!');
@@ -78,4 +80,22 @@ export const getURL = function (
     console.error(`${err.message}`);
     // return err;
   }
+};
+
+export const renderSpinner = function (containerHtml) {
+  const html = `<div class="spinner">
+                    <svg>
+                    <!--<use href="src/img/icons.svg#icon-loader"></use>-->
+                    <use href="${icons}#icon-loader"></use>
+                    </svg>
+                </div>`;
+  containerHtml.insertAdjacentHTML('afterbegin', html);
+};
+
+export const emptyContainer = function (container) {
+  initParentTags();
+  container.innerHTML = '';
+  // document.querySelector('.search-results').previousSibling.remove();
+  if (parentTags.loadSpinner) parentTags.loadSpinner.remove();
+  if (parentTags.loadError) parentTags.loadError.remove();
 };

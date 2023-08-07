@@ -9,16 +9,23 @@ const parentTagsFunction = function () {
     searchField: document.querySelector('.search__field'),
     resultsContainer: document.querySelector('.search-results'),
     resultsListContainer: document.querySelector('.results'),
-    spinnerResults: document.querySelector('.spinner'),
-    errorResults: document.querySelector('.error'),
-    // previewLinks: document.querySelector('.preview__link'),
+    loadSpinner: document.querySelector('.spinner'),
+    loadError: document.querySelector('.error'),
     previewLinksAll: document.querySelectorAll('.preview__link'),
+    ingredientList: document.querySelector('.recipe__ingredient-list'),
+    btnPrevious: document.querySelector('.pagination__btn--prev'),
+    btnNext: document.querySelector('.pagination__btn--next'),
+    paginationContainer: document.querySelector('.pagination'),
+    btnBookmark: document.querySelector('.btn--round'),
+    btnNavBookmarkList: document.querySelector('.bookmarks__list'),
+    btnServingIncrease: document.querySelector('.btn--increase-servings'),
+    btnServingDecrease: document.querySelector('.btn--decrease-servings'),
   };
 };
 
 export const initParentTags = function () {
   parentTags = parentTagsFunction();
-  console.log(parentTags);
+  // console.log(parentTags);
 };
 initParentTags();
 

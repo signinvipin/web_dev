@@ -16,7 +16,7 @@ export const errorMessage = {
 };
 
 // Code with HTML insertion
-export const renderError = function (error) {
+export const renderError = function (error, containerHtml) {
   const html = `<div class="error">
                   <div>
                     <svg>
@@ -26,5 +26,5 @@ export const renderError = function (error) {
                   </div>
                   <p>${error}</p>
                 </div>`;
-  parentTags.resultsContainer.insertAdjacentHTML('afterbegin', html);
+  containerHtml.insertAdjacentHTML('afterbegin', html);
 };

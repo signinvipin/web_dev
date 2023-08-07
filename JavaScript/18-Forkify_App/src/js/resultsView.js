@@ -2,6 +2,8 @@
 import { parentTags, initParentTags } from './mainView.js';
 import icons from '../img/icons.svg';
 import imgError from '../img/favicon.png';
+import { emptyContainer } from './reusableView.js';
+import { softDataStorage } from './model.js';
 
 /** 'onerror' inline Jscript code for image load failure error handling, replacing failed image with set fallbackDefault.jpg.
  * If in case fallbackDefault.img is not present to avoid ininite loop, use:
@@ -11,19 +13,10 @@ import imgError from '../img/favicon.png';
 
 class resultsPreview {
   // By Code insertion to HTML
-  renderSpinner() {
-    const html = `<div class="spinner">
-                      <svg>
-                      <!--<use href="src/img/icons.svg#icon-loader"></use>-->
-                      <use href="${icons}#icon-loader"></use>
-                      </svg>
-                  </div>`;
-    parentTags.resultsContainer.insertAdjacentHTML('afterbegin', html);
-  }
 
-  renderRecipeResults(userId, imageURL, recipeTitle, recipePublisher, userKey) {
+  renderRecipeResults(recpId, imageURL, recipeTitle, recipePublisher, userKey) {
     const html = `<li class="preview">
-                      <a class="preview__link" href="#${userId}">
+                      <a class="preview__link" href="#${recpId}">
                         <figure class="preview__fig">
                           <img src="${imageURL}" onerror = "this.onerror = null; this.src = '${imgError}'" alt="${recipeTitle}" />
                         </figure>
@@ -45,14 +38,14 @@ class resultsPreview {
 
   renderResults(data) {
     for (let {
-      userId,
+      recpId,
       imageURL,
       recipeTitle,
       recipePublisher,
       userKey = undefined,
     } of data) {
       resultsViewMethods.renderRecipeResults(
-        userId,
+        recpId,
         imageURL,
         recipeTitle,
         recipePublisher,
@@ -75,16 +68,102 @@ class resultsPreview {
     recipeTarget.classList.add('preview__link--active');
 
     const href = event.target.closest('.preview__link').getAttribute('href');
-    return href.slice(1);
+    const recipeId = href.slice(1);
+    const [currentRecipeOwner] = softDataStorage.resultsListView.filter(
+      el => el.recpId === recipeId
+    );
+    return currentRecipeOwner;
   }
 
-  // show error - remove list, spinner
-  emptyResultsContainer() {
+  // render navigation
+  resultsNavPrevNext(pageCounter, clickEventListener) {
+    parentTags.paginationContainer.innerHTML = '';
+    const html = `<button class="btn--inline pagination__btn--prev">
+                    <svg class="search__icon">
+                      <use href="${icons}#icon-arrow-left"></use>
+                    </svg>
+                    <span>${'Page ' + (pageCounter - 1)}</span>
+                  </button>
+                  <button class="btn--inline pagination__btn--next">
+                    <span>${'Page ' + (pageCounter + 1)}</span>
+                    <svg class="search__icon">
+                      <use href="${icons}#icon-arrow-right"></use>
+                    </svg>
+                  </button>`;
+    parentTags.paginationContainer.insertAdjacentHTML('afterbegin', html);
     initParentTags();
-    parentTags.resultsListContainer.innerHTML = '';
-    // document.querySelector('.search-results').previousSibling.remove();
-    if (parentTags.spinnerResults) parentTags.spinnerResults.remove();
-    if (parentTags.errorResults) parentTags.errorResults.remove();
+    clickEventListener();
+  }
+
+  resultsNavPrevious(pageCounter, clickEventListener) {
+    parentTags.paginationContainer.innerHTML = '';
+
+    const html = `<button class="btn--inline pagination__btn--prev">
+                    <svg class="search__icon">
+                      <use href="${icons}#icon-arrow-left"></use>
+                    </svg>
+                    <span>${'Page ' + (pageCounter - 1)}</span>
+                  </button>`;
+    parentTags.paginationContainer.insertAdjacentHTML('afterbegin', html);
+    initParentTags();
+    clickEventListener();
+  }
+
+  resultsNavNext(pageCounter, clickEventListener) {
+    parentTags.paginationContainer.innerHTML = '';
+    const html = `<button class="btn--inline pagination__btn--next">
+                    <span>${'Page ' + (pageCounter + 1)}</span>
+                    <svg class="search__icon">
+                      <use href="${icons}#icon-arrow-right"></use>
+                    </svg>
+                  </button>`;
+    parentTags.paginationContainer.insertAdjacentHTML('afterbegin', html);
+    initParentTags();
+    clickEventListener();
+  }
+
+  paginateResults(data, pageCounter, clickEventListener, recipeFunction) {
+    console.log(data.length);
+    const pageTotal = Math.ceil(data.length / 10);
+    console.log('Total Pages ' + pageTotal);
+    const self = this;
+
+    // if pageTotal is 4
+    const pageEnd = pageTotal; // 4
+    const pageStart = pageTotal - (pageTotal - 1); // 1
+    console.log('pageStart ' + pageStart + ', pageEnd ' + pageEnd);
+
+    // 0-10 , 10-20...
+
+    let startSlice = 10 * (pageCounter - 1);
+    let endSlice = 10 * pageCounter;
+
+    const renderData = () => {
+      console.log(startSlice, endSlice);
+      const recipe = data.slice(startSlice, endSlice);
+      // console.log(recipe);
+      return recipe;
+    };
+    // console.log(renderData());
+    // console.log(this);
+    if (pageCounter === pageStart) {
+      parentTags.resultsListContainer.innerHTML = '';
+      this.renderResults(renderData());
+      recipeFunction();
+      this.resultsNavNext(pageCounter, clickEventListener);
+    }
+    if (pageCounter === pageEnd) {
+      parentTags.resultsListContainer.innerHTML = '';
+      this.renderResults(renderData());
+      recipeFunction();
+      this.resultsNavPrevious(pageCounter, clickEventListener);
+    }
+    if (pageCounter > pageStart && pageCounter < pageEnd) {
+      parentTags.resultsListContainer.innerHTML = '';
+      this.renderResults(renderData());
+      recipeFunction();
+      this.resultsNavPrevNext(pageCounter, clickEventListener);
+    }
   }
 }
 
