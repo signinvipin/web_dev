@@ -609,6 +609,7 @@ const resultsRecipeSelection = function(event) {
             (0, _bookMarkViewJs.bookmarkViewMethods).renderRecipeBookmarkIcon((0, _modelJs.softDataStorage));
             (0, _bookMarkViewJs.bookmarkViewMethods).btnClickListener((0, _modelJs.softDataStorage), resultsRecipeSelection);
             (0, _recipeViewJs.recipeViewMethods).renderIngredients((0, _modelJs.softDataStorage).currentRecipeData.recipeIngredients);
+            (0, _recipeViewJs.recipeViewMethods).addClickServings((0, _modelJs.softDataStorage).currentRecipeData.recipeIngredients);
         } catch (err) {
             console.error(err.message);
             (0, _reusableViewJs.emptyContainer)((0, _mainViewJs.parentTags).recipeContainer);
@@ -2693,16 +2694,15 @@ const parentTagsFunction = function() {
         btnBookmark: document.querySelector(".btn--round"),
         btnNavBookmarkList: document.querySelector(".bookmarks__list"),
         btnServingIncrease: document.querySelector(".btn--increase-servings"),
-        btnServingDecrease: document.querySelector(".btn--decrease-servings")
+        btnServingDecrease: document.querySelector(".btn--decrease-servings"),
+        peopleServings: document.querySelector(".recipe__info-data--people")
     };
 };
 const initParentTags = function() {
     parentTags = parentTagsFunction();
 // console.log(parentTags);
 };
-initParentTags(); // const recipeContainer = document.querySelector('.recipe');
- // const searchForm = document.querySelector('.search');
- // const searchField = document.querySelector('.search__field');
+initParentTags();
 
 },{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"gkKU3":[function(require,module,exports) {
 exports.interopDefault = function(a) {
@@ -3137,7 +3137,7 @@ class recipeView {
             (0, _reusableViewJs.timeout)((0, _configurationJs.timePeriod))
         ]);
     }
-    renderRecipe(sourceURL, recipePublisher, recipeServings, cookingTime, recipeTitle, imageURL, data1) {
+    renderRecipe(sourceURL, recipePublisher, recipeServings, cookingTime, recipeTitle, imageURL, data) {
         const html = `<figure class="recipe__fig">
       <img src="${imageURL}" alt="Tomato" class="recipe__img" />
       <h1 class="recipe__title">
@@ -3174,7 +3174,7 @@ class recipeView {
         </div>
       </div>
 
-      <div class="recipe__user-generated ${data1.userKey ? "" : "hidden"}">
+      <div class="recipe__user-generated ${data.userKey ? "" : "hidden"}">
         <svg>
           <use href="${(0, _iconsSvgDefault.default)}#icon-user"></use>
         </svg>
@@ -3225,22 +3225,32 @@ class recipeView {
                   </li>`;
         (0, _mainViewJs.parentTags).ingredientList.insertAdjacentHTML("beforeend", html);
     }
-    renderIngredients(data1) {
-        let servingsCount1 = 4;
-        for (let { quantity, unit, description } of data1){
+    renderIngredients(data, servingsCount = 4) {
+        (0, _mainViewJs.parentTags).ingredientList.innerHTML = "";
+        for (let { quantity, unit, description } of data){
             // console.log(quantity, unit, description);
             // fractional data conversion
-            quantity = quantity === null ? "" : new (0, _fractional.Fraction)(quantity);
+            quantity = quantity === null ? "" : new (0, _fractional.Fraction)(quantity / 4 * servingsCount);
             recipeViewMethods.ingredientList(quantity, unit, description);
         }
     }
-    addClickServings() {
+    addClickServings(data) {
+        let servingsCount = 4;
+        const self = this;
+        const updateQuantity = ()=>{
+            (0, _mainViewJs.parentTags).peopleServings.textContent = servingsCount;
+            // console.log(parentTags.peopleServings.textContent);
+            self.renderIngredients(data, servingsCount);
+        };
         (0, _mainViewJs.parentTags).btnServingIncrease.addEventListener("click", function() {
             servingsCount += 1;
-            renderIngredients(data);
+            updateQuantity();
         });
         (0, _mainViewJs.parentTags).btnServingDecrease.addEventListener("click", function() {
-            if (servingsCount > 4) servingsCount -= 1;
+            if (servingsCount > 4) {
+                servingsCount -= 1;
+                updateQuantity();
+            }
         });
     }
 }

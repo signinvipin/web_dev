@@ -116,27 +116,36 @@ class recipeView {
     parentTags.ingredientList.insertAdjacentHTML('beforeend', html);
   }
 
-  renderIngredients(data) {
-    let servingsCount = 4;
-
+  renderIngredients(data, servingsCount = 4) {
+    parentTags.ingredientList.innerHTML = '';
     for (let { quantity, unit, description } of data) {
       // console.log(quantity, unit, description);
       // fractional data conversion
-      quantity = quantity === null ? '' : new Fraction(quantity);
+      quantity =
+        quantity === null ? '' : new Fraction((quantity / 4) * servingsCount);
 
       recipeViewMethods.ingredientList(quantity, unit, description);
     }
   }
 
-  addClickServings() {
+  addClickServings(data) {
+    let servingsCount = 4;
+    const self = this;
+
+    const updateQuantity = () => {
+      parentTags.peopleServings.textContent = servingsCount;
+      // console.log(parentTags.peopleServings.textContent);
+      self.renderIngredients(data, servingsCount);
+    };
+
     parentTags.btnServingIncrease.addEventListener('click', function () {
       servingsCount += 1;
-      renderIngredients(data);
+      updateQuantity();
     });
     parentTags.btnServingDecrease.addEventListener('click', function () {
       if (servingsCount > 4) {
         servingsCount -= 1;
-        renderIngredients(data); /////////////////////set servings and quantity
+        updateQuantity();
       }
     });
   }

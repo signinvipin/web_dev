@@ -20,6 +20,7 @@ const parentTagsFunction = function () {
     btnNavBookmarkList: document.querySelector('.bookmarks__list'),
     btnServingIncrease: document.querySelector('.btn--increase-servings'),
     btnServingDecrease: document.querySelector('.btn--decrease-servings'),
+    peopleServings: document.querySelector('.recipe__info-data--people'),
   };
 };
 
@@ -28,7 +29,3 @@ export const initParentTags = function () {
   // console.log(parentTags);
 };
 initParentTags();
-
-// const recipeContainer = document.querySelector('.recipe');
-// const searchForm = document.querySelector('.search');
-// const searchField = document.querySelector('.search__field');

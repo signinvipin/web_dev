@@ -60,6 +60,9 @@ const resultsRecipeSelection = function (event) {
       recipeViewMethods.renderIngredients(
         softDataStorage.currentRecipeData.recipeIngredients
       );
+      recipeViewMethods.addClickServings(
+        softDataStorage.currentRecipeData.recipeIngredients
+      );
     } catch (err) {
       console.error(err.message);
       emptyContainer(parentTags.recipeContainer);
