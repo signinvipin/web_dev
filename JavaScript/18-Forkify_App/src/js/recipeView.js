@@ -8,9 +8,9 @@ import { parentTags, initParentTags } from './mainView.js';
 import { Fraction } from 'fractional';
 
 class recipeView {
-  async getRecipeData() {
+  async getRecipeData(key, id) {
     return await Promise.race([
-      getData(getURL(undefined, key, softDataStorage.currentRecipe.recpId)),
+      getData(getURL(undefined, key, id)),
       timeout(timePeriod),
       // timeout(0.5),
     ]);
@@ -61,7 +61,7 @@ class recipeView {
         </div>
       </div>
 
-      <div class="recipe__user-generated ${data.userKey ? '' : 'hidden'}">
+      <div class="recipe__user-generated ${data ? '' : 'hidden'}">
         <svg>
           <use href="${icons}#icon-user"></use>
         </svg>

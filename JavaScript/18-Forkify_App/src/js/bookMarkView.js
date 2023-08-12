@@ -4,9 +4,10 @@ import { parentTags, initParentTags } from './mainView.js';
 import icons from '../img/icons.svg';
 
 class bookmarkView {
-  insertBookmarkMessage() {
-    parentTags.btnNavBookmarkList.innerHTML = '';
-
+  _message = `No bookmarks yet. Find a nice recipe and bookmark it :)`;
+  insertSmileMessage(_message, containerHtml) {
+    // parentTags.btnNavBookmarkList.innerHTML = '';
+    containerHtml.innerHTML = '';
     const htmlMessage = `<div class="message">
                           <div>
                             <svg>
@@ -14,10 +15,10 @@ class bookmarkView {
                             </svg>
                           </div>
                           <p>
-                            No bookmarks yet. Find a nice recipe and bookmark it :)
+                            ${this._message}
                           </p>
                         </div>`;
-    parentTags.btnNavBookmarkList.insertAdjacentHTML('afterbegin', htmlMessage);
+    containerHtml.insertAdjacentHTML('afterbegin', htmlMessage);
   }
 
   insertBookmarks(data) {
@@ -55,13 +56,13 @@ class bookmarkView {
       );
     }
     if (data.bookmarksList.size === 0) {
-      this.insertBookmarkMessage();
+      this.insertSmileMessage(parentTags.btnNavBookmarkList);
     }
     initParentTags();
   }
 
   recipeBookmarkedCheck(data) {
-    console.log(data.bookmarksList.size);
+    console.log('bookmark entries ' + data.bookmarksList.size);
 
     // check if recipe present in Set or not
     return data.bookmarksList.has(data.currentRecipe);

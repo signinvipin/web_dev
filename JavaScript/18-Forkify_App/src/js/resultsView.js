@@ -54,11 +54,7 @@ class resultsPreview {
     }
   }
 
-  // addResultsHandler(resultsFunction) {
-  //   parentTags.resultsContainer.addEventListener('change', resultsFunction);
-  // }
-
-  resultsSelection(event) {
+  activateResult(event) {
     document.querySelectorAll('.preview__link').forEach(item => {
       // console.log(e);
       item.classList.remove('preview__link--active');
@@ -68,10 +64,18 @@ class resultsPreview {
     recipeTarget.classList.add('preview__link--active');
 
     const href = event.target.closest('.preview__link').getAttribute('href');
+
+    // const href = window.location.hash;
+    // console.log('href ' + href);
     const recipeId = href.slice(1);
+    return recipeId;
+  }
+
+  resultsSelection(resultClickId) {
     const [currentRecipeOwner] = softDataStorage.resultsListView.filter(
-      el => el.recpId === recipeId
+      el => el.recpId === resultClickId
     );
+
     return currentRecipeOwner;
   }
 
@@ -123,15 +127,15 @@ class resultsPreview {
   }
 
   paginateResults(data, pageCounter, clickEventListener, recipeFunction) {
-    console.log(data.length);
+    // console.log(data.length);
     const pageTotal = Math.ceil(data.length / 10);
-    console.log('Total Pages ' + pageTotal);
+    // console.log('Total Pages ' + pageTotal);
     const self = this;
 
     // if pageTotal is 4
     const pageEnd = pageTotal; // 4
     const pageStart = pageTotal - (pageTotal - 1); // 1
-    console.log('pageStart ' + pageStart + ', pageEnd ' + pageEnd);
+    // console.log('pageStart ' + pageStart + ', pageEnd ' + pageEnd);
 
     // 0-10 , 10-20...
 
@@ -139,24 +143,27 @@ class resultsPreview {
     let endSlice = 10 * pageCounter;
 
     const renderData = () => {
-      console.log(startSlice, endSlice);
+      // console.log(startSlice, endSlice);
       const recipe = data.slice(startSlice, endSlice);
       // console.log(recipe);
       return recipe;
     };
     // console.log(renderData());
     // console.log(this);
+
     if (pageCounter === pageStart) {
       parentTags.resultsListContainer.innerHTML = '';
       this.renderResults(renderData());
       recipeFunction();
-      this.resultsNavNext(pageCounter, clickEventListener);
+      if (pageCounter !== pageEnd)
+        this.resultsNavNext(pageCounter, clickEventListener);
     }
     if (pageCounter === pageEnd) {
       parentTags.resultsListContainer.innerHTML = '';
       this.renderResults(renderData());
       recipeFunction();
-      this.resultsNavPrevious(pageCounter, clickEventListener);
+      if (pageStart !== pageEnd)
+        this.resultsNavPrevious(pageCounter, clickEventListener);
     }
     if (pageCounter > pageStart && pageCounter < pageEnd) {
       parentTags.resultsListContainer.innerHTML = '';

@@ -51,8 +51,8 @@ export const generateResultsList = function (recipes) {
 };
 
 export const generateCurrentRecipeData = function (data) {
-  // console.log(data);
-  return {
+  console.log(data);
+  const ObjRecipe = {
     cookingTime: data.cooking_time,
     recipeId: data.id,
     imageURL: data.image_url,
@@ -62,15 +62,75 @@ export const generateCurrentRecipeData = function (data) {
     sourceURL: data.source_url,
     recipeTitle: data.title,
   };
+  data.key ? (ObjRecipe.userKey = data.key) : (ObjRecipe.userKey = undefined);
+  return ObjRecipe;
+};
+
+/*
+const prototypeobject = {
+  cookingTime: '23',
+  image: 'TESTimgurl',
+  'ingredient-1': '0.5,kg,Rice',
+  'ingredient-2': '1,,Avocado',
+  'ingredient-3': ',,salt',
+  'ingredient-4': 'test,test,test',
+  'ingredient-5': 'test,test,test',
+  'ingredient-6': '',
+  publisher: 'TESTpublisher',
+  servings: '4',
+  sourceUrl: 'TESTurl',
+  title: 'TESTtitle',
+};
+*/
+
+export const generateUploadData = function (data) {
+  try {
+    let upload = [];
+    const ObjArr = Object.entries(data);
+    ObjArr.forEach(ar => {
+      if (ar[0].startsWith('ing')) {
+        let [quantity, unit, description] = ar[1].split(',');
+
+        if (quantity === '' && unit === undefined && description === undefined)
+          return;
+        if (quantity === '' && unit === '' && description === '') return;
+        quantity = quantity === '' ? null : +quantity;
+        if (quantity === NaN)
+          throw new Error('Quantity should be a number. Please try again.');
+        upload.push({
+          quantity: quantity,
+          unit: unit,
+          description: description,
+        });
+      }
+    });
+    console.log(upload);
+
+    // if (data.sourceUrl.length < 5)
+    //   throw new Error('URL must be at least 5 characters long!'); // 5 characters long
+
+    // return [{},{},{}] array of objects {quantity value/null number, unit ''/unit string, description string}
+    return {
+      cooking_time: +data.cookingTime,
+      image_url: data.image,
+      ingredients: upload,
+      publisher: data.publisher,
+      servings: +data.servings,
+      source_url: data.sourceUrl,
+      title: data.title,
+    };
+  } catch (err) {
+    throw err;
+  }
 };
 
 export const softDataStorage = {
   recentRequestStatus: '',
   currentRecipe: '',
-  currentRecipeData: {},
+  currentRecipeData: {}, // data formed from selected and fetched recipe
   allRecipeReceived: [], // original recipe list received
   resultsListView: [], // list of recipes for results view
-  bookmarksList: new Set(),
+  bookmarksList: new Set(), // list of bookmarks
 };
 
 const storeData = function (dataObject) {

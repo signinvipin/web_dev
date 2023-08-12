@@ -1,7 +1,7 @@
 // Reusable Functions
 
 /** All Imports */
-import { baseURL } from './configuration.js';
+import { baseURL, key } from './configuration.js';
 import icons from '../img/icons.svg';
 import { parentTags, initParentTags } from './mainView.js';
 
@@ -31,8 +31,23 @@ export const getData = async function (url) {
   return data.recipe;
 };
 
-// Post Data
-export const postData = async function () {};
+// Post Data to Create Recipe
+export const postData = async function (key, data) {
+  try {
+    const resp = await fetch(getURL(undefined, key), {
+      method: 'POST',
+      headers: { 'Content-type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+    // console.log(resp);
+    const dataResponse = await resp.json();
+    if (!resp.ok) throw new Error(`${dataResponse.message} (${resp.status})`);
+
+    return dataResponse;
+  } catch (err) {
+    throw err; // throw existing error
+  }
+};
 
 /**
  * This function generates operation ready URL as per the availability of search query, recipe #id and user API key.
@@ -77,8 +92,8 @@ export const getURL = function (
 
     return apiURL;
   } catch (err) {
-    console.error(`${err.message}`);
-    // return err;
+    // console.error(`${err.message}`);
+    return err;
   }
 };
 
@@ -94,8 +109,35 @@ export const renderSpinner = function (containerHtml) {
 
 export const emptyContainer = function (container) {
   initParentTags();
-  container.innerHTML = '';
+  console.log(container);
+  if (container) container.innerHTML = ''; ////problem finding container
   // document.querySelector('.search-results').previousSibling.remove();
   if (parentTags.loadSpinner) parentTags.loadSpinner.remove();
   if (parentTags.loadError) parentTags.loadError.remove();
 };
+
+//////////////DELETE Recipes
+// export const recList = ['64d2742a1d6902001415a629', '64d242251d6902001415a5c1'];
+
+// export const deleteRecipe = function (dataList, key) {
+//   // request deletion
+//   console.log(dataList);
+//   const deleteAll = async function () {
+//     for (let id in dataList) {
+//       console.log(id);
+//       console.log(dataList[id]);
+//       const resp = await fetch(
+//         `https://forkify-api.herokuapp.com/api/v2/recipes/${dataList[id]}?key=${key}`,
+//         {
+//           method: 'DELETE',
+//           headers: {
+//             'Content-type': 'application/json',
+//           },
+//         }
+//       );
+//       // const data = await resp.json();
+//       console.log(resp);
+//     }
+//   };
+//   deleteAll();
+// };

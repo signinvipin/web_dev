@@ -576,7 +576,7 @@ function hmrAccept(bundle /*: ParcelRequire */ , id /*: string */ ) {
 },{}],"ebWYT":[function(require,module,exports) {
 // https://forkify-api.herokuapp.com/v2
 ///////////////////////////////////////
-var _webImmediateJs = require("core-js/modules/web.immediate.js"); // bookmarkViewMethods;
+var _webImmediateJs = require("core-js/modules/web.immediate.js"); // deleteRecipe(recList, key);
 var _regeneratorRuntime = require("regenerator-runtime");
 var _mainViewJs = require("./mainView.js");
 var _modelJs = require("./model.js");
@@ -587,41 +587,53 @@ var _resultsViewJs = require("./resultsView.js");
 var _errorViewJs = require("./errorView.js");
 var _recipeViewJs = require("./recipeView.js");
 var _bookMarkViewJs = require("./bookMarkView.js");
-const resultsRecipeSelection = function(event) {
+var _newrecipeViewJs = require("./newrecipeView.js");
+const recipeRenderFunction = async function(event) {
     event.preventDefault();
-    // select recipe in results
-    // return href for softDataStorage
-    (0, _modelJs.softDataStorage).currentRecipe = (0, _resultsViewJs.resultsViewMethods).resultsSelection(event);
-    console.log((0, _modelJs.softDataStorage).currentRecipe);
-    // loading spinner
-    (0, _reusableViewJs.emptyContainer)((0, _mainViewJs.parentTags).recipeContainer);
-    (0, _reusableViewJs.renderSpinner)((0, _mainViewJs.parentTags).recipeContainer);
-    // fetch n display recipe
-    const fetchRecipe = async function() {
-        try {
-            const recipeData = await (0, _recipeViewJs.recipeViewMethods).getRecipeData();
-            (0, _modelJs.softDataStorage).currentRecipeData = (0, _modelJs.generateCurrentRecipeData)(recipeData);
-            console.log((0, _modelJs.softDataStorage).resultsListView);
-            (0, _reusableViewJs.emptyContainer)((0, _mainViewJs.parentTags).recipeContainer);
-            console.log((0, _modelJs.softDataStorage));
-            (0, _recipeViewJs.recipeViewMethods).renderRecipe((0, _modelJs.softDataStorage).currentRecipeData.sourceURL, (0, _modelJs.softDataStorage).currentRecipeData.recipePublisher, (0, _modelJs.softDataStorage).currentRecipeData.recipeServings, (0, _modelJs.softDataStorage).currentRecipeData.cookingTime, (0, _modelJs.softDataStorage).currentRecipeData.recipeTitle, (0, _modelJs.softDataStorage).currentRecipeData.imageURL, (0, _modelJs.softDataStorage).currentRecipe);
-            (0, _mainViewJs.initParentTags)();
-            (0, _bookMarkViewJs.bookmarkViewMethods).renderRecipeBookmarkIcon((0, _modelJs.softDataStorage));
-            (0, _bookMarkViewJs.bookmarkViewMethods).btnClickListener((0, _modelJs.softDataStorage), resultsRecipeSelection);
-            (0, _recipeViewJs.recipeViewMethods).renderIngredients((0, _modelJs.softDataStorage).currentRecipeData.recipeIngredients);
-            (0, _recipeViewJs.recipeViewMethods).addClickServings((0, _modelJs.softDataStorage).currentRecipeData.recipeIngredients);
-        } catch (err) {
-            console.error(err.message);
-            (0, _reusableViewJs.emptyContainer)((0, _mainViewJs.parentTags).recipeContainer);
-            (0, _errorViewJs.renderError)(err.message, (0, _mainViewJs.parentTags).recipeContainer);
+    console.log(event);
+    // console.log(event.type);
+    try {
+        let id;
+        // Take id from result or bookmark clicked
+        if (event.type === "click") {
+            // select recipe in results and take href and return id
+            id = (0, _resultsViewJs.resultsViewMethods).activateResult(event);
+            // select recipe in results
+            (0, _modelJs.softDataStorage).currentRecipe = (0, _resultsViewJs.resultsViewMethods).resultsSelection(id);
+            console.log((0, _modelJs.softDataStorage).currentRecipe);
+            // Update/Add id to window location URL on recipe result click
+            window.history.pushState(null, "", `#${id}`);
         }
-    };
-    fetchRecipe();
+        // Take id from URL in windows location
+        if (event.type === "load") {
+            id = window.location.hash.slice(1);
+            console.log("id " + id);
+        }
+        if (!id) return;
+        // loading spinner
+        (0, _reusableViewJs.emptyContainer)((0, _mainViewJs.parentTags).recipeContainer);
+        (0, _reusableViewJs.renderSpinner)((0, _mainViewJs.parentTags).recipeContainer);
+        const recipeData = await (0, _recipeViewJs.recipeViewMethods).getRecipeData((0, _configurationJs.key), id);
+        (0, _modelJs.softDataStorage).currentRecipeData = (0, _modelJs.generateCurrentRecipeData)(recipeData);
+        // console.log(softDataStorage.currentRecipeData);
+        (0, _reusableViewJs.emptyContainer)((0, _mainViewJs.parentTags).recipeContainer);
+        // console.log(softDataStorage);
+        (0, _recipeViewJs.recipeViewMethods).renderRecipe((0, _modelJs.softDataStorage).currentRecipeData.sourceURL, (0, _modelJs.softDataStorage).currentRecipeData.recipePublisher, (0, _modelJs.softDataStorage).currentRecipeData.recipeServings, (0, _modelJs.softDataStorage).currentRecipeData.cookingTime, (0, _modelJs.softDataStorage).currentRecipeData.recipeTitle, (0, _modelJs.softDataStorage).currentRecipeData.imageURL, (0, _modelJs.softDataStorage).currentRecipeData.userKey);
+        (0, _mainViewJs.initParentTags)();
+        (0, _bookMarkViewJs.bookmarkViewMethods).renderRecipeBookmarkIcon((0, _modelJs.softDataStorage));
+        (0, _bookMarkViewJs.bookmarkViewMethods).btnClickListener((0, _modelJs.softDataStorage), recipeRenderFunction);
+        (0, _recipeViewJs.recipeViewMethods).renderIngredients((0, _modelJs.softDataStorage).currentRecipeData.recipeIngredients);
+        (0, _recipeViewJs.recipeViewMethods).addClickServings((0, _modelJs.softDataStorage).currentRecipeData.recipeIngredients);
+    } catch (err) {
+        console.error(err.message);
+        (0, _reusableViewJs.emptyContainer)((0, _mainViewJs.parentTags).recipeContainer);
+        (0, _errorViewJs.renderError)(err.message, (0, _mainViewJs.parentTags).recipeContainer);
+    }
 };
 const recipeFunction = function() {
     // Add click, select, make selected active and retreive href '#hashvalue'
     document.querySelectorAll(".preview__link").forEach((el)=>{
-        el.addEventListener("click", resultsRecipeSelection);
+        el.addEventListener("click", recipeRenderFunction);
     });
 };
 const resultsFunction = function() {
@@ -653,7 +665,7 @@ const searchFunction = async function(e) {
         // get search input
         const searchQuery = (0, _searchViewJs.searchMethods).getQuery();
         (0, _searchViewJs.searchMethods).clearSearchField();
-        console.log("length of searchQuery is " + searchQuery.length);
+        // console.log('length of searchQuery is ' + searchQuery.length);
         // test search input
         if (!searchQuery || searchQuery.length < 3) {
             (0, _reusableViewJs.emptyContainer)((0, _mainViewJs.parentTags).resultsListContainer);
@@ -666,33 +678,78 @@ const searchFunction = async function(e) {
         (0, _reusableViewJs.renderSpinner)((0, _mainViewJs.parentTags).resultsContainer);
         // Retreive data from server
         const arrData = await Promise.race([
-            (0, _modelJs.queryResults)(searchQuery),
+            (0, _modelJs.queryResults)(searchQuery, (0, _configurationJs.key)),
             (0, _reusableViewJs.timeout)((0, _configurationJs.timePeriod))
         ]);
         if (!arrData) throw new Error("Please connect to internet and try again!");
-        console.log(arrData);
-        const status = arrData.flat().some((e)=>e === "results");
+        // console.log(arrData);
+        const getStatus = ()=>{
+            const hasResults = arrData.flat().some((e)=>e === "results");
+            // console.log(arrData.flat()[3]);
+            const hasResultsNum = arrData.flat()[3] === 0 ? false : true;
+            if (hasResults && hasResultsNum) return true;
+            else return false;
+        };
+        const status = getStatus();
         console.log(status);
+        if (!status) throw new Error("Invalid search query. Please try again.");
         // Data destructuring
         const [, [, results], [, { recipes }]] = arrData;
-        console.log(results, recipes);
+        // console.log(results, recipes);
         // assign data to softDataStorage
-        (0, _modelJs.softDataStorage).recipeReceived = recipes;
+        (0, _modelJs.softDataStorage).allRecipeReceived = recipes;
         (0, _modelJs.softDataStorage).recentRequestStatus = status;
         (0, _modelJs.softDataStorage).resultsListView = (0, _modelJs.generateResultsList)(recipes);
-        console.log((0, _modelJs.softDataStorage));
+        // console.log(softDataStorage);
         // render results data
         (0, _reusableViewJs.emptyContainer)((0, _mainViewJs.parentTags).resultsListContainer);
         resultsFunction();
     } catch (err) {
-        console.error(`${err.message}`);
+        console.error(`${err}`);
         (0, _reusableViewJs.emptyContainer)((0, _mainViewJs.parentTags).resultsListContainer);
-        (0, _errorViewJs.renderError)(err.message, (0, _mainViewJs.parentTags).resultsContainer);
+        (0, _errorViewJs.renderError)(err, (0, _mainViewJs.parentTags).resultsContainer);
+    }
+};
+const addRecipeFunction = async function() {
+    try {
+        // get Form Data as Object
+        const dataArr = [
+            ...new FormData((0, _mainViewJs.parentTags).addRecipeForm)
+        ];
+        let ObjectData = Object.fromEntries(dataArr);
+        console.log(ObjectData);
+        dataObject = (0, _modelJs.generateUploadData)(ObjectData);
+        console.log(dataObject);
+        // renderSpinner
+        (0, _mainViewJs.parentTags).addRecipeForm.remove();
+        (0, _reusableViewJs.renderSpinner)((0, _mainViewJs.parentTags).addRecipeWindow);
+        (0, _mainViewJs.initParentTags)();
+        // fetch post and view recipe using data Object from form
+        const postRequest = await Promise.race([
+            (0, _reusableViewJs.postData)((0, _configurationJs.key), dataObject),
+            (0, _reusableViewJs.timeout)((0, _configurationJs.timePeriod))
+        ]);
+        const returnedData = postRequest;
+        console.log(returnedData.status);
+        console.log(returnedData.data.recipe); /////// work on data to recipeRenderFunction
+        // upon success render success message, then restore form on close
+        const messageSuccess = "Your recipe has been succesfully created.";
+        (0, _newrecipeViewJs.addRecipe).renderModalSuccess(messageSuccess, (0, _mainViewJs.parentTags).addRecipeWindow);
+        // render received data
+        recipeRenderFunction(returnedData.data.recipe);
+    } catch (err) {
+        console.error(err);
+        // upon error render error message, then restore form on close
+        (0, _newrecipeViewJs.addRecipe).renderModalError(err.message, (0, _mainViewJs.parentTags).addRecipeWindow, addRecipeFunction);
+    // parentTags.loadError.remove();
     }
 };
 (0, _searchViewJs.searchMethods).addSearchHandler(searchFunction);
+(0, _newrecipeViewJs.addRecipe).addRecipeClickListener(addRecipeFunction);
+(0, _newrecipeViewJs.addRecipe).addUploadHandler(addRecipeFunction);
+window.addEventListener("load", recipeRenderFunction);
 
-},{"core-js/modules/web.immediate.js":"49tUX","regenerator-runtime":"dXNgZ","./mainView.js":"asXf2","./model.js":"Y4A21","./reusableView.js":"2nI8H","./configuration.js":"eSmrz","./searchView.js":"9M3GU","./resultsView.js":"faCQd","./errorView.js":"8pAzM","./recipeView.js":"jSwDy","./bookMarkView.js":"KHTJv"}],"49tUX":[function(require,module,exports) {
+},{"core-js/modules/web.immediate.js":"49tUX","regenerator-runtime":"dXNgZ","./mainView.js":"asXf2","./model.js":"Y4A21","./reusableView.js":"2nI8H","./configuration.js":"eSmrz","./searchView.js":"9M3GU","./resultsView.js":"faCQd","./errorView.js":"8pAzM","./recipeView.js":"jSwDy","./bookMarkView.js":"KHTJv","./newrecipeView.js":"fduiq"}],"49tUX":[function(require,module,exports) {
 "use strict";
 // TODO: Remove this module from `core-js@4` since it's split to modules listed below
 require("52e9b3eefbbce1ed");
@@ -2695,7 +2752,13 @@ const parentTagsFunction = function() {
         btnNavBookmarkList: document.querySelector(".bookmarks__list"),
         btnServingIncrease: document.querySelector(".btn--increase-servings"),
         btnServingDecrease: document.querySelector(".btn--decrease-servings"),
-        peopleServings: document.querySelector(".recipe__info-data--people")
+        peopleServings: document.querySelector(".recipe__info-data--people"),
+        addRecipeWindow: document.querySelector(".add-recipe-window"),
+        btnNavAddRecipe: document.querySelector(".nav__btn--add-recipe"),
+        btnCloseAddRecipe: document.querySelector(".btn--close-modal"),
+        addRecipeOverlay: document.querySelector(".overlay"),
+        addRecipeForm: document.querySelector(".upload"),
+        addRecipeSuccessMessage: document.querySelector(".message")
     };
 };
 const initParentTags = function() {
@@ -2741,6 +2804,7 @@ parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "queryResults", ()=>queryResults);
 parcelHelpers.export(exports, "generateResultsList", ()=>generateResultsList);
 parcelHelpers.export(exports, "generateCurrentRecipeData", ()=>generateCurrentRecipeData);
+parcelHelpers.export(exports, "generateUploadData", ()=>generateUploadData);
 parcelHelpers.export(exports, "softDataStorage", ()=>softDataStorage);
 var _reusableViewJs = require("./reusableView.js");
 const queryResults = async function(searchQuery, key, id) {
@@ -2775,8 +2839,8 @@ const generateResultsList = function(recipes) {
     return listResults;
 };
 const generateCurrentRecipeData = function(data) {
-    // console.log(data);
-    return {
+    console.log(data);
+    const ObjRecipe = {
         cookingTime: data.cooking_time,
         recipeId: data.id,
         imageURL: data.image_url,
@@ -2786,6 +2850,42 @@ const generateCurrentRecipeData = function(data) {
         sourceURL: data.source_url,
         recipeTitle: data.title
     };
+    data.key ? ObjRecipe.userKey = data.key : ObjRecipe.userKey = undefined;
+    return ObjRecipe;
+};
+const generateUploadData = function(data) {
+    try {
+        let upload = [];
+        const ObjArr = Object.entries(data);
+        ObjArr.forEach((ar)=>{
+            if (ar[0].startsWith("ing")) {
+                let [quantity, unit, description] = ar[1].split(",");
+                if (quantity === "" && unit === undefined && description === undefined) return;
+                if (quantity === "" && unit === "" && description === "") return;
+                quantity = quantity === "" ? null : +quantity;
+                upload.push({
+                    quantity: quantity,
+                    unit: unit,
+                    description: description
+                });
+            }
+        });
+        console.log(upload);
+        // if (data.sourceUrl.length < 5)
+        //   throw new Error('URL must be at least 5 characters long!'); // 5 characters long
+        // return [{},{},{}] array of objects {quantity value/null number, unit ''/unit string, description string}
+        return {
+            cooking_time: +data.cookingTime,
+            image_url: data.image,
+            ingredients: upload,
+            publisher: data.publisher,
+            servings: +data.servings,
+            source_url: data.sourceUrl,
+            title: data.title
+        };
+    } catch (err) {
+        throw err;
+    }
 };
 const softDataStorage = {
     recentRequestStatus: "",
@@ -2828,7 +2928,23 @@ const getData = async function(url) {
     const { data } = await resp.json();
     return data.recipe;
 };
-const postData = async function() {};
+const postData = async function(key, data) {
+    try {
+        const resp = await fetch(getURL(undefined, key), {
+            method: "POST",
+            headers: {
+                "Content-type": "application/json"
+            },
+            body: JSON.stringify(data)
+        });
+        // console.log(resp);
+        const dataResponse = await resp.json();
+        if (!resp.ok) throw new Error(`${dataResponse.message} (${resp.status})`);
+        return dataResponse;
+    } catch (err) {
+        throw err; // throw existing error
+    }
+};
 const getURL = function(searchQuery, key, hashId) {
     // console.log(searchQuery);
     try {
@@ -2851,8 +2967,8 @@ const getURL = function(searchQuery, key, hashId) {
         else throw new Error("No input received!");
         return apiURL;
     } catch (err) {
-        console.error(`${err.message}`);
-    // return err;
+        // console.error(`${err.message}`);
+        return err;
     }
 };
 const renderSpinner = function(containerHtml) {
@@ -2866,11 +2982,35 @@ const renderSpinner = function(containerHtml) {
 };
 const emptyContainer = function(container) {
     (0, _mainViewJs.initParentTags)();
-    container.innerHTML = "";
+    console.log(container);
+    if (container) container.innerHTML = ""; ////problem finding container
     // document.querySelector('.search-results').previousSibling.remove();
     if ((0, _mainViewJs.parentTags).loadSpinner) (0, _mainViewJs.parentTags).loadSpinner.remove();
     if ((0, _mainViewJs.parentTags).loadError) (0, _mainViewJs.parentTags).loadError.remove();
-};
+}; //////////////DELETE Recipes
+ // export const recList = ['64d2742a1d6902001415a629', '64d242251d6902001415a5c1'];
+ // export const deleteRecipe = function (dataList, key) {
+ //   // request deletion
+ //   console.log(dataList);
+ //   const deleteAll = async function () {
+ //     for (let id in dataList) {
+ //       console.log(id);
+ //       console.log(dataList[id]);
+ //       const resp = await fetch(
+ //         `https://forkify-api.herokuapp.com/api/v2/recipes/${dataList[id]}?key=${key}`,
+ //         {
+ //           method: 'DELETE',
+ //           headers: {
+ //             'Content-type': 'application/json',
+ //           },
+ //         }
+ //       );
+ //       // const data = await resp.json();
+ //       console.log(resp);
+ //     }
+ //   };
+ //   deleteAll();
+ // };
 
 },{"./configuration.js":"eSmrz","../img/icons.svg":"8PWvx","./mainView.js":"asXf2","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"eSmrz":[function(require,module,exports) {
 // All the configuration values for app
@@ -2989,10 +3129,7 @@ var _modelJs = require("./model.js");
     renderResults(data) {
         for (let { recpId, imageURL, recipeTitle, recipePublisher, userKey } of data)resultsViewMethods.renderRecipeResults(recpId, imageURL, recipeTitle, recipePublisher, userKey);
     }
-    // addResultsHandler(resultsFunction) {
-    //   parentTags.resultsContainer.addEventListener('change', resultsFunction);
-    // }
-    resultsSelection(event) {
+    activateResult(event) {
         document.querySelectorAll(".preview__link").forEach((item)=>{
             // console.log(e);
             item.classList.remove("preview__link--active");
@@ -3000,8 +3137,13 @@ var _modelJs = require("./model.js");
         const recipeTarget = event.target.closest(".preview__link");
         recipeTarget.classList.add("preview__link--active");
         const href = event.target.closest(".preview__link").getAttribute("href");
+        // const href = window.location.hash;
+        // console.log('href ' + href);
         const recipeId = href.slice(1);
-        const [currentRecipeOwner] = (0, _modelJs.softDataStorage).resultsListView.filter((el)=>el.recpId === recipeId);
+        return recipeId;
+    }
+    resultsSelection(resultClickId) {
+        const [currentRecipeOwner] = (0, _modelJs.softDataStorage).resultsListView.filter((el)=>el.recpId === resultClickId);
         return currentRecipeOwner;
     }
     // render navigation
@@ -3048,19 +3190,19 @@ var _modelJs = require("./model.js");
         clickEventListener();
     }
     paginateResults(data, pageCounter, clickEventListener, recipeFunction) {
-        console.log(data.length);
+        // console.log(data.length);
         const pageTotal = Math.ceil(data.length / 10);
-        console.log("Total Pages " + pageTotal);
+        // console.log('Total Pages ' + pageTotal);
         const self = this;
         // if pageTotal is 4
         const pageEnd = pageTotal; // 4
         const pageStart = pageTotal - (pageTotal - 1); // 1
-        console.log("pageStart " + pageStart + ", pageEnd " + pageEnd);
+        // console.log('pageStart ' + pageStart + ', pageEnd ' + pageEnd);
         // 0-10 , 10-20...
         let startSlice = 10 * (pageCounter - 1);
         let endSlice = 10 * pageCounter;
         const renderData = ()=>{
-            console.log(startSlice, endSlice);
+            // console.log(startSlice, endSlice);
             const recipe = data.slice(startSlice, endSlice);
             // console.log(recipe);
             return recipe;
@@ -3071,13 +3213,13 @@ var _modelJs = require("./model.js");
             (0, _mainViewJs.parentTags).resultsListContainer.innerHTML = "";
             this.renderResults(renderData());
             recipeFunction();
-            this.resultsNavNext(pageCounter, clickEventListener);
+            if (pageCounter !== pageEnd) this.resultsNavNext(pageCounter, clickEventListener);
         }
         if (pageCounter === pageEnd) {
             (0, _mainViewJs.parentTags).resultsListContainer.innerHTML = "";
             this.renderResults(renderData());
             recipeFunction();
-            this.resultsNavPrevious(pageCounter, clickEventListener);
+            if (pageStart !== pageEnd) this.resultsNavPrevious(pageCounter, clickEventListener);
         }
         if (pageCounter > pageStart && pageCounter < pageEnd) {
             (0, _mainViewJs.parentTags).resultsListContainer.innerHTML = "";
@@ -3102,10 +3244,12 @@ parcelHelpers.export(exports, "renderError", ()=>renderError);
 var _mainViewJs = require("./mainView.js");
 var _iconsSvg = require("../img/icons.svg");
 var _iconsSvgDefault = parcelHelpers.interopDefault(_iconsSvg);
+var _newrecipeViewJs = require("./newrecipeView.js");
 const errorMessage = {
     noResults: "No recipes found for your query. Please try again!"
 };
 const renderError = function(error, containerHtml) {
+    containerHtml.innerHTML = "";
     const html = `<div class="error">
                   <div>
                     <svg>
@@ -3118,7 +3262,187 @@ const renderError = function(error, containerHtml) {
     containerHtml.insertAdjacentHTML("afterbegin", html);
 };
 
-},{"./mainView.js":"asXf2","../img/icons.svg":"8PWvx","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"jSwDy":[function(require,module,exports) {
+},{"./mainView.js":"asXf2","../img/icons.svg":"8PWvx","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","./newrecipeView.js":"fduiq"}],"fduiq":[function(require,module,exports) {
+// send and create new recipe item to server
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "addRecipe", ()=>addRecipe);
+var _mainViewJs = require("./mainView.js");
+var _iconsSvg = require("../img/icons.svg");
+var _iconsSvgDefault = parcelHelpers.interopDefault(_iconsSvg);
+var _reusableViewJs = require("./reusableView.js");
+class recipeCreate {
+    renderForm(containerHtml) {
+        const html = `<form class="upload">
+                    <div class="upload__column">
+                      <h3 class="upload__heading">Recipe data</h3>
+                      <label>Title</label>
+                      <input value="TEST" required name="title" type="text" />
+                      <label>URL</label>
+                      <input value="TEST" required name="sourceUrl" type="text" />
+                      <label>Image URL</label>
+                      <input value="TEST" required name="image" type="text" />
+                      <label>Publisher</label>
+                      <input value="TEST" required name="publisher" type="text" />
+                      <label>Prep time</label>
+                      <input value="23" required name="cookingTime" type="number" />
+                      <label>Servings</label>
+                      <input value="23" required name="servings" type="number" />
+                    </div>
+
+                    <div class="upload__column">
+                      <h3 class="upload__heading">Ingredients</h3>
+                      <label>Ingredient 1</label>
+                      <input
+                        value="0.5,kg,Rice"
+                        type="text"
+                        required
+                        name="ingredient-1"
+                        placeholder="Format: 'Quantity,Unit,Description'"
+                      />
+                      <label>Ingredient 2</label>
+                      <input
+                        value="1,,Avocado"
+                        type="text"
+                        name="ingredient-2"
+                        placeholder="Format: 'Quantity,Unit,Description'"
+                      />
+                      <label>Ingredient 3</label>
+                      <input
+                        value=",,salt"
+                        type="text"
+                        name="ingredient-3"
+                        placeholder="Format: 'Quantity,Unit,Description'"
+                      />
+                      <label>Ingredient 4</label>
+                      <input
+                        type="text"
+                        name="ingredient-4"
+                        placeholder="Format: 'Quantity,Unit,Description'"
+                      />
+                      <label>Ingredient 5</label>
+                      <input
+                        type="text"
+                        name="ingredient-5"
+                        placeholder="Format: 'Quantity,Unit,Description'"
+                      />
+                      <label>Ingredient 6</label>
+                      <input
+                        type="text"
+                        name="ingredient-6"
+                        placeholder="Format: 'Quantity,Unit,Description'"
+                      />
+                    </div>
+
+                    <button class="btn upload__btn">
+                      <svg>
+                        <use href="${(0, _iconsSvgDefault.default)}#icon-upload-cloud"></use>
+                      </svg>
+                      <span>Upload</span>
+                    </button>
+                  </form>`;
+        containerHtml.insertAdjacentHTML("beforeend", html);
+    }
+    renderModalError(error, containerHtml, addRecipeFunction) {
+        // parentTags.addRecipeForm.remove();
+        (0, _mainViewJs.parentTags).loadSpinner.remove();
+        const html = `<div class="error">
+                    <div>
+                      <svg>
+                        <!-- <use href="src/img/icons.svg#icon-alert-triangle"></use> -->
+                        <use href= "${(0, _iconsSvgDefault.default)}#icon-alert-triangle"></use>
+                      </svg>
+                    </div>
+                    <p>${error}</p>
+                  </div>`;
+        containerHtml.insertAdjacentHTML("afterbegin", html);
+        (0, _mainViewJs.initParentTags)();
+    // const restoreForm = function (e) {
+    //   e.preventDefault();
+    //   if (parentTags.loadError) parentTags.loadError.remove();
+    //   if (!parentTags.addRecipeForm) {
+    //     addRecipe.renderForm(parentTags.addRecipeWindow);
+    //     initParentTags();
+    //     addRecipe.addUploadHandler(addRecipeFunction);
+    //     console.log('reDone');
+    //   }
+    //   console.log('removeDone');
+    // };
+    // // parentTags.btnCloseAddRecipe.removeEventListener('click', restoreForm);
+    // parentTags.btnCloseAddRecipe.addEventListener('click', restoreForm);
+    // // parentTags.addRecipeOverlay.removeEventListener('click', restoreForm);
+    // parentTags.addRecipeOverlay.addEventListener('click', restoreForm);
+    }
+    renderModalSuccess(message, containerHtml) {
+        // parentTags.addRecipeForm.remove();
+        (0, _mainViewJs.parentTags).loadSpinner.remove();
+        const htmlMessage = `<div class="message">
+                          <div>
+                            <svg>
+                              <use href="${(0, _iconsSvgDefault.default)}#icon-smile"></use>
+                            </svg>
+                          </div>
+                          <p>
+                            ${message}
+                          </p>
+                        </div>`;
+        containerHtml.insertAdjacentHTML("afterbegin", htmlMessage);
+        (0, _mainViewJs.initParentTags)();
+    // const restoreForm = function (e) {
+    //   e.preventDefault();
+    //   if (parentTags.addRecipeSuccessMessage)
+    //     parentTags.addRecipeSuccessMessage.remove();
+    //   if (!parentTags.addRecipeForm) {
+    //     addRecipe.renderForm(parentTags.addRecipeWindow);
+    //     initParentTags();
+    //     addRecipe.addUploadHandler(addRecipeFunction);
+    //   }
+    //   console.log('removeDone');
+    // };
+    // parentTags.btnCloseAddRecipe.addEventListener('click', restoreForm);
+    // parentTags.addRecipeOverlay.addEventListener('click', restoreForm);
+    }
+    addUploadHandler(func) {
+        (0, _mainViewJs.parentTags).addRecipeForm.addEventListener("submit", async function(e) {
+            e.preventDefault();
+            console.log(e);
+            await func();
+        });
+    }
+    toggleWindowOverlay() {
+        (0, _mainViewJs.parentTags).addRecipeWindow.classList.toggle("hidden");
+        (0, _mainViewJs.parentTags).addRecipeOverlay.classList.toggle("hidden");
+    }
+    eventListenerToElement(htmlElement, addRecipeFunction) {
+        const self = this;
+        // console.log(this);
+        // console.log(htmlElement);
+        htmlElement.addEventListener("click", function(event) {
+            event.preventDefault();
+            if (htmlElement === (0, _mainViewJs.parentTags).btnNavAddRecipe) self.toggleWindowOverlay();
+            if (htmlElement === (0, _mainViewJs.parentTags).btnCloseAddRecipe || htmlElement === (0, _mainViewJs.parentTags).addRecipeOverlay) {
+                self.toggleWindowOverlay();
+                if ((0, _mainViewJs.parentTags).addRecipeSuccessMessage) (0, _mainViewJs.parentTags).addRecipeSuccessMessage.remove();
+                if ((0, _mainViewJs.parentTags).loadError) (0, _mainViewJs.parentTags).loadError.remove();
+                if (!(0, _mainViewJs.parentTags).addRecipeForm) {
+                    addRecipe.renderForm((0, _mainViewJs.parentTags).addRecipeWindow);
+                    (0, _mainViewJs.initParentTags)();
+                    addRecipe.addUploadHandler(addRecipeFunction);
+                }
+                console.log("removeDone");
+            }
+        });
+    }
+    addRecipeClickListener(addRecipeFunction) {
+        const self = this;
+        this.eventListenerToElement((0, _mainViewJs.parentTags).btnNavAddRecipe, addRecipeFunction);
+        this.eventListenerToElement((0, _mainViewJs.parentTags).btnCloseAddRecipe, addRecipeFunction);
+        this.eventListenerToElement((0, _mainViewJs.parentTags).addRecipeOverlay, addRecipeFunction);
+    }
+}
+const addRecipe = new recipeCreate();
+
+},{"./mainView.js":"asXf2","../img/icons.svg":"8PWvx","./reusableView.js":"2nI8H","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"jSwDy":[function(require,module,exports) {
 // Keeps all recipe viewing Methods
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
@@ -3131,9 +3455,9 @@ var _iconsSvgDefault = parcelHelpers.interopDefault(_iconsSvg);
 var _mainViewJs = require("./mainView.js");
 var _fractional = require("fractional");
 class recipeView {
-    async getRecipeData() {
+    async getRecipeData(key, id) {
         return await Promise.race([
-            (0, _reusableViewJs.getData)((0, _reusableViewJs.getURL)(undefined, (0, _configurationJs.key), (0, _modelJs.softDataStorage).currentRecipe.recpId)),
+            (0, _reusableViewJs.getData)((0, _reusableViewJs.getURL)(undefined, key, id)),
             (0, _reusableViewJs.timeout)((0, _configurationJs.timePeriod))
         ]);
     }
@@ -3174,7 +3498,7 @@ class recipeView {
         </div>
       </div>
 
-      <div class="recipe__user-generated ${data.userKey ? "" : "hidden"}">
+      <div class="recipe__user-generated ${data ? "" : "hidden"}">
         <svg>
           <use href="${(0, _iconsSvgDefault.default)}#icon-user"></use>
         </svg>
@@ -3518,8 +3842,10 @@ var _mainViewJs = require("./mainView.js");
 var _iconsSvg = require("../img/icons.svg");
 var _iconsSvgDefault = parcelHelpers.interopDefault(_iconsSvg);
 class bookmarkView {
-    insertBookmarkMessage() {
-        (0, _mainViewJs.parentTags).btnNavBookmarkList.innerHTML = "";
+    _message = `No bookmarks yet. Find a nice recipe and bookmark it :)`;
+    insertSmileMessage(_message, containerHtml) {
+        // parentTags.btnNavBookmarkList.innerHTML = '';
+        containerHtml.innerHTML = "";
         const htmlMessage = `<div class="message">
                           <div>
                             <svg>
@@ -3527,10 +3853,10 @@ class bookmarkView {
                             </svg>
                           </div>
                           <p>
-                            No bookmarks yet. Find a nice recipe and bookmark it :)
+                            ${this._message}
                           </p>
                         </div>`;
-        (0, _mainViewJs.parentTags).btnNavBookmarkList.insertAdjacentHTML("afterbegin", htmlMessage);
+        containerHtml.insertAdjacentHTML("afterbegin", htmlMessage);
     }
     insertBookmarks(data) {
         const htmlBookmark = `<li class="preview">
@@ -3558,11 +3884,11 @@ class bookmarkView {
                     resultsRecipeSelection(event);
                 }));
         }
-        if (data.bookmarksList.size === 0) this.insertBookmarkMessage();
+        if (data.bookmarksList.size === 0) this.insertSmileMessage((0, _mainViewJs.parentTags).btnNavBookmarkList);
         (0, _mainViewJs.initParentTags)();
     }
     recipeBookmarkedCheck(data) {
-        console.log(data.bookmarksList.size);
+        console.log("bookmark entries " + data.bookmarksList.size);
         // check if recipe present in Set or not
         return data.bookmarksList.has(data.currentRecipe);
     }

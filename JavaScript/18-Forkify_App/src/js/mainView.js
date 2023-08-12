@@ -21,6 +21,12 @@ const parentTagsFunction = function () {
     btnServingIncrease: document.querySelector('.btn--increase-servings'),
     btnServingDecrease: document.querySelector('.btn--decrease-servings'),
     peopleServings: document.querySelector('.recipe__info-data--people'),
+    addRecipeWindow: document.querySelector('.add-recipe-window'),
+    btnNavAddRecipe: document.querySelector('.nav__btn--add-recipe'),
+    btnCloseAddRecipe: document.querySelector('.btn--close-modal'),
+    addRecipeOverlay: document.querySelector('.overlay'),
+    addRecipeForm: document.querySelector('.upload'),
+    addRecipeSuccessMessage: document.querySelector('.message'),
   };
 };
 

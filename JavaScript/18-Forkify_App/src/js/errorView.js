@@ -1,8 +1,9 @@
 // Keeps all the error rendering
 
 // Imports
-import { parentTags } from './mainView.js';
+import { parentTags, initParentTags } from './mainView.js';
 import icons from '../img/icons.svg';
+import { addRecipe } from './newrecipeView.js';
 
 /*
 // Code with toggle class 'hidden'
@@ -17,6 +18,7 @@ export const errorMessage = {
 
 // Code with HTML insertion
 export const renderError = function (error, containerHtml) {
+  containerHtml.innerHTML = '';
   const html = `<div class="error">
                   <div>
                     <svg>

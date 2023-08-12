@@ -10,73 +10,97 @@ import {
   softDataStorage,
   generateResultsList,
   generateCurrentRecipeData,
+  generateUploadData,
 } from './model.js';
-import { timeout, renderSpinner, emptyContainer } from './reusableView.js';
-import { timePeriod } from './configuration.js';
+import {
+  timeout,
+  renderSpinner,
+  emptyContainer,
+  postData,
+  deleteRecipe,
+  recList,
+} from './reusableView.js';
+import { timePeriod, key } from './configuration.js';
 import { searchMethods } from './searchView.js';
 import { resultsViewMethods } from './resultsView.js';
 import { renderError, errorMessage } from './errorView.js';
 import { recipeViewMethods } from './recipeView.js';
 import { bookmarkViewMethods } from './bookMarkView.js';
+import { addRecipe } from './newrecipeView.js';
 
-const resultsRecipeSelection = function (event) {
+const recipeRenderFunction = async function (event) {
   event.preventDefault();
+  console.log(event);
+  // console.log(event.type);
 
-  // select recipe in results
-  // return href for softDataStorage
-  softDataStorage.currentRecipe = resultsViewMethods.resultsSelection(event);
-  console.log(softDataStorage.currentRecipe);
+  try {
+    let id;
 
-  // loading spinner
-  emptyContainer(parentTags.recipeContainer);
-  renderSpinner(parentTags.recipeContainer);
+    // Take id from result or bookmark clicked
+    if (event.type === 'click') {
+      // select recipe in results and take href and return id
+      id = resultsViewMethods.activateResult(event);
 
-  // fetch n display recipe
-  const fetchRecipe = async function () {
-    try {
-      const recipeData = await recipeViewMethods.getRecipeData();
-      softDataStorage.currentRecipeData = generateCurrentRecipeData(recipeData);
-      console.log(softDataStorage.resultsListView);
+      // select recipe in results
+      softDataStorage.currentRecipe = resultsViewMethods.resultsSelection(id);
+      console.log(softDataStorage.currentRecipe);
 
-      emptyContainer(parentTags.recipeContainer);
-      console.log(softDataStorage);
-      recipeViewMethods.renderRecipe(
-        softDataStorage.currentRecipeData.sourceURL,
-        softDataStorage.currentRecipeData.recipePublisher,
-        softDataStorage.currentRecipeData.recipeServings,
-        softDataStorage.currentRecipeData.cookingTime,
-        softDataStorage.currentRecipeData.recipeTitle,
-        softDataStorage.currentRecipeData.imageURL,
-        softDataStorage.currentRecipe
-      );
-
-      initParentTags();
-      bookmarkViewMethods.renderRecipeBookmarkIcon(softDataStorage);
-      bookmarkViewMethods.btnClickListener(
-        softDataStorage,
-        resultsRecipeSelection
-      );
-
-      recipeViewMethods.renderIngredients(
-        softDataStorage.currentRecipeData.recipeIngredients
-      );
-      recipeViewMethods.addClickServings(
-        softDataStorage.currentRecipeData.recipeIngredients
-      );
-    } catch (err) {
-      console.error(err.message);
-      emptyContainer(parentTags.recipeContainer);
-      renderError(err.message, parentTags.recipeContainer);
+      // Update/Add id to window location URL on recipe result click
+      window.history.pushState(null, '', `#${id}`);
     }
-  };
-  fetchRecipe();
+
+    // Take id from URL in windows location
+    if (event.type === 'load') {
+      id = window.location.hash.slice(1);
+      console.log('id ' + id);
+    }
+
+    if (!id) return;
+
+    // loading spinner
+    emptyContainer(parentTags.recipeContainer);
+    renderSpinner(parentTags.recipeContainer);
+
+    const recipeData = await recipeViewMethods.getRecipeData(key, id);
+
+    softDataStorage.currentRecipeData = generateCurrentRecipeData(recipeData);
+
+    // console.log(softDataStorage.currentRecipeData);
+
+    emptyContainer(parentTags.recipeContainer);
+    // console.log(softDataStorage);
+    recipeViewMethods.renderRecipe(
+      softDataStorage.currentRecipeData.sourceURL,
+      softDataStorage.currentRecipeData.recipePublisher,
+      softDataStorage.currentRecipeData.recipeServings,
+      softDataStorage.currentRecipeData.cookingTime,
+      softDataStorage.currentRecipeData.recipeTitle,
+      softDataStorage.currentRecipeData.imageURL,
+      softDataStorage.currentRecipeData.userKey
+    );
+
+    initParentTags();
+    bookmarkViewMethods.renderRecipeBookmarkIcon(softDataStorage);
+    bookmarkViewMethods.btnClickListener(softDataStorage, recipeRenderFunction);
+
+    recipeViewMethods.renderIngredients(
+      softDataStorage.currentRecipeData.recipeIngredients
+    );
+    recipeViewMethods.addClickServings(
+      softDataStorage.currentRecipeData.recipeIngredients
+    );
+  } catch (err) {
+    console.error(err.message);
+    emptyContainer(parentTags.recipeContainer);
+    renderError(err.message, parentTags.recipeContainer);
+  }
 };
 
 const recipeFunction = function () {
   // Add click, select, make selected active and retreive href '#hashvalue'
 
   document.querySelectorAll('.preview__link').forEach(el => {
-    el.addEventListener('click', resultsRecipeSelection);
+    el.addEventListener('click', recipeRenderFunction);
   });
 };
 
@@ -133,7 +157,7 @@ const searchFunction = async function (e) {
     // get search input
     const searchQuery = searchMethods.getQuery();
     searchMethods.clearSearchField();
-    console.log('length of searchQuery is ' + searchQuery.length);
+    // console.log('length of searchQuery is ' + searchQuery.length);
 
     // test search input
     if (!searchQuery || searchQuery.length < 3) {
@@ -149,35 +173,95 @@ const searchFunction = async function (e) {
 
     // Retreive data from server
     const arrData = await Promise.race([
-      queryResults(searchQuery),
+      queryResults(searchQuery, key),
       timeout(timePeriod),
     ]);
 
     if (!arrData) throw new Error('Please connect to internet and try again!');
-    console.log(arrData);
-    const status = arrData.flat().some(e => e === 'results');
+    // console.log(arrData);
+    const getStatus = () => {
+      const hasResults = arrData.flat().some(e => e === 'results');
+      // console.log(arrData.flat()[3]);
+      const hasResultsNum = arrData.flat()[3] === 0 ? false : true;
+      if (hasResults && hasResultsNum) {
+        return true;
+      } else {
+        return false;
+      }
+    };
+    const status = getStatus();
     console.log(status);
+
+    if (!status) throw new Error('Invalid search query. Please try again.');
 
     // Data destructuring
     const [, [, results], [, { recipes }]] = arrData;
-    console.log(results, recipes);
+    // console.log(results, recipes);
 
     // assign data to softDataStorage
-    softDataStorage.recipeReceived = recipes;
+    softDataStorage.allRecipeReceived = recipes;
     softDataStorage.recentRequestStatus = status;
     softDataStorage.resultsListView = generateResultsList(recipes);
-    console.log(softDataStorage);
+    // console.log(softDataStorage);
 
     // render results data
     emptyContainer(parentTags.resultsListContainer);
     resultsFunction();
   } catch (err) {
-    console.error(`${err.message}`);
+    console.error(`${err}`);
 
     emptyContainer(parentTags.resultsListContainer);
-    renderError(err.message, parentTags.resultsContainer);
+    renderError(err, parentTags.resultsContainer);
+  }
+};
+
+const addRecipeFunction = async function () {
+  try {
+    // get Form Data as Object
+    const dataArr = [...new FormData(parentTags.addRecipeForm)];
+    let ObjectData = Object.fromEntries(dataArr);
+    console.log(ObjectData);
+
+    dataObject = generateUploadData(ObjectData);
+    console.log(dataObject);
+
+    // renderSpinner
+    parentTags.addRecipeForm.remove();
+    renderSpinner(parentTags.addRecipeWindow);
+    initParentTags();
+
+    // fetch post and view recipe using data Object from form
+    const postRequest = await Promise.race([
+      postData(key, dataObject),
+      timeout(timePeriod),
+    ]);
+    const returnedData = postRequest;
+    console.log(returnedData.status);
+    console.log(returnedData.data.recipe); /////// work on data to recipeRenderFunction
+
+    // upon success render success message, then restore form on close
+    const messageSuccess = 'Your recipe has been succesfully created.';
+    addRecipe.renderModalSuccess(messageSuccess, parentTags.addRecipeWindow);
+
+    // render received data
+    recipeRenderFunction(returnedData.data.recipe);
+  } catch (err) {
+    console.error(err);
+    // upon error render error message, then restore form on close
+    addRecipe.renderModalError(
+      err.message,
+      parentTags.addRecipeWindow,
+      addRecipeFunction
+    );
+
+    // parentTags.loadError.remove();
   }
 };
 
 searchMethods.addSearchHandler(searchFunction);
-// bookmarkViewMethods;
+addRecipe.addRecipeClickListener(addRecipeFunction);
+addRecipe.addUploadHandler(addRecipeFunction);
+
+window.addEventListener('load', recipeRenderFunction);
+
+// deleteRecipe(recList, key);
