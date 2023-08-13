@@ -39,7 +39,7 @@ class bookmarkView {
     );
   }
 
-  renderBookmarkList(data, resultsRecipeSelection) {
+  renderBookmarkList(data, recipeRenderFunction) {
     if (data.bookmarksList.size > 0) {
       parentTags.btnNavBookmarkList.innerHTML = '';
 
@@ -51,7 +51,8 @@ class bookmarkView {
       document.querySelectorAll('.preview__link').forEach(el =>
         el.addEventListener('click', function (event) {
           event.preventDefault();
-          resultsRecipeSelection(event);
+          // resultsRecipeSelection(event);
+          recipeRenderFunction(event);
         })
       );
     }

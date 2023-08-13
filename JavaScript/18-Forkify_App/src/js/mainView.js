@@ -27,6 +27,7 @@ const parentTagsFunction = function () {
     addRecipeOverlay: document.querySelector('.overlay'),
     addRecipeForm: document.querySelector('.upload'),
     addRecipeSuccessMessage: document.querySelector('.message'),
+    headerLogo: document.querySelector('.header__logo'),
   };
 };
 

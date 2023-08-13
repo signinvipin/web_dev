@@ -594,6 +594,8 @@ const recipeRenderFunction = async function(event) {
     // console.log(event.type);
     try {
         let id;
+        console.log(window.location);
+        console.log(window.location.href);
         // Take id from result or bookmark clicked
         if (event.type === "click") {
             // select recipe in results and take href and return id
@@ -606,16 +608,24 @@ const recipeRenderFunction = async function(event) {
         }
         // Take id from URL in windows location
         if (event.type === "load") {
+            if (window.location.href === window.location.origin + "/") return;
             id = window.location.hash.slice(1);
             console.log("id " + id);
         }
-        if (!id) return;
+        if (!id || id === "") return;
         // loading spinner
         (0, _reusableViewJs.emptyContainer)((0, _mainViewJs.parentTags).recipeContainer);
         (0, _reusableViewJs.renderSpinner)((0, _mainViewJs.parentTags).recipeContainer);
         const recipeData = await (0, _recipeViewJs.recipeViewMethods).getRecipeData((0, _configurationJs.key), id);
         (0, _modelJs.softDataStorage).currentRecipeData = (0, _modelJs.generateCurrentRecipeData)(recipeData);
         // console.log(softDataStorage.currentRecipeData);
+        // set currentRecipe when reload after browser close
+        const reId = (0, _modelJs.softDataStorage).currentRecipeData.recipeId;
+        const usrKey = (0, _modelJs.softDataStorage).currentRecipeData.userKey;
+        const reTitle = (0, _modelJs.softDataStorage).currentRecipeData.recipeTitle;
+        const rePublisher = (0, _modelJs.softDataStorage).currentRecipeData.recipePublisher;
+        const imgURL = (0, _modelJs.softDataStorage).currentRecipeData.imageURL;
+        (0, _modelJs.softDataStorage).currentRecipe = (0, _modelJs.previewObject)(reId, imgURL, rePublisher, reTitle, usrKey); //pass current recipe object after creating it
         (0, _reusableViewJs.emptyContainer)((0, _mainViewJs.parentTags).recipeContainer);
         // console.log(softDataStorage);
         (0, _recipeViewJs.recipeViewMethods).renderRecipe((0, _modelJs.softDataStorage).currentRecipeData.sourceURL, (0, _modelJs.softDataStorage).currentRecipeData.recipePublisher, (0, _modelJs.softDataStorage).currentRecipeData.recipeServings, (0, _modelJs.softDataStorage).currentRecipeData.cookingTime, (0, _modelJs.softDataStorage).currentRecipeData.recipeTitle, (0, _modelJs.softDataStorage).currentRecipeData.imageURL, (0, _modelJs.softDataStorage).currentRecipeData.userKey);
@@ -669,13 +679,13 @@ const searchFunction = async function(e) {
         // test search input
         if (!searchQuery || searchQuery.length < 3) {
             (0, _reusableViewJs.emptyContainer)((0, _mainViewJs.parentTags).resultsListContainer);
-            (0, _errorViewJs.renderError)((0, _errorViewJs.errorMessage).noResults, (0, _mainViewJs.parentTags).resultsContainer);
+            (0, _errorViewJs.renderError)((0, _errorViewJs.errorMessage).noResults, (0, _mainViewJs.parentTags).resultsListContainer);
             return;
         }
         // initialize parentTags
         // render spinner
         (0, _reusableViewJs.emptyContainer)((0, _mainViewJs.parentTags).resultsListContainer);
-        (0, _reusableViewJs.renderSpinner)((0, _mainViewJs.parentTags).resultsContainer);
+        (0, _reusableViewJs.renderSpinner)((0, _mainViewJs.parentTags).resultsListContainer);
         // Retreive data from server
         const arrData = await Promise.race([
             (0, _modelJs.queryResults)(searchQuery, (0, _configurationJs.key)),
@@ -707,7 +717,7 @@ const searchFunction = async function(e) {
     } catch (err) {
         console.error(`${err}`);
         (0, _reusableViewJs.emptyContainer)((0, _mainViewJs.parentTags).resultsListContainer);
-        (0, _errorViewJs.renderError)(err, (0, _mainViewJs.parentTags).resultsContainer);
+        (0, _errorViewJs.renderError)(err, (0, _mainViewJs.parentTags).resultsListContainer);
     }
 };
 const addRecipeFunction = async function() {
@@ -748,6 +758,10 @@ const addRecipeFunction = async function() {
 (0, _newrecipeViewJs.addRecipe).addRecipeClickListener(addRecipeFunction);
 (0, _newrecipeViewJs.addRecipe).addUploadHandler(addRecipeFunction);
 window.addEventListener("load", recipeRenderFunction);
+(0, _mainViewJs.parentTags).headerLogo.addEventListener("click", ()=>{
+    window.location.href = window.location.origin + "/";
+// window.location.reload;
+});
 
 },{"core-js/modules/web.immediate.js":"49tUX","regenerator-runtime":"dXNgZ","./mainView.js":"asXf2","./model.js":"Y4A21","./reusableView.js":"2nI8H","./configuration.js":"eSmrz","./searchView.js":"9M3GU","./resultsView.js":"faCQd","./errorView.js":"8pAzM","./recipeView.js":"jSwDy","./bookMarkView.js":"KHTJv","./newrecipeView.js":"fduiq"}],"49tUX":[function(require,module,exports) {
 "use strict";
@@ -2758,7 +2772,8 @@ const parentTagsFunction = function() {
         btnCloseAddRecipe: document.querySelector(".btn--close-modal"),
         addRecipeOverlay: document.querySelector(".overlay"),
         addRecipeForm: document.querySelector(".upload"),
-        addRecipeSuccessMessage: document.querySelector(".message")
+        addRecipeSuccessMessage: document.querySelector(".message"),
+        headerLogo: document.querySelector(".header__logo")
     };
 };
 const initParentTags = function() {
@@ -2802,6 +2817,7 @@ exports.export = function(dest, destName, get) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "queryResults", ()=>queryResults);
+parcelHelpers.export(exports, "previewObject", ()=>previewObject);
 parcelHelpers.export(exports, "generateResultsList", ()=>generateResultsList);
 parcelHelpers.export(exports, "generateCurrentRecipeData", ()=>generateCurrentRecipeData);
 parcelHelpers.export(exports, "generateUploadData", ()=>generateUploadData);
@@ -2821,20 +2837,24 @@ const queryResults = async function(searchQuery, key, id) {
         console.error(err.message);
     }
 };
+const previewObject = function(id, image_url, publisher, title, key) {
+    const resultObject = {
+        recpId: id,
+        imageURL: image_url,
+        recipePublisher: publisher,
+        recipeTitle: title
+    };
+    if (key) resultsArray.userKey = key;
+    return resultObject;
+};
 const generateResultsList = function(recipes) {
     let listResults = [];
-    for (let { id, image_url, publisher, title, key } of recipes)// const dataResults = [id, image_url, publisher, title, key];
-    // console.log(dataResults);
-    (function() {
-        const resultsArray = {
-            recpId: id,
-            imageURL: image_url,
-            recipePublisher: publisher,
-            recipeTitle: title
-        };
-        if (key) resultsArray.userKey = key;
-        listResults.push(resultsArray);
-    })(id, image_url, publisher, title, key);
+    for (let { id, image_url, publisher, title, key } of recipes){
+        // const dataResults = [id, image_url, publisher, title, key];
+        // console.log(dataResults);
+        const resultsArray1 = previewObject(id, image_url, publisher, title, key);
+        listResults.push(resultsArray1);
+    }
     // console.log(listResults);
     return listResults;
 };
@@ -2851,6 +2871,7 @@ const generateCurrentRecipeData = function(data) {
         recipeTitle: data.title
     };
     data.key ? ObjRecipe.userKey = data.key : ObjRecipe.userKey = undefined;
+    console.log(ObjRecipe);
     return ObjRecipe;
 };
 const generateUploadData = function(data) {
@@ -2871,8 +2892,7 @@ const generateUploadData = function(data) {
             }
         });
         console.log(upload);
-        // if (data.sourceUrl.length < 5)
-        //   throw new Error('URL must be at least 5 characters long!'); // 5 characters long
+        if (data.sourceUrl.length < 5) throw new Error("URL must be at least 5 characters long!"); // 5 characters long
         // return [{},{},{}] array of objects {quantity value/null number, unit ''/unit string, description string}
         return {
             cooking_time: +data.cookingTime,
@@ -3872,7 +3892,7 @@ class bookmarkView {
                   </li>`;
         (0, _mainViewJs.parentTags).btnNavBookmarkList.insertAdjacentHTML("afterbegin", htmlBookmark);
     }
-    renderBookmarkList(data, resultsRecipeSelection) {
+    renderBookmarkList(data, recipeRenderFunction) {
         if (data.bookmarksList.size > 0) {
             (0, _mainViewJs.parentTags).btnNavBookmarkList.innerHTML = "";
             for (let bookmark of data.bookmarksList.values()){
@@ -3881,7 +3901,8 @@ class bookmarkView {
             }
             document.querySelectorAll(".preview__link").forEach((el)=>el.addEventListener("click", function(event) {
                     event.preventDefault();
-                    resultsRecipeSelection(event);
+                    // resultsRecipeSelection(event);
+                    recipeRenderFunction(event);
                 }));
         }
         if (data.bookmarksList.size === 0) this.insertSmileMessage((0, _mainViewJs.parentTags).btnNavBookmarkList);

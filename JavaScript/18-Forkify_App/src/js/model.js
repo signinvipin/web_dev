@@ -25,6 +25,18 @@ export const queryResults = async function (
   }
 };
 
+export const previewObject = function (id, image_url, publisher, title, key) {
+  const resultObject = {
+    recpId: id,
+    imageURL: image_url,
+    recipePublisher: publisher,
+    recipeTitle: title,
+  };
+
+  if (key) resultsArray.userKey = key;
+  return resultObject;
+};
+
 export const generateResultsList = function (recipes) {
   let listResults = [];
 
@@ -32,18 +44,8 @@ export const generateResultsList = function (recipes) {
     // const dataResults = [id, image_url, publisher, title, key];
     // console.log(dataResults);
 
-    (function () {
-      const resultsArray = {
-        recpId: id,
-        imageURL: image_url,
-        recipePublisher: publisher,
-        recipeTitle: title,
-      };
-
-      if (key) resultsArray.userKey = key;
-
-      listResults.push(resultsArray);
-    })(id, image_url, publisher, title, key);
+    const resultsArray = previewObject(id, image_url, publisher, title, key);
+    listResults.push(resultsArray);
   }
 
   // console.log(listResults);
@@ -63,6 +65,7 @@ export const generateCurrentRecipeData = function (data) {
     recipeTitle: data.title,
   };
   data.key ? (ObjRecipe.userKey = data.key) : (ObjRecipe.userKey = undefined);
+  console.log(ObjRecipe);
   return ObjRecipe;
 };
 
@@ -106,8 +109,8 @@ export const generateUploadData = function (data) {
     });
     console.log(upload);
 
-    // if (data.sourceUrl.length < 5)
-    //   throw new Error('URL must be at least 5 characters long!'); // 5 characters long
+    if (data.sourceUrl.length < 5)
+      throw new Error('URL must be at least 5 characters long!'); // 5 characters long
 
     // return [{},{},{}] array of objects {quantity value/null number, unit ''/unit string, description string}
     return {
