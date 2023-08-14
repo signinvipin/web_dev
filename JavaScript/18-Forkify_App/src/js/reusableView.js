@@ -109,7 +109,7 @@ export const renderSpinner = function (containerHtml) {
 
 export const emptyContainer = function (container) {
   initParentTags();
-  console.log(container);
+  // console.log(container);
   if (container) container.innerHTML = ''; ////problem finding container
   // document.querySelector('.search-results').previousSibling.remove();
   if (parentTags.loadSpinner) parentTags.loadSpinner.remove();

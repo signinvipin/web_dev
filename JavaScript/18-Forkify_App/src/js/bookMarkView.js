@@ -5,8 +5,10 @@ import icons from '../img/icons.svg';
 
 class bookmarkView {
   _message = `No bookmarks yet. Find a nice recipe and bookmark it :)`;
+
   insertSmileMessage(_message, containerHtml) {
     // parentTags.btnNavBookmarkList.innerHTML = '';
+    console.log(containerHtml);
     containerHtml.innerHTML = '';
     const htmlMessage = `<div class="message">
                           <div>
@@ -22,6 +24,7 @@ class bookmarkView {
   }
 
   insertBookmarks(data) {
+    console.log(parentTags.btnNavBookmarkList);
     const htmlBookmark = `<li class="preview">
                     <a class="preview__link" href="#${data.recpId}">
                       <figure class="preview__fig">
@@ -40,11 +43,17 @@ class bookmarkView {
   }
 
   renderBookmarkList(data, recipeRenderFunction) {
-    if (data.bookmarksList.size > 0) {
-      parentTags.btnNavBookmarkList.innerHTML = '';
+    initParentTags();
+    console.log(parentTags.btnNavBookmarkList);
+    console.log(data.bookmarksList);
+    console.log(this);
 
-      for (let bookmark of data.bookmarksList.values()) {
+    if (data.bookmarksList.length > 0) {
+      parentTags.btnNavBookmarkList.innerHTML = '';
+      console.log(this);
+      for (let bookmark of data.bookmarksList) {
         console.log(bookmark);
+        console.log(this);
         this.insertBookmarks(bookmark);
       }
 
@@ -56,17 +65,31 @@ class bookmarkView {
         })
       );
     }
-    if (data.bookmarksList.size === 0) {
-      this.insertSmileMessage(parentTags.btnNavBookmarkList);
+    if (data.bookmarksList.length === 0) {
+      this.insertSmileMessage(this._message, parentTags.btnNavBookmarkList);
     }
     initParentTags();
   }
 
   recipeBookmarkedCheck(data) {
-    console.log('bookmark entries ' + data.bookmarksList.size);
+    console.log('bookmark entries ' + data.bookmarksList.length);
+    // const arrBArray.from(data.bookmarksList));
 
-    // check if recipe present in Set or not
-    return data.bookmarksList.has(data.currentRecipe);
+    // check if recipe present or not
+    if (data.bookmarksList.length > 0) {
+      for (let bmk of data.bookmarksList) {
+        if (bmk.recpId === data.currentRecipe.recpId) {
+          console.log('recipe match true');
+          return true;
+        } else {
+          console.log('recipe match false');
+          return false;
+        }
+      }
+    } else {
+      console.log('recipe length false');
+      return false;
+    }
   }
 
   renderRecipeBookmarkIcon(data) {
@@ -88,11 +111,17 @@ class bookmarkView {
 
   removeBookmarkRecipe(data) {
     // remove item from Set
-    data.bookmarksList.delete(data.currentRecipe);
+    let n = 0;
+    data.bookmarksList.forEach(bmk => {
+      if (data.currentRecipe.recpId === bmk.recpId) {
+        data.bookmarksList.splice(n, 1);
+      }
+      n += 1;
+    });
     console.log(data.bookmarksList);
   }
 
-  btnClickListener(data, resultsRecipeSelection) {
+  btnClickListener(data, resultsRecipeSelection, backupData) {
     const self = this;
     parentTags.btnBookmark.addEventListener('click', function () {
       const iconType =
@@ -104,15 +133,18 @@ class bookmarkView {
         self.removeBookmarkRecipe(data);
         self.renderRecipeBookmarkIcon(data);
         self.renderBookmarkList(data, resultsRecipeSelection);
+        backupData(data);
         console.log('remove bookmark triggered');
         return;
       }
 
-      data.bookmarksList.add(data.currentRecipe);
-      // console.log(data.bookmarksList);
+      // console.log(data.currentRecipe);
+      data.bookmarksList.push(data.currentRecipe);
+      console.log(data.bookmarksList);
 
       self.renderRecipeBookmarkIcon(data);
       self.renderBookmarkList(data, resultsRecipeSelection);
+      backupData(data);
       console.log('add bookmark triggered');
       return;
     });

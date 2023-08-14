@@ -53,7 +53,7 @@ export const generateResultsList = function (recipes) {
 };
 
 export const generateCurrentRecipeData = function (data) {
-  console.log(data);
+  // console.log(data);
   const ObjRecipe = {
     cookingTime: data.cooking_time,
     recipeId: data.id,
@@ -65,7 +65,7 @@ export const generateCurrentRecipeData = function (data) {
     recipeTitle: data.title,
   };
   data.key ? (ObjRecipe.userKey = data.key) : (ObjRecipe.userKey = undefined);
-  console.log(ObjRecipe);
+  // console.log(ObjRecipe);
   return ObjRecipe;
 };
 
@@ -127,16 +127,32 @@ export const generateUploadData = function (data) {
   }
 };
 
-export const softDataStorage = {
+export let softDataStorage = {
   recentRequestStatus: '',
   currentRecipe: '',
   currentRecipeData: {}, // data formed from selected and fetched recipe
   allRecipeReceived: [], // original recipe list received
   resultsListView: [], // list of recipes for results view
-  bookmarksList: new Set(), // list of bookmarks
+  bookmarksList: [], // list of bookmarks
 };
 
-const storeData = function (dataObject) {
+export const backupData = function (dataObject) {
+  console.log(dataObject.bookmarksList);
   // add to local storage for tab reload event
+  localStorage.setItem('bookmarks', JSON.stringify(dataObject.bookmarksList));
+  console.log(localStorage.bookmarks);
 };
-storeData(softDataStorage);
+
+export const restoreData = function () {
+  const storedData = localStorage.getItem('bookmarks');
+
+  localStorage.clear(); // clear the localStorage entirely
+
+  console.log(JSON.parse(storedData));
+
+  if (storedData) {
+    JSON.parse(storedData).forEach(bmk =>
+      softDataStorage.bookmarksList.push(bmk)
+    );
+  }
+};

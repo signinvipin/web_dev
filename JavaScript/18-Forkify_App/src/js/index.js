@@ -12,6 +12,8 @@ import {
   generateCurrentRecipeData,
   generateUploadData,
   previewObject,
+  restoreData,
+  backupData,
 } from './model.js';
 import {
   timeout,
@@ -37,7 +39,7 @@ const recipeRenderFunction = async function (event) {
   try {
     let id;
 
-    console.log(window.location);
+    // console.log(window.location);
     console.log(window.location.href);
 
     // Take id from result or bookmark clicked
@@ -47,7 +49,7 @@ const recipeRenderFunction = async function (event) {
 
       // select recipe in results
       softDataStorage.currentRecipe = resultsViewMethods.resultsSelection(id);
-      console.log(softDataStorage.currentRecipe);
+      // console.log(softDataStorage.currentRecipe);
 
       // Update/Add id to window location URL on recipe result click
       window.history.pushState(null, '', `#${id}`);
@@ -57,6 +59,13 @@ const recipeRenderFunction = async function (event) {
     if (event.type === 'load') {
       if (window.location.href === window.location.origin + '/') return;
 
+      restoreData();
+      bookmarkViewMethods.renderBookmarkList(
+        softDataStorage,
+        recipeRenderFunction
+      );
+
+      console.log(softDataStorage.bookmarksList);
       id = window.location.hash.slice(1);
       console.log('id ' + id);
     }
@@ -100,7 +109,11 @@ const recipeRenderFunction = async function (event) {
 
     initParentTags();
     bookmarkViewMethods.renderRecipeBookmarkIcon(softDataStorage);
-    bookmarkViewMethods.btnClickListener(softDataStorage, recipeRenderFunction);
+    bookmarkViewMethods.btnClickListener(
+      softDataStorage,
+      recipeRenderFunction,
+      backupData
+    );
 
     recipeViewMethods.renderIngredients(
       softDataStorage.currentRecipeData.recipeIngredients

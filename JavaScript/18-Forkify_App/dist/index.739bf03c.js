@@ -594,7 +594,7 @@ const recipeRenderFunction = async function(event) {
     // console.log(event.type);
     try {
         let id;
-        console.log(window.location);
+        // console.log(window.location);
         console.log(window.location.href);
         // Take id from result or bookmark clicked
         if (event.type === "click") {
@@ -602,13 +602,16 @@ const recipeRenderFunction = async function(event) {
             id = (0, _resultsViewJs.resultsViewMethods).activateResult(event);
             // select recipe in results
             (0, _modelJs.softDataStorage).currentRecipe = (0, _resultsViewJs.resultsViewMethods).resultsSelection(id);
-            console.log((0, _modelJs.softDataStorage).currentRecipe);
+            // console.log(softDataStorage.currentRecipe);
             // Update/Add id to window location URL on recipe result click
             window.history.pushState(null, "", `#${id}`);
         }
         // Take id from URL in windows location
         if (event.type === "load") {
             if (window.location.href === window.location.origin + "/") return;
+            (0, _modelJs.restoreData)();
+            (0, _bookMarkViewJs.bookmarkViewMethods).renderBookmarkList((0, _modelJs.softDataStorage), recipeRenderFunction);
+            console.log((0, _modelJs.softDataStorage).bookmarksList);
             id = window.location.hash.slice(1);
             console.log("id " + id);
         }
@@ -631,7 +634,7 @@ const recipeRenderFunction = async function(event) {
         (0, _recipeViewJs.recipeViewMethods).renderRecipe((0, _modelJs.softDataStorage).currentRecipeData.sourceURL, (0, _modelJs.softDataStorage).currentRecipeData.recipePublisher, (0, _modelJs.softDataStorage).currentRecipeData.recipeServings, (0, _modelJs.softDataStorage).currentRecipeData.cookingTime, (0, _modelJs.softDataStorage).currentRecipeData.recipeTitle, (0, _modelJs.softDataStorage).currentRecipeData.imageURL, (0, _modelJs.softDataStorage).currentRecipeData.userKey);
         (0, _mainViewJs.initParentTags)();
         (0, _bookMarkViewJs.bookmarkViewMethods).renderRecipeBookmarkIcon((0, _modelJs.softDataStorage));
-        (0, _bookMarkViewJs.bookmarkViewMethods).btnClickListener((0, _modelJs.softDataStorage), recipeRenderFunction);
+        (0, _bookMarkViewJs.bookmarkViewMethods).btnClickListener((0, _modelJs.softDataStorage), recipeRenderFunction, (0, _modelJs.backupData));
         (0, _recipeViewJs.recipeViewMethods).renderIngredients((0, _modelJs.softDataStorage).currentRecipeData.recipeIngredients);
         (0, _recipeViewJs.recipeViewMethods).addClickServings((0, _modelJs.softDataStorage).currentRecipeData.recipeIngredients);
     } catch (err) {
@@ -2822,6 +2825,8 @@ parcelHelpers.export(exports, "generateResultsList", ()=>generateResultsList);
 parcelHelpers.export(exports, "generateCurrentRecipeData", ()=>generateCurrentRecipeData);
 parcelHelpers.export(exports, "generateUploadData", ()=>generateUploadData);
 parcelHelpers.export(exports, "softDataStorage", ()=>softDataStorage);
+parcelHelpers.export(exports, "backupData", ()=>backupData);
+parcelHelpers.export(exports, "restoreData", ()=>restoreData);
 var _reusableViewJs = require("./reusableView.js");
 const queryResults = async function(searchQuery, key, id) {
     try {
@@ -2859,7 +2864,7 @@ const generateResultsList = function(recipes) {
     return listResults;
 };
 const generateCurrentRecipeData = function(data) {
-    console.log(data);
+    // console.log(data);
     const ObjRecipe = {
         cookingTime: data.cooking_time,
         recipeId: data.id,
@@ -2871,7 +2876,7 @@ const generateCurrentRecipeData = function(data) {
         recipeTitle: data.title
     };
     data.key ? ObjRecipe.userKey = data.key : ObjRecipe.userKey = undefined;
-    console.log(ObjRecipe);
+    // console.log(ObjRecipe);
     return ObjRecipe;
 };
 const generateUploadData = function(data) {
@@ -2907,18 +2912,26 @@ const generateUploadData = function(data) {
         throw err;
     }
 };
-const softDataStorage = {
+let softDataStorage = {
     recentRequestStatus: "",
     currentRecipe: "",
     currentRecipeData: {},
     allRecipeReceived: [],
     resultsListView: [],
-    bookmarksList: new Set()
+    bookmarksList: []
 };
-const storeData = function(dataObject) {
-// add to local storage for tab reload event
+const backupData = function(dataObject) {
+    console.log(dataObject.bookmarksList);
+    // add to local storage for tab reload event
+    localStorage.setItem("bookmarks", JSON.stringify(dataObject.bookmarksList));
+    console.log(localStorage.bookmarks);
 };
-storeData(softDataStorage);
+const restoreData = function() {
+    const storedData = localStorage.getItem("bookmarks");
+    localStorage.clear(); // clear the localStorage entirely
+    console.log(JSON.parse(storedData));
+    if (storedData) JSON.parse(storedData).forEach((bmk)=>softDataStorage.bookmarksList.push(bmk));
+};
 
 },{"./reusableView.js":"2nI8H","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"2nI8H":[function(require,module,exports) {
 // Reusable Functions
@@ -3002,7 +3015,7 @@ const renderSpinner = function(containerHtml) {
 };
 const emptyContainer = function(container) {
     (0, _mainViewJs.initParentTags)();
-    console.log(container);
+    // console.log(container);
     if (container) container.innerHTML = ""; ////problem finding container
     // document.querySelector('.search-results').previousSibling.remove();
     if ((0, _mainViewJs.parentTags).loadSpinner) (0, _mainViewJs.parentTags).loadSpinner.remove();
@@ -3865,6 +3878,7 @@ class bookmarkView {
     _message = `No bookmarks yet. Find a nice recipe and bookmark it :)`;
     insertSmileMessage(_message, containerHtml) {
         // parentTags.btnNavBookmarkList.innerHTML = '';
+        console.log(containerHtml);
         containerHtml.innerHTML = "";
         const htmlMessage = `<div class="message">
                           <div>
@@ -3879,6 +3893,7 @@ class bookmarkView {
         containerHtml.insertAdjacentHTML("afterbegin", htmlMessage);
     }
     insertBookmarks(data) {
+        console.log((0, _mainViewJs.parentTags).btnNavBookmarkList);
         const htmlBookmark = `<li class="preview">
                     <a class="preview__link" href="#${data.recpId}">
                       <figure class="preview__fig">
@@ -3893,10 +3908,16 @@ class bookmarkView {
         (0, _mainViewJs.parentTags).btnNavBookmarkList.insertAdjacentHTML("afterbegin", htmlBookmark);
     }
     renderBookmarkList(data, recipeRenderFunction) {
-        if (data.bookmarksList.size > 0) {
+        (0, _mainViewJs.initParentTags)();
+        console.log((0, _mainViewJs.parentTags).btnNavBookmarkList);
+        console.log(data.bookmarksList);
+        console.log(this);
+        if (data.bookmarksList.length > 0) {
             (0, _mainViewJs.parentTags).btnNavBookmarkList.innerHTML = "";
-            for (let bookmark of data.bookmarksList.values()){
+            console.log(this);
+            for (let bookmark of data.bookmarksList){
                 console.log(bookmark);
+                console.log(this);
                 this.insertBookmarks(bookmark);
             }
             document.querySelectorAll(".preview__link").forEach((el)=>el.addEventListener("click", function(event) {
@@ -3905,13 +3926,25 @@ class bookmarkView {
                     recipeRenderFunction(event);
                 }));
         }
-        if (data.bookmarksList.size === 0) this.insertSmileMessage((0, _mainViewJs.parentTags).btnNavBookmarkList);
+        if (data.bookmarksList.length === 0) this.insertSmileMessage(this._message, (0, _mainViewJs.parentTags).btnNavBookmarkList);
         (0, _mainViewJs.initParentTags)();
     }
     recipeBookmarkedCheck(data) {
-        console.log("bookmark entries " + data.bookmarksList.size);
-        // check if recipe present in Set or not
-        return data.bookmarksList.has(data.currentRecipe);
+        console.log("bookmark entries " + data.bookmarksList.length);
+        // const arrBArray.from(data.bookmarksList));
+        // check if recipe present or not
+        if (data.bookmarksList.length > 0) {
+            for (let bmk of data.bookmarksList)if (bmk.recpId === data.currentRecipe.recpId) {
+                console.log("recipe match true");
+                return true;
+            } else {
+                console.log("recipe match false");
+                return false;
+            }
+        } else {
+            console.log("recipe length false");
+            return false;
+        }
     }
     renderRecipeBookmarkIcon(data) {
         const htmlBookmarkFill = `<svg class="">
@@ -3928,10 +3961,14 @@ class bookmarkView {
     }
     removeBookmarkRecipe(data) {
         // remove item from Set
-        data.bookmarksList.delete(data.currentRecipe);
+        let n = 0;
+        data.bookmarksList.forEach((bmk)=>{
+            if (data.currentRecipe.recpId === bmk.recpId) data.bookmarksList.splice(n, 1);
+            n += 1;
+        });
         console.log(data.bookmarksList);
     }
-    btnClickListener(data, resultsRecipeSelection) {
+    btnClickListener(data, resultsRecipeSelection, backupData) {
         const self = this;
         (0, _mainViewJs.parentTags).btnBookmark.addEventListener("click", function() {
             const iconType = (0, _mainViewJs.parentTags).btnBookmark.firstElementChild.firstElementChild.getAttribute("href").slice(55);
@@ -3939,13 +3976,16 @@ class bookmarkView {
                 self.removeBookmarkRecipe(data);
                 self.renderRecipeBookmarkIcon(data);
                 self.renderBookmarkList(data, resultsRecipeSelection);
+                backupData(data);
                 console.log("remove bookmark triggered");
                 return;
             }
-            data.bookmarksList.add(data.currentRecipe);
-            // console.log(data.bookmarksList);
+            // console.log(data.currentRecipe);
+            data.bookmarksList.push(data.currentRecipe);
+            console.log(data.bookmarksList);
             self.renderRecipeBookmarkIcon(data);
             self.renderBookmarkList(data, resultsRecipeSelection);
+            backupData(data);
             console.log("add bookmark triggered");
             return;
         });
